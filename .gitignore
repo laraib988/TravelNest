@@ -1,0 +1,26 @@
+# Node dependencies
+node_modules/
+.pnpm-store
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# NestJS build output
+backend/dist/
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS & IDE metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

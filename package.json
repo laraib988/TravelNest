@@ -1,0 +1,12 @@
+{
+  "name": "travelnest-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TravelNest OTA Marketplace Monorepo Root",
+  "scripts": {
+    "start:backend": "cd backend && npm run start",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build"
+  }
+}
