@@ -24,7 +24,7 @@ export interface AIItineraryResponse {
 export class AIPlannerService {
   constructor(private readonly vectorSearchService: VectorSearchService) {}
 
-  // SRS 9.1: AI Trip Planner (Conversational Itinerary Builder)
+  // 1. SRS 9.1: AI Trip Planner (Conversational Itinerary Builder)
   public generateItinerary(promptText: string, targetDestination = 'bali', maxBudget = 250): AIItineraryResponse {
     const query = promptText.toLowerCase();
     const dest = dbStore.destinations.find((d) => d.slug === targetDestination || query.includes(d.slug)) || dbStore.destinations[0];
@@ -83,7 +83,12 @@ export class AIPlannerService {
     };
   }
 
-  // SRS 9.3: AI Review Intelligence Summarization
+  // 2. SRS 9.2: AI Semantic / Natural-Language Vector Search
+  public semanticSearch(query: string, destination?: string) {
+    return this.vectorSearchService.hybridSearch(query, destination);
+  }
+
+  // 3. SRS 9.3: AI Review Intelligence Summarization
   public getReviewSummary(listingId: string) {
     const listing = dbStore.listings.find((l) => l.id === listingId || l.slug === listingId);
     if (!listing) return { pros: [], cons: [], sentiment_score: 0.90 };
@@ -94,7 +99,21 @@ export class AIPlannerService {
     };
   }
 
-  // SRS 9.5: AI Dynamic Pricing Advisor for Suppliers
+  // 4. SRS 9.4: AI Fake Review & Fraud Detection
+  public checkReviewFraud(reviewText: string, rating: number) {
+    const lower = reviewText.toLowerCase();
+    let fraudScore = 0.05;
+    if (lower.includes('awesome awesome') || lower.includes('best best best')) fraudScore = 0.92;
+    if (reviewText.length < 10 && rating === 5) fraudScore = 0.65;
+    return {
+      review_text: reviewText,
+      ai_fraud_score: fraudScore,
+      flagged_for_admin: fraudScore > 0.50,
+      reason: fraudScore > 0.50 ? 'Repetitive spam phrasing or suspicious rating density' : 'Genuine review pattern',
+    };
+  }
+
+  // 5. SRS 9.5: AI Dynamic Pricing Advisor for Suppliers
   public getDynamicPricingRecommendation(listingId: string) {
     const listing = dbStore.listings.find((l) => l.id === listingId || l.slug === listingId);
     if (!listing) return null;
@@ -105,7 +124,100 @@ export class AIPlannerService {
     };
   }
 
-  // SRS 9.14: "Ask AI About This Place" Contextual Q&A
+  // 6. SRS 9.6: 24/7 AI Concierge Chatbot
+  public conciergeChat(message: string, userLocale = 'en') {
+    const m = message.toLowerCase();
+    if (m.includes('cancel') || m.includes('refund')) {
+      return { response: 'Free cancellation is available up to 24 hours before your scheduled activity start time. Refunds are processed automatically within 2 business days.', confidence: 0.98 };
+    }
+    if (m.includes('weather') || m.includes('rain')) {
+      return { response: 'Most outdoor cruises & tours operate rain or shine. In case of extreme severe weather, your supplier will reschedule or offer a 100% refund.', confidence: 0.95 };
+    }
+    if (m.includes('voucher') || m.includes('qr')) {
+      return { response: 'Your electronic QR voucher is instantly available under My Bookings after payment completion and sent via email.', confidence: 0.99 };
+    }
+    return { response: 'Welcome to TravelNest AI Concierge! I can assist with booking status, cancellation policies, and local activity recommendations.', confidence: 0.90 };
+  }
+
+  // 7. SRS 9.7: AI Personalization Engine
+  public getPersonalizedRecommendations(userId?: string) {
+    return {
+      personalized_rail_title: 'Recommended For You Based on Your Travel Preferences',
+      listings: dbStore.listings.slice(0, 3),
+    };
+  }
+
+  // 8. SRS 9.8: AI Photo & Media Intelligence
+  public analyzePhotoQuality(photoUrl: string) {
+    return {
+      photo_url: photoUrl,
+      blur_score: 0.02,
+      watermark_detected: false,
+      duplicate_stock_detected: false,
+      quality_score: 96,
+      status: 'APPROVED',
+    };
+  }
+
+  // 10. SRS 9.10: AI SEO Content Assistant (Strapi Editor Integration)
+  public getSEOAssistantSuggestions(articleTitle: string, articleBody: string) {
+    return {
+      suggested_meta_title: `${articleTitle} | TravelNest Official Destination Guide 2026`,
+      suggested_meta_description: `Discover top attractions, local food hidden gems, and bookable tour slots in ${articleTitle}. Verified guide reviews included.`,
+      focus_keywords: ['travel guide 2026', 'best food tours', 'things to do'],
+      internal_link_suggestions: [
+        { title: 'Luxury Bali Sunset Catamaran Cruise', slug: 'luxury-bali-sunset-catamaran-cruise' },
+        { title: 'Shinjuku After-Dark Ramen Walk', slug: 'shinjuku-after-dark-food-tour' }
+      ],
+      readability_score: 94,
+    };
+  }
+
+  // 11. SRS 9.11: Predictive Demand Forecasting
+  public getDemandForecast(supplierId: string) {
+    return {
+      supplier_id: supplierId,
+      forecast_window_days: 30,
+      predicted_demand_level: 'HIGH_SURGE',
+      predicted_occupancy_rate: 0.88,
+      recommended_staff_count: 4,
+      trend: [
+        { date: '2026-08-10', demand_index: 82 },
+        { date: '2026-08-15', demand_index: 94 },
+        { date: '2026-08-20', demand_index: 88 },
+      ],
+    };
+  }
+
+  // 12. SRS 9.12: AI Auto Translation
+  public translateText(text: string, targetLanguage: string) {
+    return {
+      original_text: text,
+      target_language: targetLanguage,
+      translated_text: `[Translated to ${targetLanguage.toUpperCase()}]: ${text}`,
+      disclosure: 'Machine translated by TravelNest AI Engine',
+    };
+  }
+
+  // 13. SRS 9.13: Sentiment-Based Support Triage
+  public triageSupportTicket(ticketSubject: string, message: string) {
+    const text = (ticketSubject + ' ' + message).toLowerCase();
+    let priority = 'NORMAL';
+    let sentimentScore = -0.2;
+
+    if (text.includes('angry') || text.includes('fraud') || text.includes('today') || text.includes('urgent refund')) {
+      priority = 'HIGH_URGENT';
+      sentimentScore = -0.92;
+    }
+
+    return {
+      priority,
+      sentiment_score: sentimentScore,
+      auto_assigned_queue: priority === 'HIGH_URGENT' ? 'Urgent Refund Escalation' : 'General Inquiries',
+    };
+  }
+
+  // 14. SRS 9.14: "Ask AI About This Place" Contextual Q&A
   public answerContextualQuestion(listingId: string, question: string) {
     const listing = dbStore.listings.find((l) => l.id === listingId || l.slug === listingId);
     const q = question.toLowerCase();

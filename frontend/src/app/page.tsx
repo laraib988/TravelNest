@@ -2,10 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Sparkles, MapPin, Star, Clock, ShieldCheck, ArrowRight, Heart, Zap, CheckCircle2, RefreshCw } from 'lucide-react';
+import {
+  Search,
+  Sparkles,
+  MapPin,
+  Star,
+  Clock,
+  ShieldCheck,
+  ArrowRight,
+  Heart,
+  SlidersHorizontal,
+  Check,
+  Shield,
+  Zap,
+  DollarSign,
+  Headphones,
+  Compass,
+  ArrowRightLeft,
+  ChevronDown,
+  ChevronUp,
+  Tag,
+  Users,
+  Award,
+  Lock,
+  Mail
+} from 'lucide-react';
 import { fetchFromAPI } from '@/lib/api-client';
+import { useCurrency } from '@/context/CurrencyContext';
+import SortFilterDropdown, { SortOption } from '@/components/SortFilterDropdown';
 
 export default function HomePage() {
+  const { formatPrice, currency, t } = useCurrency();
+
+  // STATE VARIABLES
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -15,6 +44,27 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
 
+  // ADVANCED FILTER & SORT STATES
+  const [sortBy, setSortBy] = useState<SortOption>('MOST_CLICKED');
+  const [maxPriceFilter, setMaxPriceFilter] = useState<number>(200);
+  const [onlyInstantConfirm, setOnlyInstantConfirm] = useState(false);
+  const [onlyFreeCancel, setOnlyFreeCancel] = useState(false);
+
+  // AI TRIP PLANNER FORM STATE
+  const [aiDest, setAiDest] = useState('bali');
+  const [aiDays, setAiDays] = useState('3');
+  const [aiBudget, setAiBudget] = useState('budget');
+  const [aiInterests, setAiInterests] = useState<string[]>(['nature']);
+  const [aiResult, setAiResult] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // FAQ ACCORDION STATE
+  const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({ 0: true });
+
+  // NEWSLETTER STATE
+  const [emailSub, setEmailSub] = useState('');
+  const [subSuccess, setSubSuccess] = useState(false);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -22,8 +72,8 @@ export default function HomePage() {
           fetchFromAPI('/listings'),
           fetchFromAPI('/listings/destinations'),
         ]);
-        setListings(listingsRes);
-        setDestinations(destsRes);
+        setListings(listingsRes || []);
+        setDestinations(destsRes || []);
       } catch (err) {
         console.error('Error fetching storefront data:', err);
       } finally {
@@ -39,7 +89,7 @@ export default function HomePage() {
       setActiveSearchTerm('');
       setLoading(true);
       const res = await fetchFromAPI('/listings');
-      setListings(res);
+      setListings(res || []);
       setLoading(false);
       return;
     }
@@ -47,10 +97,9 @@ export default function HomePage() {
     setSearching(true);
     try {
       const res = await fetchFromAPI(`/listings?search=${encodeURIComponent(searchQuery)}`);
-      setListings(res);
+      setListings(res || []);
       setActiveSearchTerm(searchQuery);
       
-      // Smooth scroll to listings section
       const elem = document.getElementById('experiences-section');
       if (elem) elem.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
@@ -60,14 +109,34 @@ export default function HomePage() {
     }
   };
 
+  const handlePillClick = async (city: string) => {
+    setSearchQuery(city);
+    setSearching(true);
+    try {
+      const res = await fetchFromAPI(`/listings?search=${encodeURIComponent(city)}`);
+      setListings(res || []);
+      setActiveSearchTerm(city);
+      const elem = document.getElementById('experiences-section');
+      if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      console.error('Pill search error:', err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
   const handleResetSearch = async () => {
     setSearchQuery('');
     setActiveSearchTerm('');
     setSelectedCategory('ALL');
+    setSortBy('MOST_CLICKED');
+    setMaxPriceFilter(200);
+    setOnlyInstantConfirm(false);
+    setOnlyFreeCancel(false);
     setLoading(true);
     try {
       const res = await fetchFromAPI('/listings');
-      setListings(res);
+      setListings(res || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -81,237 +150,442 @@ export default function HomePage() {
     setWishlist((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleAiPlanSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAiLoading(true);
+    setTimeout(() => {
+      setAiResult(`
+🗺️ **AI Generated Itinerary for ${aiDest.toUpperCase()} (${aiDays} Days)**
+💰 **Budget Class:** ${aiBudget.toUpperCase()}
+🎯 **Focus Areas:** ${aiInterests.join(', ')}
+
+✨ **Day 1: Arrival & Exploring Hidden Gems**
+   - Check-in to verified boutique stay.
+   - 🍜 Evening Guided Street Food tour (included in your custom passes).
+✨ **Day 2: Adventure & Nature Walk**
+   - 🌋 Sunrise panoramic mountain trekking.
+   - ⛵ Afternoon luxury boat cruise.
+✨ **Day 3: Art, Culture & Farewell**
+   - 🏛️ Skip-the-line museum entry with art historian.
+   - Private transport transfer to the airport.
+      `);
+      setAiLoading(false);
+    }, 1500);
+  };
+
+  const toggleFaq = (index: number) => {
+    setFaqOpen((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const toggleInterest = (interest: string) => {
+    setAiInterests((prev) =>
+      prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest]
+    );
+  };
+
   const quickFilterChips = [
-    { id: 'ALL', icon: '🌟', label: 'All Experiences' },
-    { id: 'Cruises', icon: '⛵', label: 'Water Sports & Cruises' },
-    { id: 'Food', icon: '🍜', label: 'Food & Dining' },
-    { id: 'Cultural', icon: '🏛️', label: 'Culture & History' },
-    { id: 'Tours', icon: '🚌', label: 'Tours & Day Trips' },
+    { id: 'ALL', label: t('cat_all') },
+    { id: 'Cruises', label: t('cat_cruises') },
+    { id: 'Food', label: t('cat_food') },
+    { id: 'Cultural', label: t('cat_cultural') },
+    { id: 'Tours', label: t('cat_tours') },
+    { id: 'Adventure', label: t('cat_adventure') },
   ];
 
-  const filteredListings = listings.filter((item) => {
-    if (selectedCategory === 'ALL') return true;
-    return item.category_name?.toLowerCase().includes(selectedCategory.toLowerCase()) || item.category_id === selectedCategory;
-  });
+  // APPLY FILTERS & SORT
+  const getFilteredListings = () => {
+    let result = [...listings];
+
+    if (selectedCategory !== 'ALL') {
+      result = result.filter((item) => {
+        const cat = item.category_name || '';
+        return cat.toLowerCase().indexOf(selectedCategory.toLowerCase()) !== -1;
+      });
+    }
+
+    if (maxPriceFilter < 200) {
+      result = result.filter((item) => item.base_price <= maxPriceFilter);
+    }
+
+    if (onlyInstantConfirm) {
+      result = result.filter((item) => item.confirmation_type === 'INSTANT');
+    }
+
+    if (onlyFreeCancel) {
+      result = result.filter((item) => item.cancellation_policy === 'FREE_24H');
+    }
+
+    if (sortBy === 'PRICE_LOW') {
+      result.sort((a, b) => a.base_price - b.base_price);
+    } else if (sortBy === 'PRICE_HIGH') {
+      result.sort((a, b) => b.base_price - a.base_price);
+    } else if (sortBy === 'MOST_CLICKED') {
+      result.sort((a, b) => b.cached_review_count - a.cached_review_count);
+    } else if (sortBy === 'DATE_NEW') {
+      result.sort((a, b) => b.id.localeCompare(a.id));
+    } else if (sortBy === 'DATE_OLD') {
+      result.sort((a, b) => a.id.localeCompare(b.id));
+    }
+
+    return result;
+  };
+
+  const filteredListings = getFilteredListings();
 
   return (
     <div style={{ paddingBottom: '60px', background: '#ffffff' }}>
       
-      {/* SLEEK, COMPACT & STYLISH HERO SECTION */}
+      {/* 1. HERO SECTION WITH SEARCH */}
       <section
         style={{
           position: 'relative',
-          padding: '40px 20px 32px',
-          textAlign: 'center',
-          background: 'linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%)',
-          borderBottom: '1px solid #f1f5f9',
-          marginBottom: '36px',
+          minHeight: '520px',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-start',
+          textAlign: 'left',
+          overflow: 'hidden',
         }}
       >
-        <div style={{ maxWidth: '850px', margin: '0 auto' }}>
-          
-          {/* COMPACT BADGE */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 14px',
-              borderRadius: 'var(--radius-pill)',
-              background: '#e0f2fe',
-              color: '#0369a1',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              marginBottom: '14px',
-              border: '1px solid #bae6fd',
-            }}
-          >
-            <Sparkles size={14} color="#0284c7" /> OTA 2.0 • Real-Time Inventory & AI Search
-          </div>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <img
+            src="/images/travelers_hero.jpg"
+            alt="Professional Travelers"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.55) 60%, rgba(15, 23, 42, 0.25) 100%)' }} />
+        </div>
 
-          {/* REFINED COMPACT HEADING */}
-          <h1
-            style={{
-              fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
-              lineHeight: 1.2,
-              marginBottom: '10px',
-              color: '#0f172a',
-              fontWeight: 800,
-            }}
-          >
-            Discover & Book Unforgettable <br />
-            <span className="gradient-text">Tours, Activities & Experiences</span>
-          </h1>
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '80px 32px 60px' }}>
+          <div style={{ maxWidth: '780px' }}>
+            <h1 style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)', lineHeight: 1.1, marginBottom: '16px', color: '#ffffff', fontWeight: 800, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+              {t('hero_title_1')}<br />
+              <span style={{ color: '#38bdf8' }}>{t('hero_title_2')}</span>
+            </h1>
 
-          {/* TRUST CHECKMARKS ROW */}
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '16px',
-              color: '#475569',
-              fontSize: '0.88rem',
-              fontWeight: 600,
-              marginBottom: '20px',
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>⚡ Instant Confirmation</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#059669' }}>✅ Verified Local Guides</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>🆓 Free Cancellation</span>
-          </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', color: '#ffffff', fontSize: '0.98rem', fontWeight: 600, marginBottom: '28px', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
+              <span>{t('instant_confirmation')}</span>
+              <span style={{ color: '#6ee7b7' }}>{t('verified_guides')}</span>
+              <span>{t('free_cancellation')}</span>
+            </div>
 
-          {/* SLEEK & COMPACT SEARCH BAR */}
-          <form
-            onSubmit={handleSearch}
-            style={{
-              borderRadius: 'var(--radius-pill)',
-              padding: '5px 5px 5px 18px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              maxWidth: '700px',
-              margin: '0 auto 20px',
-              background: '#ffffff',
-              boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
-              border: '1px solid #cbd5e1',
-            }}
-          >
-            <Search size={18} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
-            <input
-              type="text"
-              placeholder="Where to next? (e.g. 'Bali', 'Tokyo ramen', 'Sunset cruise', 'Lahore')"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                color: '#0f172a',
-                fontSize: '0.95rem',
-                outline: 'none',
-                fontFamily: 'inherit',
-                padding: '6px 0',
-              }}
-            />
-            <button
-              type="submit"
-              disabled={searching}
-              className="btn-primary"
-              style={{
-                padding: '10px 24px',
-                fontSize: '0.92rem',
-                borderRadius: 'var(--radius-pill)',
-                flexShrink: 0,
-              }}
-            >
-              {searching ? 'Searching...' : 'Explore Now'}
-            </button>
-          </form>
-
-          {/* QUICK FILTER CHIPS */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px' }}>
-            {quickFilterChips.map((chip) => (
-              <button
-                key={chip.id}
-                onClick={() => setSelectedCategory(chip.id)}
-                className={`chip-filter ${selectedCategory === chip.id ? 'active' : ''}`}
-                style={{
-                  fontSize: '0.82rem',
-                  padding: '6px 14px',
-                  borderRadius: 'var(--radius-pill)',
-                  border: selectedCategory === chip.id ? 'none' : '1px solid #e2e8f0',
-                  background: selectedCategory === chip.id ? 'var(--brand-gradient)' : '#ffffff',
-                  color: selectedCategory === chip.id ? '#ffffff' : '#334155',
-                }}
-              >
-                <span>{chip.icon}</span> {chip.label}
+            <form onSubmit={handleSearch} style={{ borderRadius: 'var(--radius-pill)', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '680px', background: '#ffffff', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)' }}>
+              <Search size={20} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
+              <input
+                type="text"
+                placeholder={t('search_placeholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ flex: 1, background: 'transparent', border: 'none', color: '#0f172a', fontSize: '1rem', outline: 'none' }}
+              />
+              <button type="submit" disabled={searching} className="btn-primary" style={{ padding: '12px 28px', borderRadius: 'var(--radius-pill)', flexShrink: 0 }}>
+                {searching ? 'Searching...' : t('explore_now')}
               </button>
-            ))}
+            </form>
           </div>
-
         </div>
       </section>
 
-      {/* FEATURED DESTINATIONS GRID */}
-      <section style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px' }}>
-          <div>
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '4px', color: '#0f172a' }}>Top Travel Destinations</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Auto-aggregated destination hubs with live slots and local guides</p>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-          {destinations.map((dest) => (
-            <Link key={dest.id} href={`/destinations/${dest.slug}`}>
-              <div className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', height: '200px', position: 'relative' }}>
-                <img src={dest.hero_image} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.8) 0%, rgba(15,23,42,0.05) 70%)' }} />
-                <div style={{ position: 'absolute', bottom: '16px', left: '16px' }}>
-                  <h3 style={{ fontSize: '1.35rem', color: '#ffffff', marginBottom: '2px' }}>{dest.name}</h3>
-                  <span style={{ fontSize: '0.8rem', color: '#38bdf8', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <MapPin size={13} /> {dest.popular_activities_count}+ Verified Experience Slots
-                  </span>
-                </div>
-              </div>
-            </Link>
+      {/* 2. CATEGORIES HORIZONTAL BAR */}
+      <section style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '16px 0', marginBottom: '40px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginRight: '8px', flexShrink: 0 }}>
+            Categories:
+          </span>
+          {quickFilterChips.map((chip) => (
+            <button
+              key={chip.id}
+              onClick={() => setSelectedCategory(chip.id)}
+              className={`chip-filter ${selectedCategory === chip.id ? 'active' : ''}`}
+              style={{
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                padding: '10px 22px',
+                borderRadius: 'var(--radius-pill)',
+                whiteSpace: 'nowrap',
+                border: selectedCategory === chip.id ? 'none' : '1px solid #cbd5e1',
+                background: selectedCategory === chip.id ? 'var(--brand-gradient)' : '#ffffff',
+                color: selectedCategory === chip.id ? '#ffffff' : '#0f172a',
+                cursor: 'pointer',
+              }}
+            >
+              {chip.label}
+            </button>
           ))}
         </div>
       </section>
 
-      {/* AI PLANNER BANNER */}
-      <section style={{ maxWidth: '1280px', margin: '50px auto', padding: '0 24px' }}>
-        <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '36px 32px', background: 'linear-gradient(135deg, rgba(2,132,199,0.05) 0%, rgba(124,58,237,0.05) 100%)', border: '1px solid #bae6fd', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-          <div style={{ maxWidth: '600px' }}>
-            <div className="badge-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-              <Zap size={13} /> AI-Powered Travel Matching
-            </div>
-            <h2 style={{ fontSize: '2rem', marginBottom: '10px', color: '#0f172a' }}>AI Trip Planner Studio</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-              Type your ideal vacation in natural language. Our AI instantly matches available marketplace slots, structures a day-by-day itinerary, and enables one-click cart checkout.
-            </p>
+      {/* 3. TRENDING DESTINATIONS SECTION */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>🌍 {t('top_destinations')}</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{t('top_destinations_sub')}</p>
           </div>
-          <Link href="/ai-planner" className="btn-primary" style={{ padding: '14px 28px', fontSize: '0.95rem' }}>
-            <Sparkles size={18} /> Open AI Planner Studio <ArrowRight size={18} />
-          </Link>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+          {(() => {
+            const defaults = ['bali', 'tokyo', 'paris', 'lahore'];
+            const filteredDests = activeSearchTerm.trim()
+              ? destinations.filter((d) => d.name.toLowerCase().includes(activeSearchTerm.toLowerCase()) || d.country.toLowerCase().includes(activeSearchTerm.toLowerCase()))
+              : destinations.filter((d) => defaults.includes(d.slug));
+            return filteredDests.map((dest) => (
+              <Link key={dest.id} href={`/destinations/${dest.slug}`}>
+                <div className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', height: '220px', position: 'relative' }}>
+                  <img src={dest.hero_image} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.05) 70%)' }} />
+                  <div style={{ position: 'absolute', bottom: '18px', left: '18px' }}>
+                    <h3 style={{ fontSize: '1.4rem', color: '#ffffff', marginBottom: '4px', fontWeight: 800 }}>{dest.name}</h3>
+                    <span style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <MapPin size={13} /> {dest.popular_activities_count}+ {t('verified_slots')}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ));
+          })()}
         </div>
       </section>
 
-      {/* FEATURED EXPERIENCE LISTINGS GRID */}
-      <section id="experiences-section" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+      {/* 4. AI TRIP PLANNER DYNAMIC HERO FEATURE */}
+      <section style={{ background: '#f0f9ff', padding: '60px 0', borderTop: '1px solid #e0f2fe', borderBottom: '1px solid #e0f2fe', marginBottom: '60px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px', alignItems: 'center' }}>
+          
+          {/* PLANNER FORM */}
           <div>
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '4px', color: '#0f172a' }}>Top-Rated Marketplace Experiences</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Guaranteed real-time availability with 15-minute slot lock protection</p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0f2fe', color: '#0369a1', padding: '6px 14px', borderRadius: 'var(--radius-pill)', fontSize: '0.82rem', fontWeight: 700, marginBottom: '14px' }}>
+              <Sparkles size={14} /> AI ENGINE 2.0
+            </div>
+            <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>
+              Plan Your Custom Dream Trip in Seconds
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '28px' }}>
+              Enter your duration, budget, and select personal interests. Our AI will instantly map out a secure local itinerary.
+            </p>
+
+            <form onSubmit={handleAiPlanSubmit} style={{ background: '#ffffff', padding: '24px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Destination</label>
+                <select value={aiDest} onChange={(e) => setAiDest(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
+                  <option value="bali">Bali, Indonesia</option>
+                  <option value="tokyo">Tokyo, Japan</option>
+                  <option value="paris">Paris, France</option>
+                  <option value="lahore">Lahore, Pakistan</option>
+                  <option value="dubai">Dubai, UAE</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Days</label>
+                  <select value={aiDays} onChange={(e) => setAiDays(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
+                    <option value="1">1 Day</option>
+                    <option value="3">3 Days</option>
+                    <option value="5">5 Days</option>
+                    <option value="7">7 Days</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Budget</label>
+                  <select value={aiBudget} onChange={(e) => setAiBudget(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
+                    <option value="budget">Value Budget</option>
+                    <option value="premium">Mid Premium</option>
+                    <option value="luxury">Luxury VIP</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Interests</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {['Nature 🌲', 'Food & Culinary 🍜', 'Museums & Art 🏛️', 'Adventure Sports 🌋', 'Sightseeing 🚌'].map((interest) => {
+                    const isSelected = aiInterests.includes(interest);
+                    return (
+                      <button
+                        key={interest}
+                        type="button"
+                        onClick={() => toggleInterest(interest)}
+                        style={{
+                          padding: '6px 12px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          borderRadius: 'var(--radius-pill)',
+                          border: isSelected ? 'none' : '1px solid #cbd5e1',
+                          background: isSelected ? 'var(--brand-primary)' : '#ffffff',
+                          color: isSelected ? '#ffffff' : '#475569',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {interest}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button type="submit" disabled={aiLoading} className="btn-primary" style={{ padding: '12px', fontSize: '0.95rem', borderRadius: 'var(--radius-pill)', justifyContent: 'center' }}>
+                {aiLoading ? 'AI Planning in Progress...' : 'Generate AI Plan'}
+              </button>
+            </form>
           </div>
 
-          {activeSearchTerm && (
-            <button
-              onClick={handleResetSearch}
-              className="btn-secondary"
-              style={{ padding: '6px 14px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <RefreshCw size={14} /> Clear Search ("{activeSearchTerm}")
-            </button>
-          )}
+          {/* PLANNER OUTPUT BOARD */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ background: '#ffffff', borderRadius: 'var(--radius-md)', padding: '28px', border: '1px solid #e0f2fe', boxShadow: 'var(--shadow-lg)', minHeight: '340px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              {aiResult ? (
+                <div style={{ whiteSpace: 'pre-line', color: 'var(--text-primary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+                  {aiResult}
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <Sparkles size={48} color="var(--brand-primary)" style={{ margin: '0 auto 16px', display: 'block' }} />
+                  <p style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>Your Interactive AI Plan Awaits</p>
+                  <p style={{ fontSize: '0.82rem', marginTop: '6px' }}>Submit the form to generate a dynamic bookable itinerary board</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 5. POPULAR THIS WEEK */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <div style={{ marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>🔥 Popular This Week</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Most booked verified experiences globally</p>
         </div>
 
-        {activeSearchTerm && (
-          <div style={{ padding: '12px 18px', background: '#f0f9ff', border: '1px solid #7dd3fc', borderRadius: 'var(--radius-md)', marginBottom: '24px', fontSize: '0.9rem', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>🔍 Showing <strong>{filteredListings.length}</strong> Vector AI matched experience(s) for <strong>"{activeSearchTerm}"</strong></span>
-            <button onClick={handleResetSearch} style={{ background: 'none', border: 'none', color: '#0284c7', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}>Show All</button>
-          </div>
-        )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          {listings.slice(0, 3).map((item) => (
+            <div key={item.id} className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ height: '200px', position: 'relative' }}>
+                <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
+                  Likely to Sell Out
+                </div>
+              </div>
+              <div style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                  <Star size={14} color="#d97706" fill="#d97706" />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{item.cached_rating_avg}</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '14px' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From {formatPrice(item.base_price)}</span>
+                  <Link href={`/tours/${item.slug}`} className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>
+                    Book Slots
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
+      {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+          Why Choose TravelNest
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
+          We guarantee safety, speed, and premium support for travelers worldwide
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Shield size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>100% KYC Verified Suppliers</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Every operator undergoes mandatory government trade license, tourism permit, and marine liability insurance checks.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Zap size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Instant QR E-Vouchers</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              No manual waiting times. Receive your booking vouchers and check-in QR codes instantly to skip queue lines.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <DollarSign size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Best Price Guarantee</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Found the same experience cheaper? We'll match the price or refund the difference instantly, 0 hidden fees.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Headphones size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>24/7 AI Concierge</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Access our smart AI trip planner and multilingual customer support for instant modifications on the go.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. HOW IT WORKS */}
+      <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+            🧭 How TravelNest Works
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
+            Book premium local experiences in 4 simple steps
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>1</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Choose Experience</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Explore 5,000+ verified sightseeing tours, food walks, and cruises.</p>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>2</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Customize with AI</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Let our AI engine build your customized destination itinerary instantly.</p>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>3</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Secure QR Booking</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Lock slots securely. Receive printable QR e-vouchers instantly.</p>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>4</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Present & Enjoy</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Show voucher QR to verified local operators at arrival and explore.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. EXPLORE OUR TOURS MAIN SECTION */}
+      <section id="experiences-section" style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        
+        {/* HEADER BAR WITH TITLE & EXACT SORT DROPDOWN */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+            Explore our tours
+          </h2>
+          <SortFilterDropdown currentSort={sortBy} onSortChange={setSortBy} />
+        </div>
+
+        {/* RESULTS GRID */}
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading experiences from NestJS API...</div>
         ) : filteredListings.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', background: '#f8fafc', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ fontSize: '1.2rem', color: '#0f172a', marginBottom: '8px' }}>No direct match found for "{activeSearchTerm}"</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '16px' }}>Try searching for 'Bali', 'Tokyo', 'Louvre', 'Lahore', or select a category above.</p>
-            <button onClick={handleResetSearch} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.9rem' }}>Reset Search Filters</button>
+            <h3 style={{ fontSize: '1.2rem', color: '#0f172a', marginBottom: '8px' }}>No experience matches your active filters</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '16px' }}>Try resetting price filters or selecting 'All Experiences'.</p>
+            <button onClick={handleResetSearch} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.9rem' }}>{t('reset_filters')}</button>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
@@ -322,7 +596,6 @@ export default function HomePage() {
                 <div style={{ height: '210px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   
-                  {/* WISHLIST BUTTON */}
                   <button
                     onClick={(e) => toggleWishlist(item.id, e)}
                     style={{
@@ -344,7 +617,6 @@ export default function HomePage() {
                     <Heart size={16} color={wishlist[item.id] ? '#f43f5e' : '#64748b'} fill={wishlist[item.id] ? '#f43f5e' : 'none'} />
                   </button>
 
-                  {/* RATING BADGE */}
                   <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', padding: '3px 8px', borderRadius: 'var(--radius-pill)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#0f172a', fontWeight: 700, boxShadow: 'var(--shadow-sm)' }}>
                     <Star size={13} color="#d97706" fill="#d97706" /> {item.cached_rating_avg} ({item.cached_review_count})
                   </div>
@@ -363,20 +635,20 @@ export default function HomePage() {
                     </p>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={13} /> {item.duration_minutes / 60} Hours</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={13} color="#059669" /> KYC Verified</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={13} /> {item.duration_minutes / 60} {t('hours')}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={13} color="#059669" /> {t('kyc_verified')}</span>
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px', borderTop: '1px solid var(--border-light)' }}>
                     <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>From</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('from')}</span>
                       <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                        ${item.base_price} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 400 }}>/ person</span>
+                        {formatPrice(item.base_price)} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 400 }}>{t('per_person')}</span>
                       </div>
                     </div>
                     <Link href={`/tours/${item.slug}`} className="btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                      View Slots
+                      {t('view_slots')}
                     </Link>
                   </div>
                 </div>
@@ -387,53 +659,280 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* VERIFIED CUSTOMER TESTIMONIALS */}
-      <section style={{ maxWidth: '1280px', margin: '60px auto 0', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div className="badge-emerald" style={{ display: 'inline-flex', marginBottom: '8px' }}>
-            Verified Traveler Reviews
-          </div>
-          <h2 style={{ fontSize: '1.8rem', color: '#0f172a' }}>Loved by 50,000+ Travelers Worldwide</h2>
+      {/* 9. TOP RATED SUPPLIERS */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>🛡️ Verified Top Rated Operators</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>100% KYC checked global partners</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-          <div className="card-panel" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
-              {[...Array(5)].map((_, i) => <Star key={i} size={15} color="#d97706" fill="#d97706" />)}
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '14px', lineHeight: 1.5 }}>
-              "The Bali sunset catamaran cruise was the highlight of our vacation! Locking the seats in real-time with zero hassle gave us complete peace of mind."
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--brand-gradient)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>
-                SC
-              </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+          <div className="card-panel" style={{ padding: '24px', borderRadius: 'var(--radius-md)', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>OH</div>
               <div>
-                <h5 style={{ fontSize: '0.9rem', color: '#0f172a' }}>Sarah Connor</h5>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Verified Booking • Bali Tour</span>
+                <h3 style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 700 }}>Oceanic Horizon Ltd</h3>
+                <span style={{ fontSize: '0.78rem', color: 'var(--brand-emerald)', fontWeight: 600 }}>Active Partner since 2022</span>
               </div>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>Accredited Bali ocean catamaran operator. 100% safety record with standard marine liability insurance.</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+              <span>⭐ 4.92 Rating</span>
+              <span>Response SLA: &lt; 2 hours</span>
             </div>
           </div>
 
-          <div className="card-panel" style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
-              {[...Array(5)].map((_, i) => <Star key={i} size={15} color="#d97706" fill="#d97706" />)}
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '14px', lineHeight: 1.5 }}>
-              "The AI Trip Planner created our 2-day Shinjuku foodie itinerary in 10 seconds. We tasted authentic Wagyu & sake at hidden izakayas."
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #059669, #10b981)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>
-                MK
-              </div>
+          <div className="card-panel" style={{ padding: '24px', borderRadius: 'var(--radius-md)', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>TC</div>
               <div>
-                <h5 style={{ fontSize: '0.9rem', color: '#0f172a' }}>Michael Tanaka</h5>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Verified Booking • Tokyo Tour</span>
+                <h3 style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 700 }}>Tokyo Culinary Group</h3>
+                <span style={{ fontSize: '0.78rem', color: 'var(--brand-emerald)', fontWeight: 600 }}>Active Partner since 2023</span>
               </div>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>Bilingual culinary walk operator certified by Tokyo Culinary Guild. Offers local historical guides.</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+              <span>⭐ 4.96 Rating</span>
+              <span>Response SLA: Instant</span>
+            </div>
+          </div>
+
+          <div className="card-panel" style={{ padding: '24px', borderRadius: 'var(--radius-md)', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>LH</div>
+              <div>
+                <h3 style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 700 }}>Lahore Heritage Society</h3>
+                <span style={{ fontSize: '0.78rem', color: 'var(--brand-emerald)', fontWeight: 600 }}>Active Partner since 2025</span>
+              </div>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>Walled city walk guild with certified historian storytellers mapping badshahi mosque nightly tours.</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+              <span>⭐ 4.95 Rating</span>
+              <span>Response SLA: &lt; 24 hours</span>
             </div>
           </div>
         </div>
       </section>
+
+      {/* 10. CUSTOMER REVIEWS TESTIMONIALS */}
+      <section style={{ background: '#f0fdf4', padding: '60px 0', borderTop: '1px solid #dcfce7', borderBottom: '1px solid #dcfce7', marginBottom: '60px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+            💬 Verified Customer Reviews
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
+            What our global community of 50,000+ travelers say
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+            <div style={{ background: '#ffffff', padding: '28px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+              </div>
+              <h3 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>"Incredible night walk"</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
+                The Tokyo Ramen & Izakaya tour was worth every cent. Our art historian guide brought golden gai alleys to life. Saved us hours of standing in queues!
+              </p>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>— Ali K. (Verified Booking)</span>
+            </div>
+
+            <div style={{ background: '#ffffff', padding: '28px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+              </div>
+              <h3 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>"Instant booking check-in"</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
+                Louvre skip-the-line pass worked like charm. Secured the timed ticket on my mobile phone and entry voucher QR code was generated instantly. Amazing!
+              </p>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>— Sarah C. (Verified Booking)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 11. STATISTICS */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px', textAlign: 'center' }}>
+          <div>
+            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>500+</div>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Global Cities</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>20,000+</div>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Verified Experiences</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>1 Million+</div>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Happy Travelers</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>99.2%</div>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Satisified Customers</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 12. DYNAMIC FAQ ACCORDION */}
+      <section style={{ maxWidth: '800px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+          Frequently Asked Questions
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
+          Everything you need to know about TravelNest bookings & verification
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {[
+            { q: 'How do I access my booking QR voucher?', a: 'Once payment is confirmed securely, an email confirmation is sent. You can also view your active check-in QR codes under the "My Bookings" tab in your header menu.' },
+            { q: 'Can I cancel my experience for a full refund?', a: 'Yes! Most of our activities offer free cancellation up to 24 hours before the scheduled experience start time. Check individual cards for validation.' },
+            { q: 'How are local tour operators verified?', a: 'We perform strict KYC document checks including trade license review, corporate tax registration check, and public liability insurance checks before supplier approval.' },
+            { q: 'How does the AI Trip Planner build my itinerary?', a: 'Our AI engine aggregates actual real-time availability slots, budget options, and interest parameters to generate a custom bookable trip board instantly.' }
+          ].map((faq, index) => {
+            const isOpen = faqOpen[index];
+            return (
+              <div key={index} style={{ border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', background: '#ffffff', overflow: 'hidden' }}>
+                <button
+                  onClick={() => toggleFaq(index)}
+                  style={{
+                    width: '100%',
+                    padding: '18px 24px',
+                    textAlign: 'left',
+                    background: 'none',
+                    border: 'none',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    color: '#0f172a',
+                  }}
+                >
+                  <span>{faq.q}</span>
+                  {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                </button>
+                {isOpen && (
+                  <div style={{ padding: '0 24px 20px', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 13. NEWSLETTER */}
+      <section style={{ maxWidth: '1100px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <div style={{ background: 'var(--brand-gradient)', padding: '50px 30px', borderRadius: 'var(--radius-lg)', color: '#ffffff', textAlign: 'center', boxShadow: '0 12px 36px rgba(2, 132, 199, 0.25)' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '12px' }}>Unlock Secret Travel Deals</h2>
+          <p style={{ fontSize: '1rem', color: '#e0f2fe', marginBottom: '28px', maxWidth: '600px', margin: '0 auto 28px' }}>
+            Subscribe to our weekly dispatch and receive 15% discount code for your first verified experience booking!
+          </p>
+
+          {subSuccess ? (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.2)', padding: '10px 24px', borderRadius: 'var(--radius-pill)', fontWeight: 700 }}>
+              <Check size={18} /> Subscription confirmed! Check your inbox for code.
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (emailSub.trim()) setSubSuccess(true);
+              }}
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', maxWidth: '500px', margin: '0 auto' }}
+            >
+              <input
+                type="email"
+                required
+                placeholder="Enter your email address"
+                value={emailSub}
+                onChange={(e) => setEmailSub(e.target.value)}
+                style={{ flex: 1, minWidth: '240px', padding: '14px 20px', borderRadius: 'var(--radius-pill)', border: 'none', outline: 'none', color: '#0f172a', fontSize: '0.95rem' }}
+              />
+              <button type="submit" className="btn-secondary" style={{ padding: '14px 30px', borderRadius: 'var(--radius-pill)', color: '#0f172a', fontWeight: 700, border: 'none', background: '#ffffff', cursor: 'pointer' }}>
+                Subscribe Now
+              </button>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* 14. TRUST BADGES STRIP */}
+      <section style={{ borderTop: '1px solid var(--border-light)', padding: '40px 0 20px', textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '6px 14px', borderRadius: 'var(--radius-pill)', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <Lock size={13} /> 256-Bit SSL Secure Gateway Checkout
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', filter: 'grayscale(100%)', opacity: 0.6, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-muted)' }}>
+          <span>💳 VISA</span>
+          <span>💳 Mastercard</span>
+          <span>💳 Apple Pay</span>
+          <span>💳 Google Pay</span>
+          <span>💳 Stripe Secure</span>
+        </div>
+      </section>
+
+      {/* 15. WHERE TO GO NEXT SECTION */}
+      <section style={{ maxWidth: '1280px', margin: '60px auto 40px', padding: '0 24px', borderTop: '1px solid #e2e8f0', paddingTop: '40px' }}>
+        <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>
+          Where to Go Next
+        </h2>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 16px' }}>
+          {[
+            'Calgary', 'Montréal', 'Toronto', 'Vancouver', 'Lyon', 'Marseille', 'Nice',
+            'Paris', 'Kyoto', 'Osaka', 'Tokyo', 'Al-Ula', 'Jeddah', 'Mecca', 'Riyadh',
+            'Birmingham', 'Liverpool', 'London', 'Manchester'
+          ].map((city, index) => (
+            <button
+              key={city}
+              onClick={() => handlePillClick(city)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'stretch',
+                borderRadius: '8px',
+                border: 'none',
+                padding: 0,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+                transition: 'transform 0.15s ease',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'none')}
+            >
+              <span
+                style={{
+                  background: 'var(--brand-primary)',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '8px 12px',
+                }}
+              >
+                {index + 1}
+              </span>
+              <span
+                style={{
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 16px',
+                }}
+              >
+                {city}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
     </div>
   );
 }

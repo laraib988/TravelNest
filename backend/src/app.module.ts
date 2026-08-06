@@ -11,6 +11,8 @@ import { PayoutsController } from './payouts/payouts.controller';
 import { PayoutEngineService } from './payouts/payout-engine.service';
 import { AIPlannerController } from './ai-planner/ai-planner.controller';
 import { AIPlannerService } from './ai-planner/ai-planner.service';
+import { AffiliateController } from './affiliate/affiliate.controller';
+import { AffiliateService } from './affiliate/affiliate.service';
 
 @Module({
   imports: [],
@@ -21,6 +23,7 @@ import { AIPlannerService } from './ai-planner/ai-planner.service';
     KYCController,
     PayoutsController,
     AIPlannerController,
+    AffiliateController,
   ],
   providers: [
     VectorSearchService,
@@ -29,6 +32,7 @@ import { AIPlannerService } from './ai-planner/ai-planner.service';
     KYCService,
     PayoutEngineService,
     AIPlannerService,
+    AffiliateService,
   ],
 })
 export class AppModule {}

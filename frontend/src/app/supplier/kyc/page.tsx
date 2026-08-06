@@ -93,7 +93,7 @@ export default function KYCUploadPage() {
             className={`btn-secondary ${businessType === 'CORPORATE' ? 'active' : ''}`}
             style={{
               flex: 1,
-              justify: 'center',
+              justifyContent: 'center',
               padding: '14px 18px',
               background: businessType === 'CORPORATE' ? '#f0f9ff' : '#f8fafc',
               border: businessType === 'CORPORATE' ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
@@ -110,7 +110,7 @@ export default function KYCUploadPage() {
             className={`btn-secondary ${businessType === 'INDIVIDUAL_FREELANCER' ? 'active' : ''}`}
             style={{
               flex: 1,
-              justify: 'center',
+              justifyContent: 'center',
               padding: '14px 18px',
               background: businessType === 'INDIVIDUAL_FREELANCER' ? '#f0f9ff' : '#f8fafc',
               border: businessType === 'INDIVIDUAL_FREELANCER' ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',

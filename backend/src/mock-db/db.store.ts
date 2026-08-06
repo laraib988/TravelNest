@@ -22,7 +22,7 @@ export interface Category {
 
 export interface ListingOption {
   id: string;
-  name: string; // e.g., "Adult Ticket (12+ yrs)", "Child Ticket (3-11 yrs)", "VIP Pass + Hotel Transfer"
+  name: string;
   price: number;
   currency: string;
   age_group: 'ADULT' | 'CHILD' | 'SENIOR' | 'INFANT' | 'GROUP';
@@ -51,13 +51,13 @@ export interface Listing {
   cancellation_policy: 'FREE_24H' | 'NON_REFUNDABLE' | 'STRICT_7D';
   cached_rating_avg: number;
   cached_review_count: number;
-  merchandising_badges: string[]; // ['Likely to Sell Out', 'Bestseller', 'Travelers Choice 2026', 'Instant Voucher']
+  merchandising_badges: string[];
   images: Array<{ url: string; alt: string }>;
   inclusions: string[];
   exclusions: string[];
   know_before_you_go: string[];
   options: ListingOption[];
-  embedding: number[]; // 1536-dim vector representation
+  embedding: number[];
   ai_review_summary?: {
     pros: string[];
     cons: string[];
@@ -86,7 +86,7 @@ export interface BookingHold {
   slot_id: string;
   option_id: string;
   quantity: number;
-  expires_at: number; // Unix timestamp ms
+  expires_at: number;
 }
 
 export interface BookingRecord {
@@ -100,7 +100,7 @@ export interface BookingRecord {
   slot_start_time: string;
   total_travelers: number;
   gross_amount: number;
-  platform_fee: number; // 15% commission
+  platform_fee: number;
   supplier_payout: number;
   currency: string;
   status: 'PENDING_PAYMENT' | 'AWAITING_SUPPLIER_CONFIRMATION' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
@@ -228,6 +228,156 @@ class MockDatabaseStore {
       faq_schema: [
         { question: 'Is a local guide recommended for Walled City food street?', answer: 'Guided heritage walks include verified local storytellers who navigate historic gates and famous culinary spots.' }
       ]
+    },
+    {
+      id: 'dest-dubai',
+      name: 'Dubai, United Arab Emirates',
+      slug: 'dubai',
+      country: 'United Arab Emirates',
+      country_code: 'AE',
+      hero_image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80',
+      description: 'Ultra-modern desert hub boasting Burj Khalifa fast-track tickets, 4x4 dune bashing safaris, and luxury yacht cruises.',
+      popular_activities_count: 195,
+      latitude: 25.2048,
+      longitude: 55.2708,
+      faq_schema: [
+        { question: 'What is included in the Red Dune Desert Safari?', answer: 'Includes 4x4 dune bashing, camel riding, sandboarding, falconry photos, and a live BBQ buffet dinner with Tanoura dancing.' }
+      ]
+    },
+    {
+      id: 'dest-rome',
+      name: 'Rome, Italy',
+      slug: 'rome',
+      country: 'Italy',
+      country_code: 'IT',
+      hero_image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80',
+      description: 'Eternal City filled with ancient Colosseum arenas, Vatican Museums, and authentic Trastevere pasta-making classes.',
+      popular_activities_count: 175,
+      latitude: 41.9028,
+      longitude: 12.4964,
+      faq_schema: [
+        { question: 'Does Colosseum skip-the-line include access to the Arena Floor?', answer: 'VIP ticket options include exclusive access to the reconstructed Gladiator Arena Floor and Roman Forum.' }
+      ]
+    },
+    {
+      id: 'dest-new-york',
+      name: 'New York City, United States',
+      slug: 'new-york',
+      country: 'United States',
+      country_code: 'US',
+      hero_image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1200&q=80',
+      description: 'The city that never sleeps, featuring Broadway shows, Statue of Liberty ferries, and Summit One Vanderbilt observation decks.',
+      popular_activities_count: 240,
+      latitude: 40.7128,
+      longitude: -74.0060,
+      faq_schema: [
+        { question: 'Is Statue of Liberty pedestal access included?', answer: 'Priority ferry passes include Pedestal Access and admission to the Ellis Island Immigration Museum.' }
+      ]
+    },
+    {
+      id: 'dest-london',
+      name: 'London, United Kingdom',
+      slug: 'london',
+      country: 'United Kingdom',
+      country_code: 'GB',
+      hero_image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80',
+      description: 'Historic capital featuring London Eye fast-track passes, Tower of London crown jewels tours, and Thames sunset cruises.',
+      popular_activities_count: 215,
+      latitude: 51.5074,
+      longitude: -0.1278,
+      faq_schema: [
+        { question: 'How long is the Thames River sightseeing cruise?', answer: 'The hop-on hop-off Thames cruise is valid for 24 hours with commentary from accredited London captains.' }
+      ]
+    },
+    {
+      id: 'dest-istanbul',
+      name: 'Istanbul, Turkey',
+      slug: 'istanbul',
+      country: 'Turkey',
+      country_code: 'TR',
+      hero_image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1200&q=80',
+      description: 'Crossroads of Europe & Asia offering Bosphorus sunset cruises, Hagia Sophia guided walks, and Grand Bazaar food tours.',
+      popular_activities_count: 130,
+      latitude: 41.0082,
+      longitude: 28.9784,
+      faq_schema: [
+        { question: 'Is dinner included in the Bosphorus Sunset Cruise?', answer: 'Yes, the luxury yacht cruise includes a 3-course Anatolian dinner and live Turkish dervish cultural dance.' }
+      ]
+    },
+    {
+      id: 'dest-bangkok',
+      name: 'Bangkok, Thailand',
+      slug: 'bangkok',
+      country: 'Thailand',
+      country_code: 'TH',
+      hero_image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1200&q=80',
+      description: 'Vibrant capital known for Grand Palace golden spires, Damnoen Saduak floating markets, and Tuk-Tuk night foodie rides.',
+      popular_activities_count: 160,
+      latitude: 13.7563,
+      longitude: 100.5018,
+      faq_schema: [
+        { question: 'What is the departure time for the Floating Market tour?', answer: 'Morning tours depart at 07:00 AM with hotel pickup in air-conditioned minivans.' }
+      ]
+    },
+    {
+      id: 'dest-karachi',
+      name: 'Karachi, Pakistan',
+      slug: 'karachi',
+      country: 'Pakistan',
+      country_code: 'PK',
+      hero_image: 'https://images.unsplash.com/photo-1623091426425-412e68449c25?auto=format&fit=crop&w=1200&q=80',
+      description: 'City of Lights featuring Clifton Beach, Do Darya dining, and historic Mohatta Palace.',
+      popular_activities_count: 45,
+      latitude: 24.8607,
+      longitude: 67.0011,
+      faq_schema: [
+        { question: 'Is Do Darya dining safe?', answer: 'Yes, Do Darya is a famous secure seaside food street offering premium dining over the water.' }
+      ]
+    },
+    {
+      id: 'dest-islamabad',
+      name: 'Islamabad, Pakistan',
+      slug: 'islamabad',
+      country: 'Pakistan',
+      country_code: 'PK',
+      hero_image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80',
+      description: 'Beautiful capital city nestled in Margalla Hills featuring Faisal Mosque and Monal restaurant.',
+      popular_activities_count: 38,
+      latitude: 33.6844,
+      longitude: 73.0479,
+      faq_schema: [
+        { question: 'What is the best viewpoint in Islamabad?', answer: 'Daman-e-Koh and Pir Sohawa in the Margalla Hills offer panoramic views of the city.' }
+      ]
+    },
+    {
+      id: 'dest-hunza',
+      name: 'Hunza Valley, Pakistan',
+      slug: 'hunza',
+      country: 'Pakistan',
+      country_code: 'PK',
+      hero_image: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80',
+      description: 'Stunning mountain valley with Altit and Baltit forts, Attabad Lake, and views of Rakaposhi.',
+      popular_activities_count: 52,
+      latitude: 36.3167,
+      longitude: 74.6500,
+      faq_schema: [
+        { question: 'Is Attabad Lake open for boating?', answer: 'Yes, motorboating and jetskiing are available throughout the summer months.' }
+      ]
+    },
+    {
+      id: 'dest-skardu',
+      name: 'Skardu, Pakistan',
+      slug: 'skardu',
+      country: 'Pakistan',
+      country_code: 'PK',
+      hero_image: 'https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?auto=format&fit=crop&w=1200&q=80',
+      description: 'Gateway to Karakoram peaks featuring Shangrila Lake, Cold Desert of Katpana, and historic forts.',
+      popular_activities_count: 29,
+      latitude: 35.2971,
+      longitude: 75.6337,
+      faq_schema: [
+        { question: 'When is Skardu accessible?', answer: 'Skardu is accessible by road via Karakoram Highway or daily direct flights from Islamabad.' }
+      ]
     }
   ];
 
@@ -289,55 +439,55 @@ class MockDatabaseStore {
         reasoning: 'High demand detected for August weekend slots; 88% capacity reached.'
       }
     },
-    {
-      id: 'list-tokyo-food',
-      supplier_id: 'sup-tokyo-culinary',
-      destination_id: 'dest-tokyo',
-      category_id: 'cat-food',
-      category_name: 'Food & Culinary',
-      title: 'Shinjuku After-Dark Ramen, Yakitori & Izakaya Hidden Gems Tour',
-      slug: 'shinjuku-after-dark-food-tour',
-      summary: 'Explore Omoide Yokocho and Golden Gai with a local culinary historian. Taste award-winning ramen and A5 Wagyu skewers.',
-      description: 'Step into the neon-lit backalleys of Tokyo night life. Navigate the historic lantern-lit alleyways of Shinjuku with an expert local guide. Enjoy 4 authentic food stops featuring charcoal-grilled yakitori, artisanal sake pairings, and regional tonkotsu ramen.',
-      base_price: 115.00,
-      currency: 'USD',
-      duration_minutes: 180,
-      meeting_point: {
-        address: 'Shinjuku Station East Exit (Studio Alta Front), Tokyo, Japan',
-        latitude: 35.6917,
-        longitude: 139.7005
-      },
-      confirmation_type: 'INSTANT',
-      cancellation_policy: 'FREE_24H',
-      cached_rating_avg: 4.96,
-      cached_review_count: 842,
-      merchandising_badges: ['Bestseller', 'Travelers Choice 2026'],
-      images: [
-        { url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1000&q=80', alt: 'Shinjuku Neon Alleyways' },
-        { url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=1000&q=80', alt: 'Ramen Bowl' }
-      ],
-      inclusions: [
-        'Guided 3-Hour walking culinary tour',
-        'Food tastings at 4 authentic izakayas & ramen shops',
-        '3 complimentary sake & beer pairings',
-        'Small group size (Max 8 travelers)'
-      ],
-      exclusions: ['Hotel transfer', 'Additional drinks'],
-      know_before_you_go: [
-        'Tour involves approximately 2km of walking.',
-        'Must be 20+ years of age for alcoholic pairings.'
-      ],
-      options: [
-        { id: 'opt-201-adult', name: 'Standard Food & Sake Pass', price: 115.00, currency: 'USD', age_group: 'ADULT' },
-        { id: 'opt-201-nonalc', name: 'Non-Alcoholic Tasting Option', price: 95.00, currency: 'USD', age_group: 'ADULT' }
-      ],
-      embedding: [0.10, 0.95, 0.20, 0.88, 0.91, 0.15, 0.80, 0.40],
-      ai_review_summary: {
-        pros: ['Expert English-speaking guide', 'Authentic non-touristy izakayas', 'Delicious A5 Wagyu skewers'],
-        cons: ['Narrow alleys involve standing'],
-        sentiment_score: 0.98
-      }
-    },
+    // {
+    //   id: 'list-tokyo-food',
+    //   supplier_id: 'sup-tokyo-culinary',
+    //   destination_id: 'dest-tokyo',
+    //   category_id: 'cat-food',
+    //   category_name: 'Food & Culinary',
+    //   title: 'Shinjuku After-Dark Ramen, Yakitori & Izakaya Hidden Gems Tour',
+    //   slug: 'shinjuku-after-dark-food-tour',
+    //   summary: 'Explore Omoide Yokocho and Golden Gai with a local culinary historian. Taste award-winning ramen and A5 Wagyu skewers.',
+    //   description: 'Step into the neon-lit backalleys of Tokyo night life. Navigate the historic lantern-lit alleyways of Shinjuku with an expert local guide. Enjoy 4 authentic food stops featuring charcoal-grilled yakitori, artisanal sake pairings, and regional tonkotsu ramen.',
+    //   base_price: 115.00,
+    //   currency: 'USD',
+    //   duration_minutes: 180,
+    //   meeting_point: {
+    //     address: 'Shinjuku Station East Exit (Studio Alta Front), Tokyo, Japan',
+    //     latitude: 35.6917,
+    //     longitude: 139.7005
+    //   },
+    //   confirmation_type: 'INSTANT',
+    //   cancellation_policy: 'FREE_24H',
+    //   cached_rating_avg: 4.96,
+    //   cached_review_count: 842,
+    //   merchandising_badges: ['Bestseller', 'Travelers Choice 2026'],
+    //   images: [
+    //     { url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1000&q=80', alt: 'Shinjuku Neon Alleyways' },
+    //     { url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=1000&q=80', alt: 'Ramen Bowl' }
+    //   ],
+    //   inclusions: [
+    //     'Guided 3-Hour walking culinary tour',
+    //     'Food tastings at 4 authentic izakayas & ramen shops',
+    //     '3 complimentary sake & beer pairings',
+    //     'Small group size (Max 8 travelers)'
+    //   ],
+    //   exclusions: ['Hotel transfer', 'Additional drinks'],
+    //   know_before_you_go: [
+    //     'Tour involves approximately 2km of walking.',
+    //     'Must be 20+ years of age for alcoholic pairings.'
+    //   ],
+    //   options: [
+    //     { id: 'opt-201-adult', name: 'Standard Food & Sake Pass', price: 115.00, currency: 'USD', age_group: 'ADULT' },
+    //     { id: 'opt-201-nonalc', name: 'Non-Alcoholic Tasting Option', price: 95.00, currency: 'USD', age_group: 'ADULT' }
+    //   ],
+    //   embedding: [0.10, 0.95, 0.20, 0.88, 0.91, 0.15, 0.80, 0.40],
+    //   ai_review_summary: {
+    //     pros: ['Expert English-speaking guide', 'Authentic non-touristy izakayas', 'Delicious A5 Wagyu skewers'],
+    //     cons: ['Narrow alleys involve standing'],
+    //     sentiment_score: 0.98
+    //   }
+    // },
     {
       id: 'list-paris-louvre',
       supplier_id: 'sup-paris-culture',
@@ -432,6 +582,180 @@ class MockDatabaseStore {
         cons: ['Requires moderate walking through busy markets'],
         sentiment_score: 0.97
       }
+    },
+    {
+      id: 'list-dubai-desert-safari',
+      supplier_id: 'sup-dubai-safari',
+      destination_id: 'dest-dubai',
+      category_id: 'cat-adventure',
+      category_name: 'Adventure & Outdoor',
+      title: 'VIP Red Dune Desert Safari with 4x4 Dune Bashing, Camel Riding & BBQ Dinner',
+      slug: 'dubai-vip-red-dune-desert-safari',
+      summary: 'Experience thrilling Lahbab red dune bashing in a Land Cruiser, sunset sandboarding, falconry photos, and live Arabesque dance shows.',
+      description: 'Venture into the pristine Lahbab Red Dunes of Dubai. Experience adrenaline-pumping 4x4 dune bashing, capture sunset desert landscapes, ride camels, try sandboarding, and relax at an authentic Bedouin camp with a gourmet international live BBQ dinner.',
+      base_price: 65.00,
+      currency: 'USD',
+      duration_minutes: 360,
+      meeting_point: {
+        address: 'Hotel Pickup available from Dubai, Sharjah, and Ajman',
+        latitude: 25.2048,
+        longitude: 55.2708
+      },
+      confirmation_type: 'INSTANT',
+      cancellation_policy: 'FREE_24H',
+      cached_rating_avg: 4.94,
+      cached_review_count: 1890,
+      merchandising_badges: ['Bestseller', 'Instant Voucher', 'Travelers Choice 2026'],
+      images: [
+        { url: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1000&q=80', alt: 'Dubai Red Dune Safari' }
+      ],
+      inclusions: [
+        '4x4 Hotel Pickup & Drop-off in Toyota Land Cruiser',
+        '30-Min High Dune Bashing at Lahbab Desert',
+        'Sunset Sandboarding & Camel Riding',
+        'Gourmet BBQ Dinner with Vegetarian & Meat Options',
+        'Tanoura & Fire Show Live Entertainment'
+      ],
+      exclusions: ['Quad bike & Buggy rental (Optional add-on)'],
+      know_before_you_go: [
+        'Wear loose comfortable cotton clothes & sunglasses.',
+        'Not recommended for pregnant women or travelers with severe back injuries.'
+      ],
+      options: [
+        { id: 'opt-501-adult', name: 'Standard Red Dune Safari Pass', price: 65.00, currency: 'USD', age_group: 'ADULT' },
+        { id: 'opt-501-vip', name: 'VIP Table Service + Quad Bike Add-on', price: 110.00, currency: 'USD', age_group: 'ADULT' }
+      ],
+      embedding: [0.90, 0.30, 0.70, 0.40, 0.10, 0.85, 0.60, 0.90],
+      ai_review_summary: {
+        pros: ['Thrilling professional Land Cruiser dune driver', 'Great sunset photography spots', 'Delicious fresh BBQ skewers'],
+        cons: ['Bashing can be bumpy for young kids'],
+        sentiment_score: 0.97
+      }
+    },
+    {
+      id: 'list-rome-colosseum',
+      supplier_id: 'sup-rome-heritage',
+      destination_id: 'dest-rome',
+      category_id: 'cat-tickets',
+      category_name: 'Attraction Tickets',
+      title: 'Colosseum Gladiator Arena Floor & Roman Forum VIP Skip-the-Line Tour',
+      slug: 'colosseum-gladiator-arena-floor-tour',
+      summary: 'Walk through the Gladiator Gate onto the Arena Floor, then explore the Palatine Hill and ancient Roman Forum with an archaeologist.',
+      description: 'Enter the Colosseum through the exclusive Gladiator Entrance. Stand on the reconstructed Arena Floor where ancient combats took place. Your expert archaeologist guide will then bring the ruins of the Roman Forum and Palatine Hill to life.',
+      base_price: 85.00,
+      currency: 'USD',
+      duration_minutes: 180,
+      meeting_point: {
+        address: 'Piazza del Colosseo, 00184 Roma RM, Italy',
+        latitude: 41.8902,
+        longitude: 12.4922
+      },
+      confirmation_type: 'INSTANT',
+      cancellation_policy: 'FREE_24H',
+      cached_rating_avg: 4.91,
+      cached_review_count: 1650,
+      merchandising_badges: ['Likely to Sell Out', 'Bestseller'],
+      images: [
+        { url: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1000&q=80', alt: 'Colosseum Arena Rome' }
+      ],
+      inclusions: [
+        'Skip-the-line express access to Colosseum & Arena Floor',
+        'Full admission to Roman Forum & Palatine Hill',
+        'Expert licensed archaeologist guide',
+        'Headset for clear listening'
+      ],
+      exclusions: ['Underground Hypogeum access'],
+      know_before_you_go: [
+        'Full name & passport details required for security check.',
+        'No large bags, knives, or glass bottles allowed.'
+      ],
+      options: [
+        { id: 'opt-601-adult', name: 'Adult Arena Pass (18+ yrs)', price: 85.00, currency: 'USD', age_group: 'ADULT' },
+        { id: 'opt-601-youth', name: 'Youth Pass (under 18)', price: 55.00, currency: 'USD', age_group: 'CHILD' }
+      ],
+      embedding: [0.40, 0.50, 0.20, 0.30, 0.90, 0.85, 0.40, 0.60],
+      ai_review_summary: {
+        pros: ['Direct entrance via Gladiator Gate saved 2 hours', 'Engaging archaeologist guide'],
+        cons: ['Summer heat can be intense'],
+        sentiment_score: 0.96
+      }
+    },
+    {
+      id: 'list-karachi-tour',
+      supplier_id: 'sup-karachi-heritage',
+      destination_id: 'dest-karachi',
+      category_id: 'cat-tours',
+      category_name: 'Tours & Day Trips',
+      title: 'Karachi City of Lights Private Day Tour & Do Darya Seaside Dinner',
+      slug: 'karachi-city-of-lights-private-tour',
+      summary: 'Explore Mohatta Palace, Mazar-e-Quaid, Chaukhandi Tombs, and enjoy dinner at the famous Do Darya seaside.',
+      description: 'Discover the bustling metropolis of Karachi. Visit the founder monument Mazar-e-Quaid, explore structural architectural marvels like Mohatta Palace, and finish your evening dining on the water at Do Darya.',
+      base_price: 40.00,
+      currency: 'USD',
+      duration_minutes: 360,
+      meeting_point: {
+        address: 'Hotel pickup in Karachi, Pakistan',
+        latitude: 24.8607,
+        longitude: 67.0011
+      },
+      confirmation_type: 'INSTANT',
+      cancellation_policy: 'FREE_24H',
+      cached_rating_avg: 4.88,
+      cached_review_count: 142,
+      merchandising_badges: ['New', 'Bestseller'],
+      images: [
+        { url: 'https://images.unsplash.com/photo-1623091426425-412e68449c25?auto=format&fit=crop&w=1000&q=80', alt: 'Mazar e Quaid Karachi' }
+      ],
+      inclusions: [
+        'Private air-conditioned vehicle transport',
+        'Professional English-speaking guide',
+        'All monuments entry fees',
+        'Dinner at Do Darya Restaurant'
+      ],
+      exclusions: ['Gratuities'],
+      know_before_you_go: ['Bring comfortable walking shoes', 'Camera photography fees may apply at some historic sites.'],
+      options: [
+        { id: 'opt-khi-std', name: 'Standard Pass', price: 40.00, currency: 'USD', age_group: 'ADULT' }
+      ],
+      embedding: [0.45, 0.85, 0.30, 0.70, 0.75, 0.65, 0.45, 0.65]
+    },
+    {
+      id: 'list-islamabad-tour',
+      supplier_id: 'sup-islamabad-tours',
+      destination_id: 'dest-islamabad',
+      category_id: 'cat-tours',
+      category_name: 'Tours & Day Trips',
+      title: 'Islamabad Margalla Hills Hike & Faisal Mosque Guided Sightseeing Tour',
+      slug: 'islamabad-margalla-hills-faisal-mosque-tour',
+      summary: 'Guided walk through Trail 3, historic Faisal Mosque visit, and rooftop lunch overlooking the capital city.',
+      description: 'Explore the greenest capital of Pakistan. Take a guided light hike on Trail 3 of Margalla Hills, visit the magnificent Faisal Mosque, and dine with panoramic views of Rawal Lake at the Monal restaurant.',
+      base_price: 38.00,
+      currency: 'USD',
+      duration_minutes: 300,
+      meeting_point: {
+        address: 'Faisal Mosque Parking lot, Islamabad, Pakistan',
+        latitude: 33.7297,
+        longitude: 73.0372
+      },
+      confirmation_type: 'INSTANT',
+      cancellation_policy: 'FREE_24H',
+      cached_rating_avg: 4.93,
+      cached_review_count: 184,
+      merchandising_badges: ['Bestseller'],
+      images: [
+        { url: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1000&q=80', alt: 'Faisal Mosque Islamabad' }
+      ],
+      inclusions: [
+        'Local guide services',
+        'Private transport from assembly point',
+        'Traditional lunch in Margalla Hills'
+      ],
+      exclusions: ['Hiking gear'],
+      know_before_you_go: ['Modest clothing required for mosque entry', 'Keep a water bottle handy.'],
+      options: [
+        { id: 'opt-isb-std', name: 'Standard Pass', price: 38.00, currency: 'USD', age_group: 'ADULT' }
+      ],
+      embedding: [0.42, 0.82, 0.32, 0.72, 0.78, 0.62, 0.48, 0.68]
     }
   ];
 
@@ -440,7 +764,11 @@ class MockDatabaseStore {
     { id: 'slot-102', listing_id: 'list-bali-sunset', start_time: '2026-08-06T16:30:00Z', end_time: '2026-08-06T20:30:00Z', total_capacity: 20, booked_capacity: 18, held_capacity: 1 },
     { id: 'slot-201', listing_id: 'list-tokyo-food', start_time: '2026-08-05T18:00:00Z', end_time: '2026-08-05T21:00:00Z', total_capacity: 8, booked_capacity: 5, held_capacity: 0 },
     { id: 'slot-301', listing_id: 'list-paris-louvre', start_time: '2026-08-05T09:30:00Z', end_time: '2026-08-05T12:00:00Z', total_capacity: 15, booked_capacity: 10, held_capacity: 0 },
-    { id: 'slot-401', listing_id: 'list-lahore-walled-city', start_time: '2026-08-05T17:00:00Z', end_time: '2026-08-05T22:00:00Z', total_capacity: 12, booked_capacity: 4, held_capacity: 0 }
+    { id: 'slot-401', listing_id: 'list-lahore-walled-city', start_time: '2026-08-05T17:00:00Z', end_time: '2026-08-05T22:00:00Z', total_capacity: 12, booked_capacity: 4, held_capacity: 0 },
+    { id: 'slot-501', listing_id: 'list-dubai-desert-safari', start_time: '2026-08-05T15:00:00Z', end_time: '2026-08-05T21:00:00Z', total_capacity: 30, booked_capacity: 22, held_capacity: 1 },
+    { id: 'slot-601', listing_id: 'list-rome-colosseum', start_time: '2026-08-05T10:00:00Z', end_time: '2026-08-05T13:00:00Z', total_capacity: 25, booked_capacity: 19, held_capacity: 0 },
+    { id: 'slot-khi', listing_id: 'list-karachi-tour', start_time: '2026-08-05T11:00:00Z', end_time: '2026-08-05T17:00:00Z', total_capacity: 10, booked_capacity: 2, held_capacity: 0 },
+    { id: 'slot-isb', listing_id: 'list-islamabad-tour', start_time: '2026-08-05T10:00:00Z', end_time: '2026-08-05T15:00:00Z', total_capacity: 12, booked_capacity: 3, held_capacity: 0 }
   ];
 
   activeHolds: Map<string, BookingHold> = new Map();
