@@ -1,4 +1,12 @@
 import { Module } from '@nestjs/common';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { ReviewsController } from './reviews/reviews.controller';
+import { ReviewsService } from './reviews/reviews.service';
+import { PromotionsController } from './promotions/promotions.controller';
+import { PromotionsService } from './promotions/promotions.service';
+import { UsersController } from './users/users.controller';
+import { UsersService } from './users/users.service';
 import { ListingsController } from './listings/listings.controller';
 import { VectorSearchService } from './listings/vector-search.service';
 import { AvailabilityController } from './availability/availability.controller';
@@ -17,6 +25,10 @@ import { AffiliateService } from './affiliate/affiliate.service';
 @Module({
   imports: [],
   controllers: [
+    AuthController,
+    ReviewsController,
+    PromotionsController,
+    UsersController,
     ListingsController,
     AvailabilityController,
     BookingsController,
@@ -26,6 +38,10 @@ import { AffiliateService } from './affiliate/affiliate.service';
     AffiliateController,
   ],
   providers: [
+    AuthService,
+    ReviewsService,
+    PromotionsService,
+    UsersService,
     VectorSearchService,
     RedisLockService,
     BookingsService,

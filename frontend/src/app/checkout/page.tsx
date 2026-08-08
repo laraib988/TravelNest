@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
-import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, QrCode, Download, Smartphone } from 'lucide-react';
+import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, QrCode, Download, Smartphone, Tag } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -23,6 +23,37 @@ export default function CheckoutPage() {
     special_requirements: 'Seafood allergy; require vegetarian dinner option.',
     card_number: '4242 •••• •••• 4242',
   });
+
+  // SRS 3.4 / 3.8: Coupon / Promo Code State
+  const [couponCode, setCouponCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponMsg, setCouponMsg] = useState('');
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+
+  const handleApplyCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!couponCode.trim()) return;
+    setValidatingCoupon(true);
+    setCouponMsg('');
+    try {
+      const res = await fetchFromAPI('/promotions/coupons/validate', {
+        method: 'POST',
+        body: JSON.stringify({ code: couponCode, cart_total: 278.00 }),
+      });
+      if (res.valid) {
+        setDiscountAmount(res.discount_amount);
+        setAppliedCoupon(couponCode.toUpperCase());
+        setCouponMsg(`✓ Coupon applied! Saved $${res.discount_amount.toFixed(2)}`);
+      } else {
+        setCouponMsg(`❌ ${res.message || 'Invalid coupon code'}`);
+      }
+    } catch {
+      setCouponMsg('❌ Invalid or expired coupon code');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -226,14 +257,43 @@ export default function CheckoutPage() {
               <span>Subtotal</span>
               <span style={{ color: '#0f172a', fontWeight: 600 }}>$278.00 USD</span>
             </div>
+            {discountAmount > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#059669', fontWeight: 600 }}>
+                <span>Promo Discount ({appliedCoupon})</span>
+                <span>-${discountAmount.toFixed(2)} USD</span>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
               <span>Taxes & Environmental Fee</span>
               <span style={{ color: '#0f172a', fontWeight: 600 }}>$0.00 USD</span>
             </div>
           </div>
+
+          {/* SRS 3.4: PROMO CODE INPUT */}
+          <form onSubmit={handleApplyCoupon} style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>Promo / Coupon Code</label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <input
+                type="text"
+                placeholder="Try: WELCOME20, SUMMER15"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                style={{ flex: 1, padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', outline: 'none', textTransform: 'uppercase' }}
+              />
+              <button type="submit" disabled={validatingCoupon} className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.85rem' }}>
+                <Tag size={14} /> Apply
+              </button>
+            </div>
+            {couponMsg && (
+              <div style={{ fontSize: '0.78rem', marginTop: '6px', color: couponMsg.startsWith('✓') ? '#059669' : '#dc2626', fontWeight: 600 }}>
+                {couponMsg}
+              </div>
+            )}
+          </form>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
             <span>Total Payable</span>
-            <span>$278.00 USD</span>
+            <span>${(278.00 - discountAmount).toFixed(2)} USD</span>
           </div>
         </div>
       </div>

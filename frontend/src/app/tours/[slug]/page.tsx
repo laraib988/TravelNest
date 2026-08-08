@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
-import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle } from 'lucide-react';
+import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, Heart } from 'lucide-react';
 
 export default function TourDetailPage() {
   const params = useParams();
@@ -23,6 +23,15 @@ export default function TourDetailPage() {
   const [aiAnswer, setAiAnswer] = useState('');
   const [askingAi, setAskingAi] = useState(false);
 
+  // SRS 3.7: Reviews & Ratings State
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+
   useEffect(() => {
     async function loadTour() {
       try {
@@ -34,6 +43,11 @@ export default function TourDetailPage() {
         if (res.available_slots && res.available_slots.length > 0) {
           setSelectedSlot(res.available_slots[0]);
         }
+        // SRS 3.7: Fetch reviews for this listing
+        try {
+          const reviewsRes = await fetchFromAPI(`/reviews?listing_id=${res.id}`);
+          setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
+        } catch { setReviews([]); }
       } catch (err: any) {
         console.error('Error loading listing:', err);
       } finally {
@@ -42,6 +56,42 @@ export default function TourDetailPage() {
     }
     loadTour();
   }, [slug]);
+
+  // SRS 3.7: Submit Review Handler
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewComment.trim()) return;
+    setSubmittingReview(true);
+    try {
+      const newReview = await fetchFromAPI('/reviews', {
+        method: 'POST',
+        body: JSON.stringify({
+          listing_id: tour.id,
+          rating: reviewRating,
+          title: reviewTitle,
+          comment: reviewComment,
+          photos: [],
+        }),
+      });
+      setReviews((prev) => [newReview, ...prev]);
+      setShowReviewForm(false);
+      setReviewTitle('');
+      setReviewComment('');
+      setReviewRating(5);
+    } catch (err) {
+      console.error('Error submitting review:', err);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  // SRS 3.7: Helpful Vote Handler
+  const handleHelpful = async (reviewId: string) => {
+    try {
+      await fetchFromAPI(`/reviews/${reviewId}/helpful`, { method: 'POST' });
+      setReviews((prev) => prev.map((r) => r.id === reviewId ? { ...r, helpful_count: (r.helpful_count || 0) + 1 } : r));
+    } catch {}
+  };
 
   const handleAcquireHold = async () => {
     if (!selectedSlot || !selectedOption) return;
@@ -93,8 +143,32 @@ export default function TourDetailPage() {
   const remainingSeats = selectedSlot ? selectedSlot.total_capacity - (selectedSlot.booked_capacity + selectedSlot.held_capacity) : 0;
   const currentPrice = selectedOption ? selectedOption.price : tour.base_price;
 
+  // SRS 8.3: JSON-LD Structured Data (Product + AggregateRating + FAQ Schema)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: tour.title,
+    description: tour.description,
+    image: tour.images?.map((img: any) => img.url),
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: tour.cached_rating_avg,
+      reviewCount: tour.cached_review_count,
+    },
+    offers: {
+      '@type': 'Offer',
+      price: tour.base_price,
+      priceCurrency: tour.currency,
+      availability: 'https://schema.org/InStock',
+    },
+  };
+
   return (
     <div style={{ maxWidth: '1280px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* TITLE & MERCHANDISING BADGES */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
@@ -199,6 +273,136 @@ export default function TourDetailPage() {
                 <strong>🤖 AI Concierge Answer:</strong> {aiAnswer}
               </div>
             )}
+          </div>
+
+          {/* ═══════════ SRS 3.7: REVIEWS & RATINGS SECTION ═══════════ */}
+          <div style={{ marginTop: '40px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '1.6rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Star size={22} color="#d97706" fill="#d97706" /> Traveler Reviews
+                <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>({reviews.length})</span>
+              </h2>
+              <button
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="btn-primary"
+                style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+              >
+                <Send size={16} /> Write a Review
+              </button>
+            </div>
+
+            {/* RATING DISTRIBUTION HISTOGRAM */}
+            <div className="card-panel" style={{ padding: '24px', marginBottom: '24px', background: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', gap: '40px', alignItems: 'center' }}>
+              <div style={{ textAlign: 'center', minWidth: '120px' }}>
+                <div style={{ fontSize: '3.5rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{tour.cached_rating_avg}</div>
+                <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', margin: '8px 0' }}>
+                  {[1,2,3,4,5].map(s => <Star key={s} size={16} color="#d97706" fill={s <= Math.round(tour.cached_rating_avg) ? '#d97706' : 'none'} />)}
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{tour.cached_review_count} reviews</div>
+              </div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {[5,4,3,2,1].map(star => {
+                  const count = reviews.filter(r => Math.round(r.rating) === star).length;
+                  const pct = reviews.length > 0 ? (count / reviews.length) * 100 : (star === 5 ? 70 : star === 4 ? 20 : 5);
+                  return (
+                    <div key={star} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', width: '30px' }}>{star} ★</span>
+                      <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: `${pct}%`, height: '100%', background: star >= 4 ? '#059669' : star === 3 ? '#f59e0b' : '#ef4444', borderRadius: '4px', transition: 'width 0.5s ease' }} />
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', width: '35px', textAlign: 'right' }}>{Math.round(pct)}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* REVIEW SUBMISSION FORM */}
+            {showReviewForm && (
+              <form onSubmit={handleSubmitReview} className="card-panel" style={{ padding: '24px', marginBottom: '24px', background: '#fefce8', border: '1px solid #fde68a' }}>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '16px' }}>Share Your Experience</h3>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>Your Rating</label>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[1,2,3,4,5].map(s => (
+                      <Star
+                        key={s}
+                        size={28}
+                        color="#d97706"
+                        fill={s <= reviewRating ? '#d97706' : 'none'}
+                        style={{ cursor: 'pointer', transition: 'transform 0.15s' }}
+                        onClick={() => setReviewRating(s)}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Review title (e.g. 'Amazing sunset cruise!')"
+                  value={reviewTitle}
+                  onChange={(e) => setReviewTitle(e.target.value)}
+                  style={{ width: '100%', padding: '12px', marginBottom: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', background: '#fff', color: '#0f172a', fontSize: '0.95rem', outline: 'none' }}
+                />
+                <textarea
+                  placeholder="Tell travelers about your experience..."
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', background: '#fff', color: '#0f172a', fontSize: '0.95rem', resize: 'vertical', outline: 'none' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '14px' }}>
+                  <button type="button" onClick={() => setShowReviewForm(false)} className="btn-secondary" style={{ padding: '10px 20px' }}>Cancel</button>
+                  <button type="submit" disabled={submittingReview} className="btn-primary" style={{ padding: '10px 20px' }}>
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* INDIVIDUAL REVIEW CARDS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {reviews.map((review: any) => (
+                <div key={review.id} className="card-panel" style={{ padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <img src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0284c7&color=fff`} alt={review.user_name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{review.user_name}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    </div>
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '2px' }}>
+                      {[1,2,3,4,5].map(s => <Star key={s} size={14} color="#d97706" fill={s <= review.rating ? '#d97706' : 'none'} />)}
+                    </div>
+                    <span className="badge-emerald" style={{ fontSize: '0.7rem' }}>✓ Verified Booking</span>
+                  </div>
+                  {review.title && <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f172a', marginBottom: '6px' }}>{review.title}</div>}
+                  <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.7, marginBottom: '12px' }}>{review.comment}</p>
+                  {review.photos && review.photos.length > 0 && (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                      {review.photos.map((p: string, i: number) => (
+                        <img key={i} src={p} alt="Traveler photo" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                      ))}
+                    </div>
+                  )}
+                  {/* Supplier Reply */}
+                  {review.supplier_reply && (
+                    <div style={{ marginTop: '10px', padding: '12px', background: '#f0f9ff', borderRadius: '10px', border: '1px solid #7dd3fc' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>🛡️ Supplier Response</div>
+                      <p style={{ fontSize: '0.85rem', color: '#334155', margin: 0 }}>{review.supplier_reply.text}</p>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px' }}>
+                    <button onClick={() => handleHelpful(review.id)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '20px', border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '0.8rem', color: '#64748b', transition: 'all 0.2s' }}>
+                      <ThumbsUp size={13} /> Helpful ({review.helpful_count || 0})
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {reviews.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+                  No reviews yet. Be the first to share your experience!
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
