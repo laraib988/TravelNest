@@ -20,6 +20,7 @@ export default function SupplierPayoutsPage() {
   const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [triggeringPayout, setTriggeringPayout] = useState(false);
+  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -47,15 +48,16 @@ export default function SupplierPayoutsPage() {
 
   const handleTriggerPayout = async () => {
     setTriggeringPayout(true);
+    setFeedbackMsg(null);
     try {
       await fetchFromAPI('/payouts/trigger-run', {
         method: 'POST',
         body: JSON.stringify({ supplier_id: supplierId }),
       });
       await loadData();
-      alert('Payout run triggered successfully! Transfer initiated to linked bank account.');
+      setFeedbackMsg('✓ Payout run triggered successfully! Transfer initiated to linked bank account.');
     } catch (err: any) {
-      alert('Payout trigger failed: ' + err.message);
+      setFeedbackMsg('❌ Payout trigger failed: ' + err.message);
     } finally {
       setTriggeringPayout(false);
     }
@@ -64,6 +66,28 @@ export default function SupplierPayoutsPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        
+        {/* INLINE FEEDBACK BANNER */}
+        {feedbackMsg && (
+          <div 
+            style={{ 
+              padding: '14px 20px', 
+              borderRadius: '14px', 
+              marginBottom: '24px', 
+              background: feedbackMsg.startsWith('✓') ? '#ecfdf5' : '#fef2f2', 
+              border: `1px solid ${feedbackMsg.startsWith('✓') ? '#a7f3d0' : '#fecdd3'}`, 
+              color: feedbackMsg.startsWith('✓') ? '#047857' : '#b91c1c', 
+              fontSize: '0.92rem', 
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>{feedbackMsg}</span>
+            <button onClick={() => setFeedbackMsg(null)} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 800, cursor: 'pointer' }}>✕</button>
+          </div>
+        )}
         
         {/* BREADCRUMB NAV */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
@@ -134,8 +158,10 @@ export default function SupplierPayoutsPage() {
               {payouts.map((p) => (
                 <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px' }}>
                   <div>
-                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>${p.amount.toFixed(2)} USD</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Ref: {p.ref} • {p.date}</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>
+                      ${(p.amount ?? p.net_payout ?? 0).toFixed(2)} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Ref: {p.ref || p.payout_id || 'PAYOUT'} • {p.date || p.period_end || '2026-08-01'}</div>
                   </div>
                   <span className="badge-emerald">{p.status}</span>
                 </div>

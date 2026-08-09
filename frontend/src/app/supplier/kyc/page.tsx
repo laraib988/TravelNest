@@ -67,9 +67,8 @@ export default function KYCUploadPage() {
           ...activeFormData,
         }),
       });
-      setKycResult(res);
     } catch (err: any) {
-      alert('KYC submission failed: ' + err.message);
+      setKycResult({ status: 'FAILED', ai_fraud_score: 90, ocr_confidence: 0, error: 'KYC submission failed: ' + err.message });
     } finally {
       setSubmitting(false);
     }

@@ -40,7 +40,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [listings, setListings] = useState<any[]>([]);
   const [destinations, setDestinations] = useState<any[]>([]);
-  const [wishlist, setWishlist] = useState<Record<string, boolean>>({ 'list-bali-sunset': true });
+  const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
 
@@ -74,6 +74,20 @@ export default function HomePage() {
         ]);
         setListings(listingsRes || []);
         setDestinations(destsRes || []);
+
+        // Load user's saved wishlist to show correct heart icon states
+        try {
+          const wishlistRes = await fetchFromAPI('/users/me/wishlist');
+          const wishlistItems = Array.isArray(wishlistRes) ? wishlistRes : (wishlistRes?.data || []);
+          const wishlistMap: Record<string, boolean> = {};
+          wishlistItems.forEach((item: any) => {
+            const id = item.listingId || item.listing_id || item.id;
+            if (id) wishlistMap[id] = true;
+          });
+          setWishlist(wishlistMap);
+        } catch {
+          // Wishlist API not available — use default empty state
+        }
       } catch (err) {
         console.error('Error fetching storefront data:', err);
       } finally {
@@ -144,10 +158,22 @@ export default function HomePage() {
     }
   };
 
-  const toggleWishlist = (id: string, e: React.MouseEvent) => {
+  const toggleWishlist = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const isCurrentlyWishlisted = wishlist[id];
+    // Optimistic UI update
     setWishlist((prev) => ({ ...prev, [id]: !prev[id] }));
+    try {
+      if (isCurrentlyWishlisted) {
+        await fetchFromAPI(`/users/me/wishlist/${id}`, { method: 'DELETE' });
+      } else {
+        await fetchFromAPI(`/users/me/wishlist/${id}`, { method: 'POST' });
+      }
+    } catch (err) {
+      // API may not be available — keep local state toggle working
+      console.log('Wishlist API unavailable, using local state');
+    }
   };
 
   const handleAiPlanSubmit = (e: React.FormEvent) => {

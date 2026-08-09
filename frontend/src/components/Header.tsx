@@ -80,7 +80,7 @@ export default function Header() {
           {/* CENTER: MAIN NAVIGATION LINKS */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Link 
-              href="/destinations/bali" 
+              href="/destinations" 
               className="btn-secondary" 
               style={{ padding: '9px 18px', fontSize: '0.88rem', fontWeight: 600, border: '1px solid #e2e8f0', background: '#f8fafc', whiteSpace: 'nowrap' }}
             >

@@ -8,13 +8,43 @@ export default function AvailabilityCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<number | null>(15);
   const [isBlocked, setIsBlocked] = useState(false);
   const [surgePrice, setSurgePrice] = useState(89);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   const daysInMonth = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const handleSaveOverrides = () => {
+    setSaveStatus(`✓ Inventory settings saved for Aug ${selectedDate}, 2026 ($${surgePrice} USD / Slot)`);
+    setTimeout(() => {
+      setSaveStatus(null);
+    }, 4000);
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         
+        {/* INLINE STATUS BANNER (NO POPUPS) */}
+        {saveStatus && (
+          <div 
+            style={{ 
+              padding: '14px 20px', 
+              borderRadius: '14px', 
+              marginBottom: '24px', 
+              background: '#ecfdf5', 
+              border: '1px solid #a7f3d0', 
+              color: '#047857', 
+              fontSize: '0.92rem', 
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>{saveStatus}</span>
+            <button onClick={() => setSaveStatus(null)} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 800, cursor: 'pointer' }}>✕</button>
+          </div>
+        )}
+
         {/* BREADCRUMB NAV */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
           <Link href="/supplier" style={{ textDecoration: 'none', color: '#64748b' }}>Supplier Portal</Link>
@@ -125,7 +155,7 @@ export default function AvailabilityCalendarPage() {
             </div>
 
             <button 
-              onClick={() => alert(`Saved inventory settings for Aug ${selectedDate}, 2026!`)}
+              onClick={handleSaveOverrides}
               className="btn-primary" 
               style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.92rem' }}
             >

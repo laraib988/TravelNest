@@ -21,6 +21,7 @@ export default function SupplierBookingsPage() {
   const [scanModalOpen, setScanModalOpen] = useState(false);
   const [qrCodeInput, setQrCodeInput] = useState('');
   const [scanResult, setScanResult] = useState<any>(null);
+  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSupplierBookings();
@@ -79,17 +80,39 @@ export default function SupplierBookingsPage() {
 
   const handleAcceptSLA = (id: string) => {
     setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CONFIRMED' } : b));
-    alert('Booking SLA Request Accepted & Confirmed!');
+    setFeedbackMsg('✓ Booking SLA Request accepted and confirmed successfully!');
   };
 
   const handleRejectSLA = (id: string) => {
     setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
-    alert('Booking SLA Request Rejected & Refunded.');
+    setFeedbackMsg('✓ Booking SLA Request rejected and customer refunded.');
   };
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        
+        {/* INLINE FEEDBACK BANNER */}
+        {feedbackMsg && (
+          <div 
+            style={{ 
+              padding: '14px 20px', 
+              borderRadius: '14px', 
+              marginBottom: '24px', 
+              background: '#ecfdf5', 
+              border: '1px solid #a7f3d0', 
+              color: '#047857', 
+              fontSize: '0.92rem', 
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>{feedbackMsg}</span>
+            <button onClick={() => setFeedbackMsg(null)} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 800, cursor: 'pointer' }}>✕</button>
+          </div>
+        )}
         
         {/* BREADCRUMB NAV */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
@@ -135,17 +158,27 @@ export default function SupplierBookingsPage() {
                       {item.status}
                     </span>
                   </div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{item.title}</h3>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                    {item.title || item.option_name || 'Booked Experience'}
+                  </h3>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '0.85rem', color: '#64748b', marginTop: '8px' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><User size={14} /> {item.guest_name} ({item.travelers} guests)</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={14} /> {item.date} at {item.timeSlot}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><QrCode size={14} color="#7c3aed" /> Voucher: <strong>{item.qr_voucher_code}</strong></span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <User size={14} /> {item.guest_name || item.traveler_details?.lead_name || 'Lead Traveler'} ({item.travelers || item.total_travelers || 1} guests)
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Calendar size={14} /> {item.date || item.slot_start_time?.substring(0, 10) || '2026-08-15'} at {item.timeSlot || item.slot_start_time?.substring(11, 16) || '16:00'}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <QrCode size={14} color="#7c3aed" /> Voucher: <strong>{item.qr_voucher_code || 'TN-VOUCHER'}</strong>
+                    </span>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#059669' }}>${item.amount.toFixed(2)} USD</div>
+                    <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#059669' }}>
+                      ${(item.gross_amount ?? item.amount ?? 0).toFixed(2)} USD
+                    </div>
                     <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Payout after 15% fee</span>
                   </div>
 

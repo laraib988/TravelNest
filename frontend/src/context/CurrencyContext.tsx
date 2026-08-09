@@ -22,6 +22,8 @@ export const SUPPORTED_CURRENCIES: Record<string, Currency> = {
   GBP: { code: 'GBP', symbol: '£', name: 'British Pound', rate: 0.79 },
   PKR: { code: 'PKR', symbol: 'Rs', name: 'Pakistani Rupee', rate: 278.50 },
   JPY: { code: 'JPY', symbol: '¥', name: 'Japanese Yen', rate: 155.20 },
+  INR: { code: 'INR', symbol: '₹', name: 'Indian Rupee', rate: 83.50 },
+  SGD: { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar', rate: 1.35 },
   AED: { code: 'AED', symbol: 'AED', name: 'UAE Dirham', rate: 3.67 },
 };
 
@@ -81,7 +83,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   const formatPrice = (amountInUSD: number) => {
     const converted = amountInUSD * currency.rate;
-    if (currency.code === 'JPY' || currency.code === 'PKR') {
+    if (currency.code === 'JPY' || currency.code === 'PKR' || currency.code === 'INR') {
       return `${currency.symbol} ${Math.round(converted).toLocaleString()}`;
     }
     return `${currency.symbol}${converted.toFixed(2)}`;

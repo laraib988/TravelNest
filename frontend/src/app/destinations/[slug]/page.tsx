@@ -44,9 +44,9 @@ export default function DestinationHubPage() {
         <img src={destination.hero_image} alt={destination.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.85), transparent)' }} />
         <div style={{ position: 'absolute', bottom: '40px', left: '0', right: '0', maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <div className="badge-emerald" style={{ display: 'inline-flex', marginBottom: '12px' }}>
+          {/* <div className="badge-emerald" style={{ display: 'inline-flex', marginBottom: '12px' }}>
             Auto-Aggregated SEO Landing Hub • ISR 1800s
-          </div>
+          </div> */}
           <h1 style={{ fontSize: '3.2rem', marginBottom: '8px', color: '#fff' }}>{destination.name}</h1>
           <p style={{ color: '#cbd5e1', fontSize: '1.1rem', maxWidth: '700px' }}>{destination.description}</p>
         </div>

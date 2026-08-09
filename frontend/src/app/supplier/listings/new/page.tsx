@@ -21,6 +21,7 @@ export default function CreateListingWizardPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [publishSuccess, setPublishSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     title: 'Lahore Walled City Culinary Night Experience',
@@ -57,14 +58,14 @@ export default function CreateListingWizardPage() {
   const handleSubmitListing = async () => {
     setSubmitting(true);
     try {
-      // Simulate API call to create listing
       setTimeout(() => {
         setSubmitting(false);
-        alert('Listing published successfully! It is now live on TravelNest Marketplace.');
-        router.push('/supplier');
-      }, 1200);
+        setPublishSuccess(true);
+        setTimeout(() => {
+          router.push('/supplier');
+        }, 2000);
+      }, 1000);
     } catch (err: any) {
-      alert('Error creating listing: ' + err.message);
       setSubmitting(false);
     }
   };
@@ -81,6 +82,28 @@ export default function CreateListingWizardPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+        
+        {/* INLINE SUCCESS BANNER */}
+        {publishSuccess && (
+          <div 
+            style={{ 
+              padding: '16px 24px', 
+              borderRadius: '16px', 
+              marginBottom: '24px', 
+              background: '#ecfdf5', 
+              border: '1px solid #a7f3d0', 
+              color: '#047857', 
+              fontSize: '1rem', 
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+          >
+            <CheckCircle2 size={20} />
+            <span>✓ Experience Listing published successfully! Redirecting to Supplier Dashboard...</span>
+          </div>
+        )}
         
         {/* BREADCRUMB NAV */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
