@@ -1,12 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, QrCode, Download, Smartphone } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center' }}>Loading checkout...</div>}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const holdId = searchParams.get('hold_id') || '';
