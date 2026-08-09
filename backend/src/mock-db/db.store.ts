@@ -154,6 +154,67 @@ export interface PayoutRecord {
   processed_at?: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password_hash: string;
+  phone: string;
+  role: 'CUSTOMER' | 'SUPPLIER' | 'ADMIN' | 'BLOG_WRITER';
+  avatar: string;
+  home_country: string;
+  preferred_currency: string;
+  preferred_language: string;
+  saved_travelers: Array<{ name: string; age_type: string; passport_number?: string }>;
+  wishlist_listing_ids: string[];
+  loyalty_points: number;
+  membership_tier: 'BRONZE' | 'SILVER' | 'GOLD';
+  created_at: string;
+}
+
+export interface Review {
+  id: string;
+  booking_id: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string;
+  listing_id: string;
+  rating: number;
+  title: string;
+  comment: string;
+  photos: string[];
+  helpful_count: number;
+  supplier_reply?: { text: string; replied_at: string };
+  ai_fraud_score: number;
+  status: 'PUBLISHED' | 'PENDING' | 'FLAGGED' | 'REMOVED';
+  created_at: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  type: 'PERCENTAGE' | 'FIXED';
+  value: number;
+  min_spend: number;
+  max_discount?: number;
+  valid_from: string;
+  valid_to: string;
+  usage_limit: number;
+  used_count: number;
+  applicable_categories: string[];
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: 'BOOKING_CONFIRMED' | 'BOOKING_CANCELLED' | 'REVIEW_REQUEST' | 'PRICE_DROP' | 'PROMO' | 'SYSTEM';
+  title: string;
+  message: string;
+  link?: string;
+  read: boolean;
+  created_at: string;
+}
+
 class MockDatabaseStore {
   categories: Category[] = [
     { id: 'cat-things-to-do', name: 'Things to Do', slug: 'things-to-do', icon: '🌟', required_documents: ['BUSINESS_LICENSE', 'GOVT_ID'] },
@@ -220,7 +281,7 @@ class MockDatabaseStore {
       slug: 'lahore',
       country: 'Pakistan',
       country_code: 'PK',
-      hero_image: 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1200&q=80',
+      hero_image: 'https://images.unsplash.com/photo-1622547748225-3fc4abd2cca0?auto=format&fit=crop&w=1200&q=80',
       description: 'Cultural capital of Pakistan renowned for Mughal heritage, Walled City food street, and Badshahi Mosque night tours.',
       popular_activities_count: 65,
       latitude: 31.5204,
@@ -559,7 +620,7 @@ class MockDatabaseStore {
       cached_review_count: 310,
       merchandising_badges: ['Travelers Choice 2026', 'New'],
       images: [
-        { url: 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1000&q=80', alt: 'Badshahi Mosque Illuminated' }
+        { url: 'https://images.unsplash.com/photo-1622547748225-3fc4abd2cca0?auto=format&fit=crop&w=1000&q=80', alt: 'Badshahi Mosque Illuminated' }
       ],
       inclusions: [
         '5-Hour Guided Heritage & Food Tour',
@@ -799,6 +860,207 @@ class MockDatabaseStore {
       payment_intent_id: 'pi_3MxtSt2eZvKYlo2C1g9uXZ89',
       created_at: '2026-08-01T10:15:00Z'
     }
+  ];
+
+  users: User[] = [
+    {
+      id: 'cust-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      password_hash: 'mockhash',
+      phone: '+1 555-1234',
+      role: 'CUSTOMER',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+      home_country: 'US',
+      preferred_currency: 'USD',
+      preferred_language: 'en',
+      saved_travelers: [{ name: 'John Doe', age_type: 'ADULT' }],
+      wishlist_listing_ids: ['list-bali-sunset', 'list-paris-louvre'],
+      loyalty_points: 1500,
+      membership_tier: 'SILVER',
+      created_at: '2026-01-01T00:00:00Z'
+    },
+    {
+      id: 'sup-1',
+      name: 'Supplier Alice',
+      email: 'alice@oceanic.com',
+      password_hash: 'mockhash',
+      phone: '+1 555-5678',
+      role: 'SUPPLIER',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+      home_country: 'ID',
+      preferred_currency: 'USD',
+      preferred_language: 'en',
+      saved_travelers: [],
+      wishlist_listing_ids: [],
+      loyalty_points: 0,
+      membership_tier: 'BRONZE',
+      created_at: '2025-05-15T00:00:00Z'
+    },
+    {
+      id: 'admin-1',
+      name: 'Admin Bob',
+      email: 'admin@travelnest.com',
+      password_hash: 'mockhash',
+      phone: '+1 555-9999',
+      role: 'ADMIN',
+      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=150&q=80',
+      home_country: 'US',
+      preferred_currency: 'USD',
+      preferred_language: 'en',
+      saved_travelers: [],
+      wishlist_listing_ids: [],
+      loyalty_points: 0,
+      membership_tier: 'BRONZE',
+      created_at: '2025-01-01T00:00:00Z'
+    }
+  ];
+
+  reviews: Review[] = [
+    {
+      id: 'rev-1',
+      booking_id: 'book-901',
+      user_id: 'cust-1',
+      user_name: 'John Doe',
+      user_avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-bali-sunset',
+      rating: 5,
+      title: 'Amazing experience',
+      comment: 'The sunset was beautiful and the seafood was delicious!',
+      photos: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80'],
+      helpful_count: 12,
+      ai_fraud_score: 5,
+      status: 'PUBLISHED',
+      created_at: '2026-08-02T10:00:00Z'
+    },
+    {
+      id: 'rev-2',
+      booking_id: 'book-902',
+      user_id: 'cust-2',
+      user_name: 'Jane Smith',
+      user_avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-paris-louvre',
+      rating: 4,
+      title: 'Great tour but crowded',
+      comment: 'Loved the guide, but the Mona Lisa room was very crowded.',
+      photos: [],
+      helpful_count: 5,
+      supplier_reply: { text: 'Thank you for your feedback! It can get busy during peak hours.', replied_at: '2026-08-03T10:00:00Z' },
+      ai_fraud_score: 2,
+      status: 'PUBLISHED',
+      created_at: '2026-08-01T14:00:00Z'
+    },
+    {
+      id: 'rev-3',
+      booking_id: 'book-903',
+      user_id: 'cust-3',
+      user_name: 'Ahmed',
+      user_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-lahore-walled-city',
+      rating: 5,
+      title: 'Rich history',
+      comment: 'Walking through the old city felt magical.',
+      photos: [],
+      helpful_count: 8,
+      ai_fraud_score: 1,
+      status: 'PUBLISHED',
+      created_at: '2026-07-28T09:00:00Z'
+    },
+    {
+      id: 'rev-4',
+      booking_id: 'book-904',
+      user_id: 'cust-4',
+      user_name: 'Maria G',
+      user_avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-dubai-desert-safari',
+      rating: 5,
+      title: 'Thrilling ride',
+      comment: 'The dune bashing was intense but very fun!',
+      photos: [],
+      helpful_count: 3,
+      ai_fraud_score: 4,
+      status: 'PUBLISHED',
+      created_at: '2026-07-29T11:00:00Z'
+    },
+    {
+      id: 'rev-5',
+      booking_id: 'book-905',
+      user_id: 'cust-5',
+      user_name: 'Luigi',
+      user_avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-rome-colosseum',
+      rating: 3,
+      title: 'Very hot weather',
+      comment: 'Good tour but too hot in summer, provide more water.',
+      photos: [],
+      helpful_count: 2,
+      ai_fraud_score: 0,
+      status: 'PUBLISHED',
+      created_at: '2026-07-30T16:00:00Z'
+    },
+    {
+      id: 'rev-6',
+      booking_id: 'book-906',
+      user_id: 'cust-6',
+      user_name: 'Sarah',
+      user_avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-bali-sunset',
+      rating: 4,
+      title: 'Nice music',
+      comment: 'Enjoyed the acoustic sets.',
+      photos: [],
+      helpful_count: 4,
+      ai_fraud_score: 1,
+      status: 'PUBLISHED',
+      created_at: '2026-08-01T20:00:00Z'
+    },
+    {
+      id: 'rev-7',
+      booking_id: 'book-907',
+      user_id: 'cust-7',
+      user_name: 'Tom',
+      user_avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-paris-louvre',
+      rating: 5,
+      title: 'A must do in Paris',
+      comment: 'Highly recommended for art lovers.',
+      photos: [],
+      helpful_count: 7,
+      ai_fraud_score: 2,
+      status: 'PUBLISHED',
+      created_at: '2026-08-02T12:00:00Z'
+    },
+    {
+      id: 'rev-8',
+      booking_id: 'book-908',
+      user_id: 'cust-8',
+      user_name: 'Emily',
+      user_avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80',
+      listing_id: 'list-dubai-desert-safari',
+      rating: 5,
+      title: 'Perfect evening',
+      comment: 'BBQ was great and entertainment was superb.',
+      photos: [],
+      helpful_count: 10,
+      ai_fraud_score: 3,
+      status: 'PUBLISHED',
+      created_at: '2026-08-03T22:00:00Z'
+    }
+  ];
+
+  coupons: Coupon[] = [
+    { id: 'coup-1', code: 'WELCOME20', type: 'PERCENTAGE', value: 20, min_spend: 50, max_discount: 40, valid_from: '2026-08-01T00:00:00Z', valid_to: '2026-08-31T23:59:59Z', usage_limit: 1000, used_count: 150, applicable_categories: [] },
+    { id: 'coup-2', code: 'SUMMER15', type: 'PERCENTAGE', value: 15, min_spend: 100, max_discount: 50, valid_from: '2026-06-01T00:00:00Z', valid_to: '2026-08-31T23:59:59Z', usage_limit: 500, used_count: 320, applicable_categories: ['cat-tours', 'cat-tickets'] },
+    { id: 'coup-3', code: 'FLASH50', type: 'FIXED', value: 50, min_spend: 200, valid_from: '2026-08-05T00:00:00Z', valid_to: '2026-08-10T23:59:59Z', usage_limit: 100, used_count: 45, applicable_categories: [] },
+    { id: 'coup-4', code: 'TRAVEL10', type: 'PERCENTAGE', value: 10, min_spend: 0, max_discount: 25, valid_from: '2026-01-01T00:00:00Z', valid_to: '2026-12-31T23:59:59Z', usage_limit: 5000, used_count: 1200, applicable_categories: [] }
+  ];
+
+  notifications: Notification[] = [
+    { id: 'notif-1', user_id: 'cust-1', type: 'BOOKING_CONFIRMED', title: 'Booking Confirmed', message: 'Your booking for Bali Sunset Catamaran is confirmed.', link: '/bookings/book-901', read: false, created_at: '2026-08-01T10:15:00Z' },
+    { id: 'notif-2', user_id: 'cust-1', type: 'SYSTEM', title: 'Welcome to TravelNest!', message: 'Explore the best tours around the world.', read: true, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'notif-3', user_id: 'cust-1', type: 'PROMO', title: 'Summer Sale!', message: 'Use code SUMMER15 for 15% off.', read: false, created_at: '2026-08-01T00:00:00Z' },
+    { id: 'notif-4', user_id: 'cust-1', type: 'PRICE_DROP', title: 'Price drop on your wishlist', message: 'Louvre Museum tour has a 10% discount.', link: '/listings/list-paris-louvre', read: false, created_at: '2026-08-03T10:00:00Z' },
+    { id: 'notif-5', user_id: 'cust-1', type: 'REVIEW_REQUEST', title: 'How was your trip?', message: 'Leave a review for your recent Bali trip.', link: '/reviews/book-901', read: false, created_at: '2026-08-06T10:00:00Z' }
   ];
 
   kycRecords: Map<string, KYCRecord> = new Map([

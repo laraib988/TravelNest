@@ -589,7 +589,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
-            {filteredListings.map((item) => (
+            {filteredListings.filter(item => item.id !== 'list-bali-sunset').map((item) => (
               <div key={item.id} className="card-panel card-interactive" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 
                 {/* IMAGE & BADGES */}

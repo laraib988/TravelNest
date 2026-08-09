@@ -2,7 +2,19 @@
 
 import { useState } from 'react';
 import { fetchFromAPI } from '@/lib/api-client';
-import { ShieldCheck, FileText, CheckCircle2, AlertCircle, ArrowLeft, RefreshCw, Upload, Lock, Building, UserCheck } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  FileText, 
+  CheckCircle2, 
+  AlertCircle, 
+  ArrowLeft, 
+  RefreshCw, 
+  Upload, 
+  Lock, 
+  Building, 
+  UserCheck,
+  ChevronRight
+} from 'lucide-react';
 import Link from 'next/link';
 
 export default function KYCUploadPage() {
@@ -64,210 +76,199 @@ export default function KYCUploadPage() {
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
-      <Link href="/supplier" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
-        <ArrowLeft size={16} /> Return to Supplier Dashboard
-      </Link>
+    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+        
+        {/* BREADCRUMB NAV */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
+          <Link href="/supplier" style={{ textDecoration: 'none', color: '#64748b' }}>Supplier Portal</Link>
+          <ChevronRight size={14} color="#94a3b8" />
+          <span style={{ color: '#0f172a', fontWeight: 700 }}>KYC Document Verification</span>
+        </div>
 
-      <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '40px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
-          <div style={{ background: 'var(--brand-gradient)', padding: '14px', borderRadius: 'var(--radius-md)' }}>
-            <ShieldCheck size={32} color="#fff" />
+        {/* HEADING */}
+        <div style={{ marginBottom: '32px' }}>
+          <div className="badge-emerald" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+            <ShieldCheck size={14} /> Mandatory Partner Compliance & Verification
           </div>
-          <div>
-            <h1 style={{ fontSize: '1.85rem', color: '#0f172a' }}>Supplier KYC Verification & OCR Scanner (SRS 4.2)</h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
-              Select entity type to load specific document verification rules. AI Pre-Screening processes instant validation.
-            </p>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>
+            Operator KYC Verification & Document Vault
+          </h1>
+          <p style={{ color: '#475569', fontSize: '1.05rem', marginTop: '6px' }}>
+            Submit government business registration, tourism permits, and liability insurance to publish experience listings globally.
+          </p>
+        </div>
+
+        {/* VERIFICATION STATE STEPS */}
+        <div className="card-panel" style={{ padding: '24px', borderRadius: '20px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#0284c7', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>1</div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>Business Entity</div>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Corporate or Skipper</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#0284c7', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>2</div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>License Documents</div>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Trade license & insurance</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#059669', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>3</div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#059669' }}>AI OCR Verification</div>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Automated document scan</div>
+            </div>
           </div>
         </div>
 
-        {/* DYNAMIC BUSINESS TYPE TOGGLE BUTTONS */}
-        <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '8px', color: '#0f172a', fontWeight: 700 }}>
-          Select Supplier Entity Type
-        </label>
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '28px' }}>
-          <button
-            type="button"
-            onClick={() => setBusinessType('CORPORATE')}
-            className={`btn-secondary ${businessType === 'CORPORATE' ? 'active' : ''}`}
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              padding: '14px 18px',
-              background: businessType === 'CORPORATE' ? '#f0f9ff' : '#f8fafc',
-              border: businessType === 'CORPORATE' ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
-              color: businessType === 'CORPORATE' ? 'var(--brand-primary)' : '#475569',
-              fontWeight: 700,
-            }}
-          >
-            <Building size={18} /> 🏢 Registered Corporate Company
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setBusinessType('INDIVIDUAL_FREELANCER')}
-            className={`btn-secondary ${businessType === 'INDIVIDUAL_FREELANCER' ? 'active' : ''}`}
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              padding: '14px 18px',
-              background: businessType === 'INDIVIDUAL_FREELANCER' ? '#f0f9ff' : '#f8fafc',
-              border: businessType === 'INDIVIDUAL_FREELANCER' ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
-              color: businessType === 'INDIVIDUAL_FREELANCER' ? 'var(--brand-primary)' : '#475569',
-              fontWeight: 700,
-            }}
-          >
-            <UserCheck size={18} /> 👤 Individual License Holder / Guide
-          </button>
-        </div>
-
-        {/* DYNAMIC ENTITY BADGE INDICATOR */}
-        <div style={{ padding: '10px 16px', background: '#f0f9ff', border: '1px solid #7dd3fc', borderRadius: 'var(--radius-sm)', marginBottom: '24px', fontSize: '0.88rem', color: '#0369a1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Lock size={16} /> Active Verification Profile: <strong>{businessType === 'CORPORATE' ? 'Corporate Business License Suite' : 'Individual Freelance Guide / Skipper Permit Suite'}</strong>
-        </div>
-
-        <form onSubmit={handleSubmitKYC} style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#0f172a', fontWeight: 700 }}>
-              {businessType === 'CORPORATE' ? 'Legal Business / Corporate Entity Name' : 'Full Legal Name of Individual / Guide'}
+        {/* KYC FORM CONTAINER */}
+        <div className="card-panel" style={{ padding: '36px', borderRadius: '24px' }}>
+          
+          {/* ENTITY TYPE SELECTOR */}
+          <div style={{ marginBottom: '28px' }}>
+            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#334155', marginBottom: '10px' }}>
+              Select Entity Type
             </label>
-            <input
-              type="text"
-              required
-              value={activeFormData.company_name}
-              onChange={(e) => handleInputChange('company_name', e.target.value)}
-              style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
-            />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#0f172a', fontWeight: 700 }}>
-                {businessType === 'CORPORATE' ? 'Corporate Trade License Registration No' : 'Tour Guide / Skipper Permit License No'}
-              </label>
-              <input
-                type="text"
-                required
-                value={activeFormData.business_reg}
-                onChange={(e) => handleInputChange('business_reg', e.target.value)}
-                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#0f172a', fontWeight: 700 }}>
-                {businessType === 'CORPORATE' ? 'Government VAT / GST Tax Identification No' : 'Personal National Tax Identification No'}
-              </label>
-              <input
-                type="text"
-                required
-                value={activeFormData.tax_id}
-                onChange={(e) => handleInputChange('tax_id', e.target.value)}
-                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
-              />
-            </div>
-          </div>
-
-          {/* DYNAMIC DOCUMENT CHECKLIST DEPENDING ON BUSINESS TYPE */}
-          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
-            <h3 style={{ fontSize: '1.05rem', marginBottom: '16px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={18} color="var(--brand-primary)" /> Required Verification Documents ({businessType === 'CORPORATE' ? 'Corporate Set' : 'Individual Set'})
-            </h3>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', fontWeight: 600 }}>
-                  {businessType === 'CORPORATE' ? '1. Corporate Trade License Certificate' : '1. Official Tour Guide / Skipper Permit'}
-                </label>
-                <input
-                  type="text"
-                  value={activeFormData.trade_license_doc}
-                  onChange={(e) => handleInputChange('trade_license_doc', e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a' }}
-                />
+              <div 
+                onClick={() => setBusinessType('CORPORATE')}
+                style={{
+                  padding: '16px',
+                  borderRadius: '16px',
+                  border: businessType === 'CORPORATE' ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
+                  background: businessType === 'CORPORATE' ? '#f0f9ff' : '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Building size={24} color={businessType === 'CORPORATE' ? 'var(--brand-primary)' : '#64748b'} />
+                <div>
+                  <div style={{ fontSize: '0.98rem', fontWeight: 700, color: '#0f172a' }}>Corporate Tour Agency</div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Registered company with trade license</div>
+                </div>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', fontWeight: 600 }}>
-                  {businessType === 'CORPORATE' ? '2. Corporate Tax / VAT Registration Document' : '2. Individual Tax Return Document'}
-                </label>
-                <input
-                  type="text"
-                  value={activeFormData.tax_cert_doc}
-                  onChange={(e) => handleInputChange('tax_cert_doc', e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', fontWeight: 600 }}>
-                  {businessType === 'CORPORATE' ? '3. Public Liability Marine Insurance Policy' : '3. Individual Professional Liability Insurance'}
-                </label>
-                <input
-                  type="text"
-                  value={activeFormData.insurance_doc}
-                  onChange={(e) => handleInputChange('insurance_doc', e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', fontWeight: 600 }}>
-                  {businessType === 'CORPORATE' ? '4. Director Passport / Signatory Govt ID' : '4. Personal National Identity Card / Passport Scan'}
-                </label>
-                <input
-                  type="text"
-                  value={activeFormData.signatory_id_doc}
-                  onChange={(e) => handleInputChange('signatory_id_doc', e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a' }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" disabled={submitting} className="btn-primary" style={{ padding: '14px', justifyContent: 'center', fontSize: '1.05rem', marginTop: '10px' }}>
-            {submitting ? <><RefreshCw size={18} className="animate-spin" /> Running AI OCR Prescreen & State Transition...</> : <><FileText size={18} /> Submit {businessType === 'CORPORATE' ? 'Corporate' : 'Individual'} Verification Documents</>}
-          </button>
-        </form>
-
-        {/* RESULT DISPLAYER WITH DYNAMIC AUDIT TRAIL */}
-        {kycResult && (
-          <div style={{ background: '#f8fafc', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div>
-                <h3 style={{ fontSize: '1.15rem', color: '#0f172a' }}>AI Prescreening & State Machine Result</h3>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Entity Type: <strong>{kycResult.business_type}</strong></span>
-              </div>
-              <span className={kycResult.kyc_state === 'APPROVED_VERIFIED' ? 'badge-emerald' : 'badge-amber'}>
-                FINITE STATE: {kycResult.kyc_state}
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px', fontSize: '0.9rem' }}>
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>OCR Checksum Match:</span>
-                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#059669' }}>{Math.round(kycResult.ocr_confidence * 100)}%</div>
-              </div>
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>AI Fraud Risk Score:</span>
-                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: kycResult.ai_fraud_score < 25 ? '#059669' : '#d97706' }}>
-                  {kycResult.ai_fraud_score} / 100
+              <div 
+                onClick={() => setBusinessType('INDIVIDUAL_FREELANCER')}
+                style={{
+                  padding: '16px',
+                  borderRadius: '16px',
+                  border: businessType === 'INDIVIDUAL_FREELANCER' ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
+                  background: businessType === 'INDIVIDUAL_FREELANCER' ? '#f0f9ff' : '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <UserCheck size={24} color={businessType === 'INDIVIDUAL_FREELANCER' ? 'var(--brand-primary)' : '#64748b'} />
+                <div>
+                  <div style={{ fontSize: '0.98rem', fontWeight: 700, color: '#0f172a' }}>Independent Guide / Skipper</div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Licensed sole-trader or freelancer</div>
                 </div>
               </div>
             </div>
-
-            <div style={{ fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Verification Audit Trail:</span>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {kycResult.audit_reasons?.map((r: string, i: number) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#334155' }}>
-                    <CheckCircle2 size={14} color="#059669" /> {r}
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
-        )}
+
+          <form onSubmit={handleSubmitKYC} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>Company / Registered Name</label>
+                <input 
+                  type="text" 
+                  value={activeFormData.company_name}
+                  onChange={(e) => handleInputChange('company_name', e.target.value)}
+                  style={{ width: '100%', padding: '12px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #cbd5e1', outline: 'none', fontWeight: 600, color: '#0f172a' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>Registration / License Number</label>
+                <input 
+                  type="text" 
+                  value={activeFormData.business_reg}
+                  onChange={(e) => handleInputChange('business_reg', e.target.value)}
+                  style={{ width: '100%', padding: '12px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #cbd5e1', outline: 'none', fontWeight: 600, color: '#0f172a' }}
+                />
+              </div>
+            </div>
+
+            {/* DOCUMENT UPLOADS GRID */}
+            <div style={{ marginTop: '10px' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>
+                Required Verification Documents (PDF / PNG Scan)
+              </label>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                
+                <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '14px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>1. Government Trade License</span>
+                    <Upload size={16} color="var(--brand-primary)" />
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>✓ {activeFormData.trade_license_doc}</span>
+                </div>
+
+                <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '14px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>2. Tourism Operations Permit</span>
+                    <Upload size={16} color="var(--brand-primary)" />
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>✓ {activeFormData.tax_cert_doc}</span>
+                </div>
+
+                <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '14px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>3. Marine/Public Liability Insurance</span>
+                    <Upload size={16} color="var(--brand-primary)" />
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>✓ {activeFormData.insurance_doc}</span>
+                </div>
+
+                <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '14px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>4. Director Passport / Govt ID</span>
+                    <Upload size={16} color="var(--brand-primary)" />
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>✓ {activeFormData.signatory_id_doc}</span>
+                </div>
+
+              </div>
+            </div>
+
+            {/* SUBMIT BUTTON */}
+            <button 
+              type="submit" 
+              disabled={submitting} 
+              className="btn-primary" 
+              style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem', marginTop: '12px' }}
+            >
+              {submitting ? 'Running AI OCR Verification Scan...' : 'Submit Verification Vault to TravelNest Compliance'}
+            </button>
+          </form>
+
+          {/* AI OCR VERIFICATION RESULT */}
+          {kycResult && (
+            <div style={{ marginTop: '28px', padding: '24px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#0369a1' }}>
+                <CheckCircle2 size={20} />
+                <strong style={{ fontSize: '1.1rem' }}>AI OCR Verification Passed ({Math.round(kycResult.ocr_confidence * 100)}% Confidence)</strong>
+              </div>
+              <p style={{ fontSize: '0.88rem', color: '#0f172a', margin: 0 }}>
+                Status: <strong>{kycResult.status}</strong> • Risk Score: <strong>{kycResult.ai_fraud_score} / 100</strong>. Your listings are now enabled for global bookings.
+              </p>
+            </div>
+          )}
+
+        </div>
+
       </div>
     </div>
   );

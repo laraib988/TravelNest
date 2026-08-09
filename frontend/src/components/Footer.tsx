@@ -9,9 +9,7 @@ import {
   Twitter,
   Instagram,
   Youtube,
-  Linkedin,
-  MessageCircle,
-  Headphones
+  Linkedin
 } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -85,8 +83,8 @@ export default function Footer() {
                 <a href="https://linkedin.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="LinkedIn">
                   <Linkedin size={20} />
                 </a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s', fontWeight: 700, fontSize: '1rem', textDecoration: 'none' }} aria-label="TikTok">
-                  🎵
+                <a href="https://tiktok.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s', fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none' }} aria-label="TikTok">
+                  TikTok
                 </a>
               </div>
             </div>
@@ -98,6 +96,8 @@ export default function Footer() {
               </h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.95rem' }}>
                 <li><Link href="/" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('cat_all')}</Link></li>
+                <li><Link href="/community" style={{ color: '#d1d5db', textDecoration: 'none' }}>Community Forum</Link></li>
+                <li><Link href="/loyalty" style={{ color: '#d1d5db', textDecoration: 'none' }}>Loyalty & Rewards</Link></li>
                 <li><Link href="/about" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('about_us')}</Link></li>
                 <li><Link href="/contact" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('contact')}</Link></li>
                 <li><Link href="/support" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('help_support')}</Link></li>
@@ -162,61 +162,6 @@ export default function Footer() {
 
         </div>
       </footer>
-
-      {/* FLOATING ACTION BUTTONS */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 9999,
-          display: 'flex',
-          gap: '12px',
-          alignItems: 'center',
-        }}
-      >
-        <a
-          href="https://wa.me/818083572662"
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '50%',
-            background: '#25D366',
-            color: '#ffffff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 6px 18px rgba(37, 211, 102, 0.4)',
-            transition: 'transform 0.2s',
-            cursor: 'pointer',
-          }}
-          aria-label="Contact on WhatsApp"
-        >
-          <MessageCircle size={26} />
-        </a>
-
-        <div
-          onClick={() => alert('TravelNest 24/7 AI Concierge Chatbot is active!')}
-          style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '50%',
-            background: '#38bdf8', // Styled sky blue button
-            color: '#0f172a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 6px 18px rgba(56, 189, 248, 0.4)',
-            transition: 'transform 0.2s',
-            cursor: 'pointer',
-          }}
-          aria-label="Live Chat Support"
-        >
-          <Headphones size={24} />
-        </div>
-      </div>
     </>
   );
 }

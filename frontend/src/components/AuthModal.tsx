@@ -160,23 +160,32 @@ export default function AuthModal() {
         </form>
 
         {/* SOCIAL AUTH STRIP */}
-        <div style={{ margin: '24px 0 16px', textAlign: 'center', position: 'relative' }}>
+        <div style={{ margin: '20px 0 16px', textAlign: 'center', position: 'relative' }}>
           <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
-          <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#fff', padding: '0 12px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}>OR CONTINUE WITH</span>
+          <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#fff', padding: '0 12px', fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>OR SOCIAL SINGLE SIGN-ON (OAuth2)</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
           <button
-            onClick={() => login('google.user@example.com', 'pass')}
-            style={{ flex: 1, padding: '10px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+            type="button"
+            onClick={() => login('google.user@gmail.com', 'pass')}
+            style={{ padding: '10px 6px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
           >
             🌐 Google
           </button>
           <button
-            onClick={() => login('apple.user@example.com', 'pass')}
-            style={{ flex: 1, padding: '10px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+            type="button"
+            onClick={() => login('fb.user@facebook.com', 'pass')}
+            style={{ padding: '10px 6px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
           >
-            🍎 Apple
+            📘 Facebook
+          </button>
+          <button
+            type="button"
+            onClick={() => login('apple.user@apple.com', 'pass')}
+            style={{ padding: '10px 6px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', background: '#ffffff', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+          >
+            🍎 Apple ID
           </button>
         </div>
 
