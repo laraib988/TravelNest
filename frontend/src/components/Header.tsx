@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Compass,
@@ -17,7 +17,12 @@ import {
   MessageSquare,
   Award,
   ShoppingCart,
-  LogIn
+  LogIn,
+  Globe,
+  Star,
+  FileText,
+  ArrowRightLeft,
+  UserPlus
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -27,7 +32,37 @@ import AuthModal from './AuthModal';
 export default function Header() {
   const { user, openAuthModal, logout } = useAuth();
   const { t } = useCurrency();
+  
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
+  const [isExploreOpen, setIsExploreOpen] = useState(false);
+  const [isSignUpHovered, setIsSignUpHovered] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+
+  const subHeaderRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (subHeaderRef.current && !subHeaderRef.current.contains(event.target as Node)) {
+        setIsDestinationsOpen(false);
+        setIsExploreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const featuredCities = [
+    { name: 'Lahore', country: 'Pakistan', slug: 'lahore' },
+    { name: 'Karachi', country: 'Pakistan', slug: 'karachi' },
+    { name: 'Bali', country: 'Indonesia', slug: 'bali' },
+    { name: 'Tokyo', country: 'Japan', slug: 'tokyo' },
+    { name: 'Paris', country: 'France', slug: 'paris' },
+    { name: 'Dubai', country: 'UAE', slug: 'dubai' },
+    { name: 'Rome', country: 'Italy', slug: 'rome' },
+    { name: 'Skardu', country: 'Pakistan', slug: 'skardu' },
+  ];
 
   return (
     <>
@@ -35,13 +70,14 @@ export default function Header() {
         style={{ 
           position: 'sticky', 
           top: 0, 
-          zIndex: 50, 
-          background: 'rgba(255, 255, 255, 0.94)', 
+          zIndex: 100, 
+          background: 'rgba(255, 255, 255, 0.98)', 
           backdropFilter: 'blur(16px)', 
           borderBottom: '1px solid #e2e8f0',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)'
         }}
       >
+        {/* HEADER 1: PRIMARY TOP HEADER BAR */}
         <div 
           style={{ 
             maxWidth: '1280px', 
@@ -77,165 +113,41 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* CENTER: MAIN NAVIGATION LINKS */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Link 
-              href="/destinations" 
-              className="btn-secondary" 
-              style={{ padding: '9px 18px', fontSize: '0.88rem', fontWeight: 600, border: '1px solid #e2e8f0', background: '#f8fafc', whiteSpace: 'nowrap' }}
-            >
-              {t('destinations')}
-            </Link>
-            <Link 
-              href="/ai-planner" 
-              className="btn-primary" 
-              style={{ padding: '9px 20px', fontSize: '0.88rem', fontWeight: 600, whiteSpace: 'nowrap' }}
-            >
-              {t('ai_trip_studio')}
-            </Link>
-            <Link 
-              href="/blog" 
-              className="btn-secondary" 
-              style={{ padding: '9px 18px', fontSize: '0.88rem', fontWeight: 600, border: '1px solid #e2e8f0', background: '#f8fafc', whiteSpace: 'nowrap' }}
-            >
-              {t('travel_journal')}
-            </Link>
-            <Link 
-              href="/supplier" 
-              className="btn-secondary" 
-              style={{ padding: '9px 18px', fontSize: '0.88rem', fontWeight: 600, border: '1px solid #e2e8f0', background: '#f8fafc', whiteSpace: 'nowrap' }}
-            >
-              {t('supplier_portal')}
-            </Link>
-          </nav>
+          {/* CENTER IS EMPTY */}
+          <div style={{ flex: 1 }} />
 
-          {/* RIGHT: UTILITY ICONS & USER AUTH ACTION */}
+          {/* RIGHT: NAVIGATION LINKS, CURRENCY & 2 SEPARATE AUTH BUTTONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
             
+            {/* PRIMARY NAVIGATION LINKS */}
+            <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Link 
+                href="/ai-planner" 
+                className="btn-primary" 
+                style={{ padding: '8px 18px', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}
+              >
+                {t('ai_trip_studio')}
+              </Link>
+              <Link 
+                href="/blog" 
+                className="btn-secondary" 
+                style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #e2e8f0', background: '#f8fafc', whiteSpace: 'nowrap' }}
+              >
+                {t('travel_journal')}
+              </Link>
+              <Link 
+                href="/supplier" 
+                className="btn-secondary" 
+                style={{ padding: '8px 16px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #e2e8f0', background: '#f8fafc', whiteSpace: 'nowrap' }}
+              >
+                {t('supplier_portal')}
+              </Link>
+            </nav>
+
             {/* CURRENCY & LANGUAGE SELECTOR DROPDOWN */}
             <CurrencyLanguageDropdown />
 
-            {/* DIVIDER */}
-            <div style={{ width: '1px', height: '24px', background: '#e2e8f0' }} />
-
-            {/* CART */}
-            <Link href="/cart" aria-label="Cart" style={{ textDecoration: 'none' }}>
-              <div 
-                style={{ 
-                  position: 'relative', 
-                  cursor: 'pointer', 
-                  background: '#f8fafc', 
-                  padding: '9px', 
-                  borderRadius: '50%', 
-                  border: '1px solid #e2e8f0', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <ShoppingCart size={18} color="#475569" />
-                <span 
-                  style={{ 
-                    position: 'absolute', 
-                    top: '-3px', 
-                    right: '-3px', 
-                    background: 'var(--brand-primary)', 
-                    color: '#ffffff', 
-                    fontSize: '0.65rem', 
-                    fontWeight: 700, 
-                    borderRadius: '50%', 
-                    width: '16px', 
-                    height: '16px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
-                  2
-                </span>
-              </div>
-            </Link>
-
-            {/* WISHLIST */}
-            <Link href="/wishlist" aria-label="Wishlist" style={{ textDecoration: 'none' }}>
-              <div 
-                style={{ 
-                  position: 'relative', 
-                  cursor: 'pointer', 
-                  background: '#f8fafc', 
-                  padding: '9px', 
-                  borderRadius: '50%', 
-                  border: '1px solid #e2e8f0', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  transition: 'all 0.2s' 
-                }}
-              >
-                <Heart size={18} color="#e11d48" fill="#e11d48" />
-                <span 
-                  style={{ 
-                    position: 'absolute', 
-                    top: '-3px', 
-                    right: '-3px', 
-                    background: 'var(--brand-primary)', 
-                    color: '#ffffff', 
-                    fontSize: '0.65rem', 
-                    fontWeight: 700, 
-                    borderRadius: '50%', 
-                    width: '16px', 
-                    height: '16px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
-                  1
-                </span>
-              </div>
-            </Link>
-
-            {/* NOTIFICATIONS BELL */}
-            <Link href="/notifications" aria-label="Notifications" style={{ textDecoration: 'none' }}>
-              <div 
-                style={{ 
-                  position: 'relative', 
-                  cursor: 'pointer', 
-                  background: '#f8fafc', 
-                  padding: '9px', 
-                  borderRadius: '50%', 
-                  border: '1px solid #e2e8f0', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  transition: 'all 0.2s' 
-                }}
-              >
-                <Bell size={18} color="#475569" />
-                <span 
-                  style={{ 
-                    position: 'absolute', 
-                    top: '-3px', 
-                    right: '-3px', 
-                    background: 'var(--brand-primary)', 
-                    color: '#ffffff', 
-                    fontSize: '0.65rem', 
-                    fontWeight: 700, 
-                    borderRadius: '50%', 
-                    width: '16px', 
-                    height: '16px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
-                  3
-                </span>
-              </div>
-            </Link>
-
-            {/* AUTHENTICATION ACTION: SINGLE CLEAN SIGN IN BUTTON OR USER PROFILE */}
+            {/* AUTHENTICATION ACTIONS: USER PROFILE OR 2 SEPARATE BUTTONS (SIGN IN & SIGN UP) */}
             {user ? (
               <div style={{ position: 'relative' }}>
                 <button
@@ -269,7 +181,7 @@ export default function Header() {
                       border: '1px solid #e2e8f0',
                       width: '210px',
                       padding: '8px 0',
-                      zIndex: 100,
+                      zIndex: 200,
                     }}
                   >
                     <Link
@@ -335,27 +247,575 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <button
-                onClick={() => openAuthModal('LOGIN')}
-                className="btn-primary"
-                style={{ 
-                  padding: '9px 24px', 
-                  fontSize: '0.88rem', 
-                  fontWeight: 700, 
-                  borderRadius: 'var(--radius-pill)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <LogIn size={15} /> Sign In
-              </button>
+              /* 2 SEPARATE AUTH BUTTONS: SIGN IN (BLUE BG) & SIGN UP (WHITE BG -> BLUE ON HOVER) */
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => openAuthModal('LOGIN')}
+                  style={{ 
+                    padding: '8px 20px', 
+                    fontSize: '0.88rem', 
+                    fontWeight: 700, 
+                    borderRadius: 'var(--radius-pill)',
+                    border: 'none',
+                    background: '#0284c7',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <LogIn size={15} /> Sign In
+                </button>
+
+                <button
+                  onClick={() => openAuthModal('SIGNUP')}
+                  onMouseEnter={() => setIsSignUpHovered(true)}
+                  onMouseLeave={() => setIsSignUpHovered(false)}
+                  style={{ 
+                    padding: '8px 20px', 
+                    fontSize: '0.88rem', 
+                    fontWeight: 700, 
+                    borderRadius: 'var(--radius-pill)',
+                    border: '1.5px solid #0284c7',
+                    background: isSignUpHovered ? '#0284c7' : '#ffffff',
+                    color: isSignUpHovered ? '#ffffff' : '#0284c7',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s',
+                    boxShadow: isSignUpHovered ? '0 2px 8px rgba(2, 132, 199, 0.25)' : 'none'
+                  }}
+                >
+                  <UserPlus size={15} /> Sign Up
+                </button>
+              </div>
             )}
 
           </div>
-
         </div>
       </header>
+
+      {/* HEADER 2: SECONDARY NAVIGATION STRIP (NON-STICKY, SCROLLS WITH PAGE) */}
+      <div 
+        ref={subHeaderRef}
+        style={{ 
+          background: '#ffffff', 
+          borderBottom: '1px solid #e2e8f0', 
+          padding: '10px 0',
+          position: 'relative',
+          zIndex: 40
+        }}
+      >
+          <div 
+            style={{ 
+              maxWidth: '1280px', 
+              margin: '0 auto', 
+              padding: '0 24px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              gap: '20px'
+            }}
+          >
+            {/* SUB-HEADER LEFT DROPDOWNS: DESTINATIONS & EXPLORE TRAVELNEST */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+              
+              {/* 1. DESTINATIONS DROPDOWN BUTTON */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDestinationsOpen(!isDestinationsOpen);
+                    setIsExploreOpen(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '7px 16px',
+                    borderRadius: '10px',
+                    border: isDestinationsOpen ? '1.5px solid #0284c7' : '1px solid #cbd5e1',
+                    background: isDestinationsOpen ? '#f0f9ff' : '#ffffff',
+                    color: isDestinationsOpen ? '#0284c7' : '#0f172a',
+                    fontWeight: 700,
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow-sm)',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <MapPin size={15} color="#0284c7" />
+                  <span>Destinations</span>
+                  <ChevronDown size={14} color="#64748b" style={{ transform: isDestinationsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
+
+                {isDestinationsOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '44px',
+                      left: 0,
+                      background: '#ffffff',
+                      borderRadius: '18px',
+                      boxShadow: '0 14px 40px rgba(15,23,42,0.18)',
+                      border: '1px solid #e2e8f0',
+                      width: '280px',
+                      padding: '14px 0',
+                      zIndex: 300
+                    }}
+                  >
+                    <div style={{ padding: '4px 16px 8px', fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Featured Global Cities
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', padding: '0 10px' }}>
+                      {featuredCities.map((city) => (
+                        <Link
+                          key={city.slug}
+                          href={`/destinations/${city.slug}`}
+                          onClick={() => setIsDestinationsOpen(false)}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '8px 10px',
+                            borderRadius: '10px',
+                            textDecoration: 'none',
+                            transition: 'background 0.2s',
+                            background: '#f8fafc'
+                          }}
+                        >
+                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{city.name}</span>
+                          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{city.country}</span>
+                        </Link>
+                      ))}
+                    </div>
+
+                    <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '10px 0' }} />
+
+                    <Link
+                      href="/destinations"
+                      onClick={() => setIsDestinationsOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '6px 16px',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        color: '#0284c7',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <span>View All Destinations</span>
+                      <span>→</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* 2. EXPLORE TRAVELNEST DROPDOWN BUTTON */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsExploreOpen(!isExploreOpen);
+                    setIsDestinationsOpen(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '7px 16px',
+                    borderRadius: '10px',
+                    border: isExploreOpen ? '1.5px solid #7c3aed' : '1px solid #cbd5e1',
+                    background: isExploreOpen ? '#f5f3ff' : '#ffffff',
+                    color: isExploreOpen ? '#7c3aed' : '#0f172a',
+                    fontWeight: 700,
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow-sm)',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <Compass size={15} color="#7c3aed" />
+                  <span>Explore TravelNest</span>
+                  <ChevronDown size={14} color="#64748b" style={{ transform: isExploreOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
+
+                {isExploreOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '44px',
+                      left: 0,
+                      background: '#ffffff',
+                      borderRadius: '18px',
+                      boxShadow: '0 14px 40px rgba(15,23,42,0.18)',
+                      border: '1px solid #e2e8f0',
+                      width: '250px',
+                      padding: '10px 0',
+                      zIndex: 300
+                    }}
+                  >
+                    <Link
+                      href="/#experiences-section"
+                      onClick={() => setIsExploreOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      <Star size={15} color="#d97706" /> Top Experiences
+                    </Link>
+                    <Link
+                      href="/community"
+                      onClick={() => setIsExploreOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      <MessageSquare size={15} color="#0284c7" /> Community Forum
+                    </Link>
+                    <Link
+                      href="/loyalty"
+                      onClick={() => setIsExploreOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      <Award size={15} color="#059669" /> Loyalty & Rewards
+                    </Link>
+                    <Link
+                      href="/ai-planner"
+                      onClick={() => setIsExploreOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      <Sparkles size={15} color="#7c3aed" /> AI Itinerary Studio
+                    </Link>
+                    <Link
+                      href="/blog"
+                      onClick={() => setIsExploreOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
+                    >
+                      <FileText size={15} color="#dc2626" /> Travel Journal & Guides
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            {/* SECOND HEADER RIGHT ACTIONS: ONLY ICONS WITH UNIFORM PROFESSIONAL COLOR (#475569) & BLUE FLOATING TOOLTIPS */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+              
+              {/* FAVORITES ICON */}
+              <Link 
+                href="/wishlist" 
+                aria-label="Favorites" 
+                style={{ textDecoration: 'none', position: 'relative' }}
+                onMouseEnter={() => setActiveTooltip('FAVORITES')}
+                onMouseLeave={() => setActiveTooltip(null)}
+              >
+                <div 
+                  style={{ 
+                    position: 'relative', 
+                    cursor: 'pointer', 
+                    background: '#f8fafc', 
+                    padding: '9px', 
+                    borderRadius: '50%', 
+                    border: '1px solid #cbd5e1', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s' 
+                  }}
+                >
+                  <Heart size={17} color="#475569" />
+                  <span 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-3px', 
+                      right: '-3px', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.62rem', 
+                      fontWeight: 800, 
+                      borderRadius: '50%', 
+                      width: '16px', 
+                      height: '16px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}
+                  >
+                    1
+                  </span>
+                </div>
+
+                {activeTooltip === 'FAVORITES' && (
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '46px', 
+                      left: '50%', 
+                      transform: 'translateX(-50%)', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.72rem', 
+                      fontWeight: 700, 
+                      padding: '4px 10px', 
+                      borderRadius: '6px', 
+                      whiteSpace: 'nowrap', 
+                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
+                      pointerEvents: 'none', 
+                      zIndex: 250 
+                    }}
+                  >
+                    Favorites
+                  </div>
+                )}
+              </Link>
+
+              {/* CART ICON */}
+              <Link 
+                href="/cart" 
+                aria-label="Cart" 
+                style={{ textDecoration: 'none', position: 'relative' }}
+                onMouseEnter={() => setActiveTooltip('CART')}
+                onMouseLeave={() => setActiveTooltip(null)}
+              >
+                <div 
+                  style={{ 
+                    position: 'relative', 
+                    cursor: 'pointer', 
+                    background: '#f8fafc', 
+                    padding: '9px', 
+                    borderRadius: '50%', 
+                    border: '1px solid #cbd5e1', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <ShoppingCart size={17} color="#475569" />
+                  <span 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-3px', 
+                      right: '-3px', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.62rem', 
+                      fontWeight: 800, 
+                      borderRadius: '50%', 
+                      width: '16px', 
+                      height: '16px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}
+                  >
+                    2
+                  </span>
+                </div>
+
+                {activeTooltip === 'CART' && (
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '46px', 
+                      left: '50%', 
+                      transform: 'translateX(-50%)', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.72rem', 
+                      fontWeight: 700, 
+                      padding: '4px 10px', 
+                      borderRadius: '6px', 
+                      whiteSpace: 'nowrap', 
+                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
+                      pointerEvents: 'none', 
+                      zIndex: 250 
+                    }}
+                  >
+                    Cart
+                  </div>
+                )}
+              </Link>
+
+              {/* MY BOOKINGS ICON */}
+              <Link 
+                href="/my-bookings" 
+                aria-label="My Bookings" 
+                style={{ textDecoration: 'none', position: 'relative' }}
+                onMouseEnter={() => setActiveTooltip('BOOKINGS')}
+                onMouseLeave={() => setActiveTooltip(null)}
+              >
+                <div 
+                  style={{ 
+                    cursor: 'pointer', 
+                    background: '#f8fafc', 
+                    padding: '9px', 
+                    borderRadius: '50%', 
+                    border: '1px solid #cbd5e1', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <Calendar size={17} color="#475569" />
+                </div>
+
+                {activeTooltip === 'BOOKINGS' && (
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '46px', 
+                      left: '50%', 
+                      transform: 'translateX(-50%)', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.72rem', 
+                      fontWeight: 700, 
+                      padding: '4px 10px', 
+                      borderRadius: '6px', 
+                      whiteSpace: 'nowrap', 
+                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
+                      pointerEvents: 'none', 
+                      zIndex: 250 
+                    }}
+                  >
+                    My Bookings
+                  </div>
+                )}
+              </Link>
+
+              {/* COMPARE ICON */}
+              <Link 
+                href="/destinations" 
+                aria-label="Compare" 
+                style={{ textDecoration: 'none', position: 'relative' }}
+                onMouseEnter={() => setActiveTooltip('COMPARE')}
+                onMouseLeave={() => setActiveTooltip(null)}
+              >
+                <div 
+                  style={{ 
+                    cursor: 'pointer', 
+                    background: '#f8fafc', 
+                    padding: '9px', 
+                    borderRadius: '50%', 
+                    border: '1px solid #cbd5e1', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <ArrowRightLeft size={17} color="#475569" />
+                </div>
+
+                {activeTooltip === 'COMPARE' && (
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '46px', 
+                      left: '50%', 
+                      transform: 'translateX(-50%)', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.72rem', 
+                      fontWeight: 700, 
+                      padding: '4px 10px', 
+                      borderRadius: '6px', 
+                      whiteSpace: 'nowrap', 
+                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
+                      pointerEvents: 'none', 
+                      zIndex: 250 
+                    }}
+                  >
+                    Compare
+                  </div>
+                )}
+              </Link>
+
+              {/* BELL / NOTIFICATIONS ICON */}
+              <Link 
+                href="/notifications" 
+                aria-label="Notifications" 
+                style={{ textDecoration: 'none', position: 'relative' }}
+                onMouseEnter={() => setActiveTooltip('NOTIFICATIONS')}
+                onMouseLeave={() => setActiveTooltip(null)}
+              >
+                <div 
+                  style={{ 
+                    position: 'relative', 
+                    cursor: 'pointer', 
+                    background: '#f8fafc', 
+                    padding: '9px', 
+                    borderRadius: '50%', 
+                    border: '1px solid #cbd5e1', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s' 
+                  }}
+                >
+                  <Bell size={17} color="#475569" />
+                  <span 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-3px', 
+                      right: '-3px', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.62rem', 
+                      fontWeight: 800, 
+                      borderRadius: '50%', 
+                      width: '16px', 
+                      height: '16px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}
+                  >
+                    3
+                  </span>
+                </div>
+
+                {activeTooltip === 'NOTIFICATIONS' && (
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '46px', 
+                      left: '50%', 
+                      transform: 'translateX(-50%)', 
+                      background: '#0284c7', 
+                      color: '#ffffff', 
+                      fontSize: '0.72rem', 
+                      fontWeight: 700, 
+                      padding: '4px 10px', 
+                      borderRadius: '6px', 
+                      whiteSpace: 'nowrap', 
+                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
+                      pointerEvents: 'none', 
+                      zIndex: 250 
+                    }}
+                  >
+                    Notifications
+                  </div>
+                )}
+              </Link>
+
+            </div>
+
+          </div>
+        </div>
 
       <AuthModal />
     </>

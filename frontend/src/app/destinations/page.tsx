@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchFromAPI } from '@/lib/api-client';
-import { MapPin, Search, ChevronRight, Compass, Sparkles, ShieldCheck } from 'lucide-react';
+import { MapPin, Search, ChevronRight, Compass, ArrowRight } from 'lucide-react';
 
 export default function DestinationsIndexPage() {
   const [destinations, setDestinations] = useState<any[]>([]);
@@ -25,33 +25,30 @@ export default function DestinationsIndexPage() {
     loadDestinations();
   }, []);
 
-  const countries = ['ALL', ...Array.from(new Set(destinations.map((d) => d.country)))];
+  const rawCountries = destinations.map(d => d.country).filter(Boolean);
+  const countries = ['ALL', ...Array.from(new Set(rawCountries))];
 
   const filteredDestinations = destinations.filter((dest) => {
-    const matchesSearch = 
-      dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dest.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dest.description.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!dest) return false;
+    const nameMatch = (dest.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const countryMatch = (dest.country || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const descMatch = (dest.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = nameMatch || countryMatch || descMatch;
     const matchesCountry = selectedCountry === 'ALL' || dest.country === selectedCountry;
     return matchesSearch && matchesCountry;
   });
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
+    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
         
-        {/* BREADCRUMB NAV */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
           <Link href="/" style={{ textDecoration: 'none', color: '#64748b' }}>Home</Link>
           <ChevronRight size={14} color="#94a3b8" />
           <span style={{ color: '#0f172a', fontWeight: 700 }}>All Destinations</span>
         </div>
 
-        {/* HERO BANNER */}
         <div style={{ marginBottom: '36px' }}>
-          <div className="badge-emerald" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
-            <Compass size={14} /> Global Travel Directory
-          </div>
           <h1 style={{ fontSize: '2.8rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.15 }}>
             Explore Top Global Destinations
           </h1>
@@ -60,46 +57,33 @@ export default function DestinationsIndexPage() {
           </p>
         </div>
 
-        {/* SEARCH & COUNTRY FILTER BAR */}
-        <div className="card-panel" style={{ padding: '20px 24px', borderRadius: '20px', marginBottom: '36px', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
-          
+        <div className="card-panel" style={{ padding: '20px 24px', borderRadius: '20px', marginBottom: '36px', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
             <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
             <input 
               type="text" 
-              placeholder="Search destination by city or country (e.g. Lahore, Bali, Tokyo)..."
+              placeholder="Search destination by city or country..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: '100%', padding: '12px 12px 12px 42px', borderRadius: '12px', background: '#f8fafc', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.92rem', color: '#0f172a', fontWeight: 600 }}
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
-            {countries.map((country) => (
-              <button
-                key={country}
-                onClick={() => setSelectedCountry(country)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: 'var(--radius-pill)',
-                  border: selectedCountry === country ? 'none' : '1px solid #cbd5e1',
-                  background: selectedCountry === country ? 'var(--brand-gradient)' : '#ffffff',
-                  color: selectedCountry === country ? '#ffffff' : '#0f172a',
-                  fontWeight: selectedCountry === country ? 700 : 600,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {country === 'ALL' ? '🌍 All Countries' : country}
-              </button>
-            ))}
+          <div style={{ minWidth: '200px' }}>
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: '#ffffff', border: '1px solid #cbd5e1', color: '#0f172a', fontWeight: 600, fontSize: '0.9rem', outline: 'none', cursor: 'pointer' }}
+            >
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country === 'ALL' ? 'All Countries' : country}
+                </option>
+              ))}
+            </select>
           </div>
-
         </div>
 
-        {/* DESTINATIONS GRID */}
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Loading destinations directory...</div>
         ) : filteredDestinations.length === 0 ? (
@@ -140,10 +124,10 @@ export default function DestinationsIndexPage() {
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid #f1f5f9', marginTop: '12px' }}>
                       <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--brand-primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <MapPin size={13} /> {dest.popular_activities_count}+ Experiences
+                        <MapPin size={13} /> {dest.popular_activities_count || 10}+ Experiences
                       </span>
-                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>
-                        Explore →
+                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        Explore <ArrowRight size={13} />
                       </span>
                     </div>
                   </div>

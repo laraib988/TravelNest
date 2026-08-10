@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Search,
@@ -21,6 +21,8 @@ import {
   ArrowRightLeft,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Tag,
   Users,
   Award,
@@ -33,6 +35,29 @@ import SortFilterDropdown, { SortOption } from '@/components/SortFilterDropdown'
 
 export default function HomePage() {
   const { formatPrice, currency, t } = useCurrency();
+
+  const toursSliderRef = useRef<HTMLDivElement>(null);
+  const reviewsSliderRef = useRef<HTMLDivElement>(null);
+
+  const scrollTours = (direction: 'left' | 'right') => {
+    if (toursSliderRef.current) {
+      const scrollAmount = toursSliderRef.current.clientWidth;
+      toursSliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const scrollReviews = (direction: 'left' | 'right') => {
+    if (reviewsSliderRef.current) {
+      const scrollAmount = reviewsSliderRef.current.clientWidth;
+      reviewsSliderRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   // STATE VARIABLES
   const [searchQuery, setSearchQuery] = useState('');
@@ -593,18 +618,68 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. EXPLORE OUR TOURS MAIN SECTION */}
+      {/* 8. TOP RATED MARKETPLACE EXPERIENCES SLIDER SECTION */}
       <section id="experiences-section" style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
         
-        {/* HEADER BAR WITH TITLE & EXACT SORT DROPDOWN */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Explore our tours
-          </h2>
-          <SortFilterDropdown currentSort={sortBy} onSortChange={setSortBy} />
+        {/* HEADER BAR WITH TITLE, SLIDER CONTROLS & SORT DROPDOWN */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+              Top Rated Marketplace Experiences
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', margin: '4px 0 0' }}>
+              Handpicked top-rated tours, excursions and activities
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => scrollTours('left')}
+                aria-label="Previous Experiences"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#0f172a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scrollTours('right')}
+                aria-label="Next Experiences"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#0f172a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+            <SortFilterDropdown currentSort={sortBy} onSortChange={setSortBy} />
+          </div>
         </div>
 
-        {/* RESULTS GRID */}
+        {/* RESULTS SLIDER (1 ROW - 4 PRODUCTS VISIBLE) */}
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading experiences from NestJS API...</div>
         ) : filteredListings.length === 0 ? (
@@ -614,12 +689,33 @@ export default function HomePage() {
             <button onClick={handleResetSearch} className="btn-primary" style={{ padding: '10px 20px', fontSize: '0.9rem' }}>{t('reset_filters')}</button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
+          <div 
+            ref={toursSliderRef}
+            style={{ 
+              display: 'flex', 
+              gap: '24px', 
+              overflowX: 'auto', 
+              scrollBehavior: 'smooth',
+              paddingBottom: '16px',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+          >
             {filteredListings.filter(item => item.id !== 'list-bali-sunset').map((item) => (
-              <div key={item.id} className="card-panel card-interactive" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div 
+                key={item.id} 
+                className="card-panel card-interactive" 
+                style={{ 
+                  flex: '0 0 calc(25% - 18px)', 
+                  minWidth: '270px', 
+                  overflow: 'hidden', 
+                  display: 'flex', 
+                  flexDirection: 'column' 
+                }}
+              >
                 
                 {/* IMAGE & BADGES */}
-                <div style={{ height: '210px', position: 'relative' }}>
+                <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   
                   <button
@@ -653,27 +749,27 @@ export default function HomePage() {
                 </div>
 
                 {/* CONTENT */}
-                <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', lineHeight: 1.35, color: '#0f172a' }}>{item.title}</h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '14px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <h3 style={{ fontSize: '1.05rem', marginBottom: '6px', lineHeight: 1.35, color: '#0f172a', fontWeight: 700 }}>{item.title}</h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {item.summary}
                     </p>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={13} /> {item.duration_minutes / 60} {t('hours')}</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={13} color="#059669" /> {t('kyc_verified')}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> {item.duration_minutes / 60} {t('hours')}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} color="#059669" /> {t('kyc_verified')}</span>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px', borderTop: '1px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-light)' }}>
                     <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('from')}</span>
-                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                        {formatPrice(item.base_price)} <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 400 }}>{t('per_person')}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('from')}</span>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                        {formatPrice(item.base_price)}
                       </div>
                     </div>
-                    <Link href={`/tours/${item.slug}`} className="btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                    <Link href={`/tours/${item.slug}`} className="btn-secondary" style={{ padding: '7px 14px', fontSize: '0.82rem' }}>
                       {t('view_slots')}
                     </Link>
                   </div>
@@ -740,38 +836,178 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 10. CUSTOMER REVIEWS TESTIMONIALS */}
-      <section style={{ background: '#f0fdf4', padding: '60px 0', borderTop: '1px solid #dcfce7', borderBottom: '1px solid #dcfce7', marginBottom: '60px' }}>
+      {/* 10. VERIFIED TRAVELER REVIEWS SLIDER SECTION */}
+      <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-            💬 Verified Customer Reviews
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
-            What our global community of 50,000+ travelers say
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={{ background: '#ffffff', padding: '28px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
-              </div>
-              <h3 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>"Incredible night walk"</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
-                The Tokyo Ramen & Izakaya tour was worth every cent. Our art historian guide brought golden gai alleys to life. Saved us hours of standing in queues!
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                Verified Traveler Reviews
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: '4px 0 0' }}>
+                Real feedback from our global community of 50,000+ travelers
               </p>
-              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>— Ali K. (Verified Booking)</span>
             </div>
 
-            <div style={{ background: '#ffffff', padding: '28px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
-              </div>
-              <h3 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>"Instant booking check-in"</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
-                Louvre skip-the-line pass worked like charm. Secured the timed ticket on my mobile phone and entry voucher QR code was generated instantly. Amazing!
-              </p>
-              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>— Sarah C. (Verified Booking)</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => scrollReviews('left')}
+                aria-label="Previous Reviews"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#0f172a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={() => scrollReviews('right')}
+                aria-label="Next Reviews"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#0f172a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
+          </div>
+
+          <div 
+            ref={reviewsSliderRef}
+            style={{ 
+              display: 'flex', 
+              gap: '24px', 
+              overflowX: 'auto', 
+              scrollBehavior: 'smooth',
+              paddingBottom: '16px',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+          >
+            {/* REVIEW CARD 1 */}
+            <div className="card-panel" style={{ flex: '0 0 calc(33.333% - 16px)', minWidth: '300px', padding: '28px', borderRadius: '20px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '10px' }}>"Incredible Tokyo Night Walk"</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  The Tokyo Ramen & Izakaya tour was worth every cent. Our local historian guide brought Golden Gai alleys to life. Saved us hours of standing in queues!
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Ali K.</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: 'var(--radius-pill)' }}>Verified Booking</span>
+              </div>
+            </div>
+
+            {/* REVIEW CARD 2 */}
+            <div className="card-panel" style={{ flex: '0 0 calc(33.333% - 16px)', minWidth: '300px', padding: '28px', borderRadius: '20px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '10px' }}>"Instant Pass Check-in"</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  Louvre skip-the-line pass worked like a charm. Secured the timed ticket on my phone and entry voucher QR code was generated instantly. Amazing service!
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Sarah C.</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: 'var(--radius-pill)' }}>Verified Booking</span>
+              </div>
+            </div>
+
+            {/* REVIEW CARD 3 */}
+            <div className="card-panel" style={{ flex: '0 0 calc(33.333% - 16px)', minWidth: '300px', padding: '28px', borderRadius: '20px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '10px' }}>"Unforgettable Food Walk"</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  Walled City Lahore tour was standard-setting. Authentic street gastronomy, rich Mughal heritage commentary, and super helpful local host. Highly recommended!
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Hamza M.</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: 'var(--radius-pill)' }}>Verified Booking</span>
+              </div>
+            </div>
+
+            {/* REVIEW CARD 4 */}
+            <div className="card-panel" style={{ flex: '0 0 calc(33.333% - 16px)', minWidth: '300px', padding: '28px', borderRadius: '20px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '10px' }}>"Breathtaking Sunset Cruise"</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  The catamaran sail off Nusa Dua in Bali was smooth and spectacular. Fresh grilled seafood buffet and DJ vibes were outstanding. 10/10 experience!
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>David L.</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: 'var(--radius-pill)' }}>Verified Booking</span>
+              </div>
+            </div>
+
+            {/* REVIEW CARD 5 */}
+            <div className="card-panel" style={{ flex: '0 0 calc(33.333% - 16px)', minWidth: '300px', padding: '28px', borderRadius: '20px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '10px' }}>"VIP Desert Safari Safari"</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  Dune bashing in Dubai desert with live BBQ dinner show. Everything was seamless from hotel pickup to instant QR checkin at the desert camp.
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Priya N.</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: 'var(--radius-pill)' }}>Verified Booking</span>
+              </div>
+            </div>
+
+            {/* REVIEW CARD 6 */}
+            <div className="card-panel" style={{ flex: '0 0 calc(33.333% - 16px)', minWidth: '300px', padding: '28px', borderRadius: '20px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#d97706" fill="#d97706" />)}
+                </div>
+                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '10px' }}>"Seamless Rome Colosseum Entry"</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  Skip-the-line express access to arena floor was unreal. Expert guide shared fascinating historical context. Easiest booking flow ever!
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>Marcus B.</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '3px 8px', borderRadius: 'var(--radius-pill)' }}>Verified Booking</span>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
