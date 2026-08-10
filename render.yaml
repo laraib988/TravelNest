@@ -1,11 +1,7 @@
 # TravelNest API — Render Blueprint
-# If using the dashboard instead of this file, set:
-#   Root Directory = backend
-#   Build Command  = npm install && npm run build
-#   Start Command  = npm start
-#
-# If Root Directory is left blank (repo root), root package.json
-# runs `prebuild` → npm install --prefix backend before tsc.
+# Dashboard: Root Directory = backend | Build = npm install && npm run build | Start = npm start
+# Live URL: https://travelnest-5ttl.onrender.com
+# Frontend (Vercel) must set Root Directory = frontend (NOT repo root)
 
 services:
   - type: web
