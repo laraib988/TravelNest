@@ -1,0 +1,16 @@
+# TravelNest API — Render Blueprint
+# Dashboard: Root Directory = backend | Build = npm install && npm run build | Start = npm start
+# Live URL: https://travelnest-5ttl.onrender.com
+# Frontend (Vercel) must set Root Directory = frontend (NOT repo root)
+
+services:
+  - type: web
+    name: travelnest-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production

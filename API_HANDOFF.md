@@ -7,9 +7,10 @@
 | Item | Value |
 |------|--------|
 | Local base URL | `http://localhost:4000/api/v1` |
+| Production API (Render) | `https://travelnest-5ttl.onrender.com/api/v1` |
 | Content-Type | `application/json` |
 | Auth (planned) | `Authorization: Bearer <access_token>` |
-| Web frontend | Next.js → same base URL |
+| Web frontend | Next.js → same base URL (`NEXT_PUBLIC_API_URL`) |
 | Mobile stack (SRS) | Expo + TypeScript + Expo Router + TanStack Query + Zustand |
 
 > **Current backend status:** Prototype with in-memory mock DB. Contracts below match live NestJS routes today. Real PostgreSQL + Auth will keep the same paths/shapes where possible.
