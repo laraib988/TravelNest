@@ -4,7 +4,7 @@
   "description": "TravelNest NestJS API Gateway & Domain Services",
   "main": "dist/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm install && tsc",
     "start": "node dist/main.js",
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts"
   },
