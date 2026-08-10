@@ -49,9 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (email: string, pass: string) => {
+    const displayName = email.includes('sunnypirkash') ? 'Suneel Pirkash' : (email.split('@')[0].toUpperCase() || 'Traveler');
     const mockUser: User = {
       id: 'usr-' + Math.random().toString(36).substr(2, 6),
-      name: email.split('@')[0].toUpperCase() || 'Traveler',
+      name: displayName,
       email,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
       role: 'CUSTOMER',
