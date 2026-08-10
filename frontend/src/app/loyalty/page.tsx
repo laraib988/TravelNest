@@ -92,7 +92,6 @@ export default function LoyaltyPage() {
                 ≈ ${value} USD Checkout Discount Value
               </div>
             </div>
-{/* This is the redeem points button */}
             <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem' }}>
               Redeem Points at Checkout
             </button>
