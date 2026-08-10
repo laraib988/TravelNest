@@ -78,7 +78,6 @@ export default function LoyaltyPage() {
             <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.1, color: '#b45309' }}>
               <Award size={140} />
             </div>
-{/* This is sample */}
             <div>
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#b45309', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Available Rewards Balance

@@ -8,7 +8,8 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
   const port = process.env.PORT || 4000;
-  await app.listen(port);
-  console.log(`🚀 TravelNest NestJS API Gateway running on http://localhost:${port}`);
+  // Bind 0.0.0.0 so Render / cloud hosts can reach the service
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 TravelNest NestJS API Gateway running on http://0.0.0.0:${port}`);
 }
 bootstrap();

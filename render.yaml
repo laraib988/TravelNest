@@ -1,0 +1,15 @@
+# TravelNest API — Render Blueprint
+# Dashboard alternative: set Root Directory = "backend" (critical for this monorepo)
+
+services:
+  - type: web
+    name: travelnest-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Render injects PORT automatically — Nest already reads process.env.PORT
