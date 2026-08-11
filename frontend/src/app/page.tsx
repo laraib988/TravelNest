@@ -1120,19 +1120,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 14. TRUST BADGES STRIP */}
-      <section style={{ borderTop: '1px solid var(--border-light)', padding: '40px 0 20px', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f8fafc', padding: '6px 14px', borderRadius: 'var(--radius-pill)', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '16px' }}>
-          <Lock size={13} /> 256-Bit SSL Secure Gateway Checkout
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', filter: 'grayscale(100%)', opacity: 0.6, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-muted)' }}>
-          <span>💳 VISA</span>
-          <span>💳 Mastercard</span>
-          <span>💳 Apple Pay</span>
-          <span>💳 Google Pay</span>
-          <span>💳 Stripe Secure</span>
-        </div>
-      </section>
 
       {/* 15. WHERE TO GO NEXT SECTION */}
       <section style={{ maxWidth: '1280px', margin: '60px auto 40px', padding: '0 24px', borderTop: '1px solid #e2e8f0', paddingTop: '40px' }}>

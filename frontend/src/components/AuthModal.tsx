@@ -119,7 +119,7 @@ export default function AuthModal() {
         style={{
           background: '#ffffff',
           borderRadius: '24px',
-          maxWidth: step === 3 && partnerType === 'COMPANY' ? '640px' : '520px',
+          maxWidth: step === 3 && partnerType === 'COMPANY' ? '720px' : '600px',
           width: '100%',
           padding: '36px 32px',
           position: 'relative',

@@ -82,4 +82,14 @@ export class AIPlannerController {
   answerContextualQuestion(@Body() body: { listing_id: string; question: string }) {
     return this.aiPlannerService.answerContextualQuestion(body.listing_id, body.question);
   }
+  // --- NEW: AI Booking Agent (SRS §9) ---
+  @Post('agent/session')
+  createAgentSession() {
+    return this.aiPlannerService.createAgentSession();
+  }
+
+  @Post('agent/session/:id/message')
+  processAgentMessage(@Param('id') id: string, @Body() body: { message: string }) {
+    return this.aiPlannerService.processAgentMessage(id, body.message);
+  }
 }
