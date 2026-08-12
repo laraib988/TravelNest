@@ -96,7 +96,7 @@ export default function LoyaltyPage() {
               Redeem Points at Checkout
             </button>
           </div>
-
+{/* THis is section 1 */}
           {/* TIER PROGRESS CARD */}
           <div className="card-panel" style={{ padding: '32px', borderRadius: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
