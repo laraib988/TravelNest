@@ -11,10 +11,17 @@ import {
   Youtube,
   Linkedin
 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useCurrency } from '@/context/CurrencyContext';
 
 export default function Footer() {
+  const pathname = usePathname();
   const { t } = useCurrency();
+
+  // On admin pages, hide the public footer
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <>

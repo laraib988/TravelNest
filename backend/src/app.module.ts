@@ -21,6 +21,8 @@ import { AIPlannerController } from './ai-planner/ai-planner.controller';
 import { AIPlannerService } from './ai-planner/ai-planner.service';
 import { AffiliateController } from './affiliate/affiliate.controller';
 import { AffiliateService } from './affiliate/affiliate.service';
+import { AdminController } from './admin/admin.controller';
+import { AdminService } from './admin/admin.service';
 
 @Module({
   imports: [],
@@ -36,6 +38,7 @@ import { AffiliateService } from './affiliate/affiliate.service';
     PayoutsController,
     AIPlannerController,
     AffiliateController,
+    AdminController,
   ],
   providers: [
     AuthService,
@@ -49,6 +52,7 @@ import { AffiliateService } from './affiliate/affiliate.service';
     PayoutEngineService,
     AIPlannerService,
     AffiliateService,
+    AdminService,
   ],
 })
 export class AppModule {}

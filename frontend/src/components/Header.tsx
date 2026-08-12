@@ -22,16 +22,24 @@ import {
   Star,
   FileText,
   ArrowRightLeft,
-  UserPlus
+  UserPlus,
+  LayoutDashboard
 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import CurrencyLanguageDropdown from './CurrencyLanguageDropdown';
 import AuthModal from './AuthModal';
 
 export default function Header() {
+  const pathname = usePathname();
   const { user, openAuthModal, logout } = useAuth();
   const { t } = useCurrency();
+
+  // On admin pages, hide the public customer header so admin layout has its own dedicated UI
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
   
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
@@ -219,6 +227,13 @@ export default function Header() {
                       style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.88rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
                     >
                       <ShieldCheck size={15} color="#059669" /> {t('supplier_portal')}
+                    </Link>
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.88rem', color: '#7c3aed', textDecoration: 'none', fontWeight: 700, background: '#f5f3ff' }}
+                    >
+                      <LayoutDashboard size={15} color="#7c3aed" /> Admin Portal
                     </Link>
                     <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '4px 0' }} />
                     <button

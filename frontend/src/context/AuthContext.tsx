@@ -50,12 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, pass: string) => {
     const displayName = email.includes('sunnypirkash') ? 'Suneel Pirkash' : (email.split('@')[0].toUpperCase() || 'Traveler');
+    const role: User['role'] = (email.toLowerCase().includes('admin') || email.toLowerCase() === 'admin@travelnest.com') ? 'ADMIN' : (email.toLowerCase().includes('supplier') ? 'SUPPLIER' : 'CUSTOMER');
+    
     const mockUser: User = {
       id: 'usr-' + Math.random().toString(36).substr(2, 6),
-      name: displayName,
+      name: role === 'ADMIN' && !email.includes('sunnypirkash') ? 'Admin Administrator' : displayName,
       email,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      role: 'CUSTOMER',
+      role,
     };
     setUser(mockUser);
     localStorage.setItem('travelnest_user', JSON.stringify(mockUser));
@@ -64,12 +66,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signup = async (name: string, email: string, pass: string) => {
+    const role: User['role'] = (email.toLowerCase().includes('admin')) ? 'ADMIN' : (email.toLowerCase().includes('supplier') ? 'SUPPLIER' : 'CUSTOMER');
     const mockUser: User = {
       id: 'usr-' + Math.random().toString(36).substr(2, 6),
       name,
       email,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      role: 'CUSTOMER',
+      role,
     };
     setUser(mockUser);
     localStorage.setItem('travelnest_user', JSON.stringify(mockUser));
