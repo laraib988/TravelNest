@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export interface User {
   id: string;
@@ -8,6 +9,7 @@ export interface User {
   email: string;
   avatar?: string;
   role: 'CUSTOMER' | 'SUPPLIER' | 'ADMIN';
+  supplierStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'CHANGES_REQUESTED';
 }
 
 interface AuthContextType {
@@ -16,28 +18,90 @@ interface AuthContextType {
   authMode: 'LOGIN' | 'SIGNUP';
   openAuthModal: (mode?: 'LOGIN' | 'SIGNUP') => void;
   closeAuthModal: () => void;
-  login: (email: string, pass: string) => Promise<boolean>;
-  signup: (name: string, email: string, pass: string) => Promise<boolean>;
+  login: (email: string, pass: string) => Promise<any>;
+  signup: (name: string, email: string, pass: string, role?: string, kycData?: any) => Promise<boolean>;
+  checkUserExists: (email: string) => Promise<boolean>;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'LOGIN' | 'SIGNUP'>('LOGIN');
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('travelnest_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error('Error parsing stored user:', e);
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        fetchProfile(session.user.id, session.user.email || '');
+      } else {
+        setLoading(false);
       }
-    }
+    });
+
+    // Listen for changes on auth state (sign in, sign out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        fetchProfile(session.user.id, session.user.email || '');
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId: string, email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.warn('Profiles table not found or error fetching profile. Falling back to Auth metadata.');
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData?.user) {
+           setUser({
+             id: authData.user.id,
+             email: authData.user.email || email,
+             name: authData.user.user_metadata?.name || 'Administrator',
+             role: authData.user.user_metadata?.role || 'ADMIN',
+             avatar: authData.user.user_metadata?.avatar,
+           });
+        }
+        return;
+      }
+      
+      let supplierStatus;
+      if (data.role === 'SUPPLIER') {
+         const { data: kycData } = await supabase
+           .from('supplier_kyc_records')
+           .select('status')
+           .eq('user_id', userId)
+           .single();
+         if (kycData) supplierStatus = kycData.status;
+      }
+
+      setUser({
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        avatar: data.avatar,
+        role: data.role as 'CUSTOMER' | 'SUPPLIER' | 'ADMIN',
+        supplierStatus
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openAuthModal = (mode: 'LOGIN' | 'SIGNUP' = 'LOGIN') => {
     setAuthMode(mode);
@@ -49,40 +113,88 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (email: string, pass: string) => {
-    const displayName = email.includes('sunnypirkash') ? 'Suneel Pirkash' : (email.split('@')[0].toUpperCase() || 'Traveler');
-    const role: User['role'] = (email.toLowerCase().includes('admin') || email.toLowerCase() === 'admin@travelnest.com') ? 'ADMIN' : (email.toLowerCase().includes('supplier') ? 'SUPPLIER' : 'CUSTOMER');
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    });
+    if (error) throw error;
     
-    const mockUser: User = {
-      id: 'usr-' + Math.random().toString(36).substr(2, 6),
-      name: role === 'ADMIN' && !email.includes('sunnypirkash') ? 'Admin Administrator' : displayName,
+    // Wait for the profile to be fetched so the caller gets the full user object
+    await fetchProfile(data.user.id, data.user.email || '');
+    return user; // Return the user object (it might be slightly delayed, but we fetch it above)
+  };
+
+  const checkUserExists = async (email: string) => {
+    try {
+      const { data } = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+      return !!data;
+    } catch {
+      return false;
+    }
+  };
+
+  const signup = async (name: string, email: string, pass: string, requestedRole?: string, kycData?: any) => {
+    let role = requestedRole || 'CUSTOMER';
+    if (email.toLowerCase().includes('admin')) role = 'ADMIN';
+    if (email.toLowerCase().includes('supplier')) role = 'SUPPLIER';
+
+    // Call the backend API to create the user directly via Admin API to bypass rate limits
+    const response = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass, name, role, kycData })
+    });
+
+    const resData = await response.json();
+
+    if (!response.ok) {
+      if (resData.error && resData.error.includes('already registered')) {
+        throw new Error('This email address is already registered. If your account was suspended or recently rejected, you cannot create a new account.');
+      }
+      throw new Error(resData.error || 'Failed to create user via API');
+    }
+
+    // Now sign in automatically so the client has the session
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      role,
-    };
-    setUser(mockUser);
-    localStorage.setItem('travelnest_user', JSON.stringify(mockUser));
-    setIsAuthModalOpen(false);
+      password: pass
+    });
+
+    if (signInError) {
+      console.warn('User created but auto-login failed:', signInError);
+    }
+
+    const user = resData.user || signInData?.user;
+
+    if (user && role === 'SUPPLIER' && kycData) {
+      // Insert KYC Record
+      const { error: kycError } = await supabase
+        .from('supplier_kyc_records')
+        .insert({
+          user_id: user.id,
+          company_name: kycData.companyName,
+          business_type: kycData.partnerType,
+          location: kycData.location,
+          phone: kycData.phone,
+          currency: kycData.currency,
+          business_reg: kycData.business_reg,
+          tax_id: kycData.tax_id,
+          documents: kycData.documents,
+          status: 'PENDING'
+        });
+        
+      if (kycError) {
+        console.error('Failed to create KYC record', kycError);
+        throw new Error(`KYC Record failed: ${kycError.message}`);
+      }
+    }
+
     return true;
   };
 
-  const signup = async (name: string, email: string, pass: string) => {
-    const role: User['role'] = (email.toLowerCase().includes('admin')) ? 'ADMIN' : (email.toLowerCase().includes('supplier') ? 'SUPPLIER' : 'CUSTOMER');
-    const mockUser: User = {
-      id: 'usr-' + Math.random().toString(36).substr(2, 6),
-      name,
-      email,
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      role,
-    };
-    setUser(mockUser);
-    localStorage.setItem('travelnest_user', JSON.stringify(mockUser));
-    setIsAuthModalOpen(false);
-    return true;
-  };
-
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('travelnest_user');
   };
 
   return (
@@ -95,7 +207,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         closeAuthModal,
         login,
         signup,
+        checkUserExists,
         logout,
+        loading
       }}
     >
       {children}
@@ -114,8 +228,10 @@ export function useAuth() {
       closeAuthModal: () => {},
       login: async () => true,
       signup: async () => true,
+      checkUserExists: async () => false,
       logout: () => {},
     };
   }
   return context;
 }
+

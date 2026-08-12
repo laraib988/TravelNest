@@ -70,7 +70,8 @@ export default function ListingsManagementPage() {
   const loadListings = async () => {
     setLoading(true);
     try {
-      const data = await fetchFromAPI('/listings').catch(() => null);
+      const res = await fetch('/api/admin/listings');
+      const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         setListings(
           data.map((l: any, idx: number) => ({
@@ -183,11 +184,20 @@ export default function ListingsManagementPage() {
     triggerAction('Product catalog refreshed successfully!');
   };
 
-  const handleApproveProduct = (id: string, title: string) => {
-    setListings((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status: 'LIVE' } : l))
-    );
-    triggerAction(`Product Approved & Published: "${title}"!`);
+  const handleApproveProduct = async (id: string, title: string) => {
+    try {
+      await fetch('/api/admin/listings/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: id })
+      });
+      setListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status: 'LIVE' } : l))
+      );
+      triggerAction(`Product Approved & Published: "${title}"!`);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleToggleStatus = (id: string, currentStatus: string, title: string) => {

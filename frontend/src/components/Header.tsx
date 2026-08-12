@@ -29,15 +29,15 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import CurrencyLanguageDropdown from './CurrencyLanguageDropdown';
-import AuthModal from './AuthModal';
+// import removed
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, openAuthModal, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useCurrency();
 
-  // On admin pages, hide the public customer header so admin layout has its own dedicated UI
-  if (pathname?.startsWith('/admin')) {
+  // On admin and supplier pages, hide the public customer header
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/supplier')) {
     return null;
   }
   
@@ -85,6 +85,11 @@ export default function Header() {
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)'
         }}
       >
+        {/* TOP ANNOUNCEMENT BAR */}
+        <div style={{ background: 'var(--brand-gradient)', color: '#ffffff', padding: '6px 24px', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <Sparkles size={14} /> ⚡ Flash Sale: Get 15% off Bali & Tokyo Experiences with code <strong>TRAVELNEST2026</strong>
+        </div>
+
         {/* HEADER 1: PRIMARY TOP HEADER BAR */}
         <div 
           style={{ 
@@ -261,62 +266,16 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : (
-              /* 2 SEPARATE AUTH BUTTONS: SIGN IN (BLUE BG) & SIGN UP (WHITE BG -> BLUE ON HOVER) */
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <button
-                  onClick={() => openAuthModal('LOGIN')}
-                  style={{ 
-                    padding: '8px 20px', 
-                    fontSize: '0.88rem', 
-                    fontWeight: 700, 
-                    borderRadius: 'var(--radius-pill)',
-                    border: 'none',
-                    background: '#0284c7',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 2px 8px rgba(2, 132, 199, 0.25)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <LogIn size={15} /> Sign In
-                </button>
-
-                <button
-                  onClick={() => openAuthModal('SIGNUP')}
-                  onMouseEnter={() => setIsSignUpHovered(true)}
-                  onMouseLeave={() => setIsSignUpHovered(false)}
-                  style={{ 
-                    padding: '8px 20px', 
-                    fontSize: '0.88rem', 
-                    fontWeight: 700, 
-                    borderRadius: 'var(--radius-pill)',
-                    border: '1.5px solid #0284c7',
-                    background: isSignUpHovered ? '#0284c7' : '#ffffff',
-                    color: isSignUpHovered ? '#ffffff' : '#0284c7',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    transition: 'all 0.2s',
-                    boxShadow: isSignUpHovered ? '0 2px 8px rgba(2, 132, 199, 0.25)' : 'none'
-                  }}
-                >
-                  <UserPlus size={15} /> Sign Up
-                </button>
-              </div>
-            )}
+            ) : null}
 
           </div>
         </div>
       </header>
 
       {/* HEADER 2: SECONDARY NAVIGATION STRIP (NON-STICKY, SCROLLS WITH PAGE) */}
-      <div 
-        ref={subHeaderRef}
+      {!pathname.startsWith('/supplier') && (
+        <div 
+          ref={subHeaderRef}
         style={{ 
           background: '#ffffff', 
           borderBottom: '1px solid #e2e8f0', 
@@ -828,11 +787,10 @@ export default function Header() {
               </Link>
 
             </div>
-
           </div>
         </div>
-
-      <AuthModal />
+      )}
+      {/* Removed AuthModal */}
     </>
   );
 }

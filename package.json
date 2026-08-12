@@ -1,21 +1,26 @@
-{
-  "name": "travelnest-root",
-  "version": "1.0.0",
-  "private": true,
-  "description": "TravelNest OTA Marketplace Monorepo Root",
-  "scripts": {
-    "install:backend": "npm install --prefix backend",
-    "install:frontend": "npm install --prefix frontend",
-    "build": "npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "npm run start --prefix frontend",
-    "build:backend": "npm install --prefix backend && npm run build --prefix backend",
-    "start:backend": "npm run start --prefix backend",
-    "build:frontend": "npm run build --prefix frontend",
-    "build:all": "npm run build:backend && npm run build:frontend",
-    "dev:backend": "npm run dev --prefix backend",
-    "dev:frontend": "npm run dev --prefix frontend"
-  },
-  "engines": {
-    "node": ">=20"
-  }
-}
+{
+  "name": "travelnest-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TravelNest OTA Marketplace Monorepo Root",
+  "scripts": {
+    "install:backend": "npm install --prefix backend",
+    "install:frontend": "npm install --prefix frontend",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm run start --prefix frontend",
+    "build:backend": "npm install --prefix backend && npm run build --prefix backend",
+    "start:backend": "npm run start --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:all": "npm run build:backend && npm run build:frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
+  },
+  "devDependencies": {
+    "vercel": "^58.9.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

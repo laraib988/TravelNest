@@ -18,8 +18,8 @@ export default function Footer() {
   const pathname = usePathname();
   const { t } = useCurrency();
 
-  // On admin pages, hide the public footer
-  if (pathname?.startsWith('/admin')) {
+  // On admin and supplier pages, hide the public footer
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/supplier')) {
     return null;
   }
 

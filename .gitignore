@@ -15,6 +15,9 @@ backend/dist/
 .env.local
 *.env
 
+# Vercel local link (repo root only)
+.vercel/
+
 # Logs
 *.log
 npm-debug.log*

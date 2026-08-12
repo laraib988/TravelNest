@@ -27,7 +27,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 export default function SupplierPage() {
-  const { openAuthModal } = useAuth();
+  // removed openAuthModal
 
   const platformStats = [
     { value: '2M+', label: 'Monthly Visitors', icon: Globe },
@@ -205,8 +205,8 @@ export default function SupplierPage() {
               </p>
 
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <button
-                  onClick={() => openAuthModal('SIGNUP')}
+                <Link
+                  href="/supplier/signup"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -219,12 +219,13 @@ export default function SupplierPage() {
                     fontSize: '1rem',
                     border: 'none',
                     cursor: 'pointer',
+                    textDecoration: 'none',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                     transition: 'all 0.2s'
                   }}
                 >
                   Apply Now <ArrowRight size={18} />
-                </button>
+                </Link>
                 <a
                   href="#how-it-works"
                   style={{
@@ -635,8 +636,8 @@ export default function SupplierPage() {
           <p style={{ fontSize: '1.05rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: '0 0 28px' }}>
             Join 500+ tour operators already earning more with TravelNest. Zero listing fees — pay only when you earn.
           </p>
-          <button
-            onClick={() => openAuthModal('SIGNUP')}
+          <Link
+            href="/supplier/signup"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -649,12 +650,13 @@ export default function SupplierPage() {
               fontSize: '1rem',
               border: 'none',
               cursor: 'pointer',
+              textDecoration: 'none',
               boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
               transition: 'all 0.2s'
             }}
           >
             Get Started Now <ArrowRight size={18} />
-          </button>
+          </Link>
         </div>
       </section>
 

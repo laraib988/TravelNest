@@ -78,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, signup } = useAuth();
 
   useEffect(() => {
     setIsMounted(true);
@@ -91,6 +91,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!isMounted) return null;
 
+  // Allow access to login and signup pages without layout restrictions
+  if (pathname === '/admin/login' || pathname === '/admin/signup') {
+    return <>{children}</>;
+  }
+
   if (!user || user.role !== 'ADMIN') {
     return (
       <div className="admin-layout" style={{ justifyContent: 'center', alignItems: 'center', background: '#f8fafc', minHeight: '100vh', padding: '24px' }}>
@@ -101,17 +106,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             You are currently logged in as <strong>{user ? `${user.name} (${user.role})` : 'Guest'}</strong>. An Administrator account is required to access the Admin Panel.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <button 
+            <Link 
+              href="/admin/login" 
               className="btn-primary" 
-              style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.9rem' }}
-              onClick={() => {
-                login('admin@travelnest.com', 'admin');
-              }}
+              style={{ width: '100%', justifyContent: 'center', textDecoration: 'none', padding: '12px', fontSize: '0.9rem' }}
             >
-              Login as Admin
-            </button>
-            <Link href="/" className="btn-secondary" style={{ width: '100%', justifyContent: 'center', textDecoration: 'none', padding: '10px', fontSize: '0.88rem' }}>
-              Return to Homepage
+              Login to Admin Portal
             </Link>
           </div>
         </div>
