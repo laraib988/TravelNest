@@ -93,11 +93,16 @@ export default function HomePage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [listingsRes, destsRes] = await Promise.all([
+        const [listingsRes, destsRes, supabaseListingsRes] = await Promise.all([
           fetchFromAPI('/listings'),
           fetchFromAPI('/listings/destinations'),
+          fetch('/api/public/listings').then(res => res.json()).catch(() => [])
         ]);
-        setListings(listingsRes || []);
+        
+        // Combine Supabase listings with mock listings
+        const combinedListings = [...(supabaseListingsRes || []), ...(listingsRes || [])];
+        setListings(combinedListings);
+        
         setDestinations(destsRes || []);
 
         // Load user's saved wishlist to show correct heart icon states

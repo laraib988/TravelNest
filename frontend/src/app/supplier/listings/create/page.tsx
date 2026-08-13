@@ -14,6 +14,8 @@ export default function CreateListingPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [productId, setProductId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   // Step 1 State
   const [basicInfo, setBasicInfo] = useState({
@@ -83,14 +85,42 @@ export default function CreateListingPage() {
     images: []
   });
 
+  // Load existing listing if editing
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      if (id && user && !productId) {
+        setProductId(id);
+        fetch(`/api/supplier/listings/${id}?userId=${user.id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && !data.error) {
+              setBasicInfo(data.basic_info || basicInfo);
+              setPhotos(data.basic_info?.photos || photos);
+              setExperienceDetails(data.experience_details || experienceDetails);
+              setTransportOptions(data.transport_pricing || transportOptions);
+              setLogistics(data.logistics || logistics);
+              setItinerary(data.itinerary || itinerary);
+              setCurrentStep(data.current_step || 1);
+            }
+          })
+          .catch(err => console.error('Error fetching listing:', err));
+      }
+    }
+  }, [user]);
+
   // Auto-Save Logic with Debounce
   const saveDraft = useCallback(async () => {
-    if (!user) return;
+    if (!user) return { success: false };
     setSaveStatus('saving');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
       const res = await fetch('/api/supplier/listings/autosave', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           userId: user.id,
           productId,
@@ -103,15 +133,24 @@ export default function CreateListingPage() {
           itinerary: itinerary
         })
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
-      if (data.success) {
-        if (!productId) setProductId(data.data.id);
+      if (res.ok && data.success) {
+        if (!productId || data.cloned) {
+          setProductId(data.data.id);
+          // If we just created a clone, update the URL so a refresh keeps the new draft
+          window.history.replaceState({}, '', `/supplier/listings/create?id=${data.data.id}`);
+        }
         setSaveStatus('saved');
+        return { success: true, id: data.data.id };
       } else {
         setSaveStatus('error');
+        return { success: false, error: data.error };
       }
-    } catch (e) {
+    } catch (e: any) {
+      clearTimeout(timeoutId);
       setSaveStatus('error');
+      return { success: false, error: e.name === 'AbortError' ? 'Network timeout: Supabase is unreachable' : e.message };
     }
   }, [user, productId, currentStep, basicInfo, photos, experienceDetails, transportOptions, logistics, itinerary]);
 
@@ -865,26 +904,78 @@ export default function CreateListingPage() {
 
               <div style={{ marginTop: '40px', padding: '30px', background: '#eff6ff', borderRadius: '16px', border: '1px solid #bfdbfe', textAlign: 'center' }}>
                 <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1e3a8a', margin: '0 0 10px 0' }}>Ready to go live?</h3>
-                <p style={{ color: '#1e40af', marginBottom: '24px' }}>Publishing will make this tour visible to customers (or send it for Admin approval depending on your account status).</p>
+                <p style={{ color: '#1e40af', marginBottom: '16px' }}>Publishing will make this tour visible to customers (or send it for Admin approval depending on your account status).</p>
+                
+                {publishError && (
+                  <div style={{ background: '#fef2f2', color: '#b91c1c', padding: '12px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #f87171', fontWeight: 600 }}>
+                    Error: {publishError}
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
                   <button 
+                    disabled={isPublishing}
                     onClick={async () => {
-                      await saveDraft();
-                      router.push('/supplier/dashboard');
+                      setPublishError(null);
+                      setIsPublishing(true);
+                      const result = await saveDraft();
+                      if (result && result.success) {
+                        router.push('/supplier');
+                      } else {
+                        setPublishError(result?.error || 'Failed to save draft');
+                        setIsPublishing(false);
+                      }
                     }}
-                    style={{ background: '#ffffff', color: '#1e3a8a', padding: '14px 32px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 700, border: '1px solid #bfdbfe', cursor: 'pointer' }}
+                    style={{ background: '#ffffff', color: '#1e3a8a', padding: '14px 32px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 700, border: '1px solid #bfdbfe', cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
                   >
                     Keep as Draft
                   </button>
                   <button 
+                    disabled={isPublishing}
                     onClick={async () => {
-                      if (!productId || !user) return;
-                      await fetch('/api/supplier/listings/publish', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, productId }) });
-                      router.push('/supplier/dashboard');
+                      if (!user) return;
+                      setPublishError(null);
+                      setIsPublishing(true);
+                      
+                      let currentId = productId;
+                      if (!currentId) {
+                        const saveRes = await saveDraft();
+                        if (saveRes && saveRes.success) {
+                          currentId = saveRes.id;
+                        } else {
+                          setPublishError(saveRes?.error || 'Failed to save before publishing');
+                          setIsPublishing(false);
+                          return;
+                        }
+                      }
+
+                      try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 8000);
+                        
+                        const res = await fetch('/api/supplier/listings/publish', { 
+                          method: 'POST', 
+                          headers: { 'Content-Type': 'application/json' }, 
+                          signal: controller.signal,
+                          body: JSON.stringify({ userId: user.id, productId: currentId }) 
+                        });
+                        clearTimeout(timeoutId);
+                        
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                          router.push('/supplier/dashboard');
+                        } else {
+                          setPublishError(data.error || 'Failed to publish');
+                          setIsPublishing(false);
+                        }
+                      } catch (err: any) {
+                        setPublishError(err.name === 'AbortError' ? 'Network timeout: Supabase API is unreachable' : (err.message || 'Network error'));
+                        setIsPublishing(false);
+                      }
                     }}
-                    style={{ background: '#2563eb', color: '#ffffff', padding: '14px 40px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)' }}
+                    style={{ background: '#2563eb', color: '#ffffff', padding: '14px 40px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 700, border: 'none', cursor: isPublishing ? 'not-allowed' : 'pointer', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)', opacity: isPublishing ? 0.7 : 1 }}
                   >
-                    Publish Listing Now
+                    {isPublishing ? 'Processing...' : 'Publish Listing Now'}
                   </button>
                 </div>
               </div>

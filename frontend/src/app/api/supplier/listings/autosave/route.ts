@@ -17,7 +17,41 @@ export async function POST(request: Request) {
     const supabaseAdmin = createClient(supabaseUrl!, supabaseServiceKey!);
 
     if (productId) {
-      // Update existing draft
+      // Fetch current status
+      const { data: currentProduct, error: fetchErr } = await supabaseAdmin
+        .from('products')
+        .select('status, logistics')
+        .eq('id', productId)
+        .eq('supplier_id', userId)
+        .single();
+        
+      if (fetchErr) throw fetchErr;
+
+      if (currentProduct.status === 'PUBLISHED' || currentProduct.status === 'APPROVED') {
+        // Create a new clone draft for the edits, pointing to the original
+        const updatedLogistics = logistics || {};
+        updatedLogistics.parent_id = productId; // Store reference to original
+        
+        const { data, error } = await supabaseAdmin
+          .from('products')
+          .insert({
+            supplier_id: userId,
+            status: 'DRAFT',
+            current_step: step || 1,
+            basic_info: { ...(basic_info || {}), photos: photos || {} },
+            experience_details: experience_details || {},
+            transport_pricing: transport_pricing || [],
+            logistics: updatedLogistics,
+            itinerary: itinerary || []
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return NextResponse.json({ success: true, data, cloned: true }, { status: 201 });
+      }
+
+      // Otherwise, update existing draft/pending
       const { data, error } = await supabaseAdmin
         .from('products')
         .update({
@@ -58,7 +92,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, data }, { status: 201 });
     }
   } catch (error: any) {
-    console.error('Autosave error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Autosave error details:', error);
+    return NextResponse.json({ 
+      error: error.message || 'Database error occurred',
+      details: error.details || error.hint || 'No additional details' 
+    }, { status: 500 });
   }
 }

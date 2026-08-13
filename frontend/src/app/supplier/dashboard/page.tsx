@@ -48,6 +48,7 @@ export default function SupplierDashboard() {
   const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS'>('DASHBOARD');
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -69,15 +70,21 @@ export default function SupplierDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Live / Published</span>;
+        return <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Approved & Live</span>;
+      case 'APPROVED':
+        return <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Request Approved</span>;
       case 'PENDING_APPROVAL':
         return <span style={{ background: '#fef3c7', color: '#92400e', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Pending Approval</span>;
       case 'DRAFT':
         return <span style={{ background: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Draft</span>;
+      case 'NEEDS_FIX':
+        return <span style={{ background: '#fffbeb', color: '#d97706', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Needs Fixes</span>;
+      case 'PENDING_DELETION':
+        return <span style={{ background: '#fee2e2', color: '#b91c1c', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Pending Deletion</span>;
       case 'REJECTED':
         return <span style={{ background: '#fee2e2', color: '#b91c1c', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Rejected</span>;
       default:
-        return <span>{status}</span>;
+        return <span style={{ background: '#f3f4f6', color: '#374151', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>{status}</span>;
     }
   };
 
@@ -135,7 +142,7 @@ export default function SupplierDashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '40px' }}>
               <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Active Listings</div>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginTop: '8px' }}>{listings.filter(l => l.status === 'LIVE' || l.status === 'PUBLISHED').length}</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginTop: '8px' }}>{listings.filter(l => l.status === 'LIVE' || l.status === 'PUBLISHED' || l.status === 'APPROVED').length}</div>
               </div>
               <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Total Bookings</div>
@@ -184,6 +191,15 @@ export default function SupplierDashboard() {
                       <span>•</span>
                       <span>Updated {item.lastUpdated}</span>
                     </div>
+                    {/* Admin Feedback Block */}
+                    {(item.status === 'NEEDS_FIX' || item.status === 'REJECTED') && item.admin_feedback && (
+                      <div style={{ marginTop: '12px', padding: '12px', borderRadius: '8px', background: item.status === 'NEEDS_FIX' ? '#fffbeb' : '#fef2f2', border: `1px solid ${item.status === 'NEEDS_FIX' ? '#fde68a' : '#fecaca'}` }}>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: item.status === 'NEEDS_FIX' ? '#92400e' : '#991b1b', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                          <span style={{ fontWeight: 800 }}>{item.status === 'NEEDS_FIX' ? 'Required Fixes:' : 'Reason for Rejection:'}</span> 
+                          {item.admin_feedback}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Status */}
@@ -193,7 +209,7 @@ export default function SupplierDashboard() {
 
                   {/* Actions Dropdown Simulation */}
                   <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
-                    <button style={{ padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit Listing">
+                    <button onClick={() => router.push(`/supplier/listings/create?id=${item.id}`)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit Listing">
                       <Edit size={16} />
                     </button>
                     {item.status === 'PUBLISHED' && (
@@ -206,7 +222,11 @@ export default function SupplierDashboard() {
                         <ArrowUpRight size={16} />
                       </button>
                     )}
-                    <button style={{ padding: '8px', borderRadius: '8px', border: '1px solid #fee2e2', background: '#fef2f2', color: '#e11d48', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete Listing">
+                    <button 
+                      onClick={() => setDeleteConfirmId(item.id)}
+                      style={{ padding: '8px', borderRadius: '8px', border: '1px solid #fee2e2', background: '#fef2f2', color: '#e11d48', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+                      title="Delete Listing"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -227,6 +247,52 @@ export default function SupplierDashboard() {
         )}
 
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
+            <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <Trash2 size={32} color="#ef4444" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>Request Deletion?</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', margin: '0 0 24px 0', lineHeight: 1.5 }}>
+              Are you sure you want to permanently delete this listing? This request will be sent to the admin for final approval.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setDeleteConfirmId(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/supplier/listings/request-delete', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: user?.id, productId: deleteConfirmId })
+                    });
+                    if (res.ok) {
+                      setListings(prev => prev.map(l => l.id === deleteConfirmId ? { ...l, status: 'PENDING_DELETION' } : l));
+                      setDeleteConfirmId(null);
+                    } else {
+                      const data = await res.json();
+                      alert('Error: ' + data.error);
+                    }
+                  } catch (err) {
+                    alert('Network error requesting deletion');
+                  }
+                }}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.3)' }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

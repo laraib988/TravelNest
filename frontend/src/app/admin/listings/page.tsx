@@ -6,7 +6,7 @@ import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
 import {
   LayoutGrid, List, Search, Plus, ExternalLink, Star, Edit, PowerOff,
-  CheckCircle2, Clock, MapPin, Tag, ShieldCheck, RefreshCw, X, Sparkles, Filter
+  CheckCircle2, Clock, MapPin, Tag, ShieldCheck, RefreshCw, X, Sparkles, Filter, Trash2
 } from 'lucide-react';
 
 interface Listing {
@@ -36,6 +36,7 @@ export default function ListingsManagementPage() {
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [search, setSearch] = useState('');
@@ -186,17 +187,25 @@ export default function ListingsManagementPage() {
 
   const handleApproveProduct = async (id: string, title: string) => {
     try {
-      await fetch('/api/admin/listings/approve', {
+      const res = await fetch('/api/admin/listings/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId: id })
       });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to approve listing');
+      }
+
       setListings((prev) =>
         prev.map((l) => (l.id === id ? { ...l, status: 'LIVE' } : l))
       );
       triggerAction(`Product Approved & Published: "${title}"!`);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      triggerAction(`Error: ${e.message}`);
     }
   };
 
@@ -383,6 +392,7 @@ export default function ListingsManagementPage() {
             <option value="All">All Statuses</option>
             <option value="LIVE">Live Only</option>
             <option value="PENDING_APPROVAL">Pending Review Queue</option>
+            <option value="PENDING_DELETION">Deletion Requests</option>
             <option value="DEACTIVATED">Deactivated</option>
           </select>
 
@@ -515,72 +525,100 @@ export default function ListingsManagementPage() {
                 </div>
 
                 {/* Card Action Footer */}
-                <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+                <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {l.status === 'PENDING_APPROVAL' ? (
-                    <button
-                      style={{
-                        flex: 1,
-                        padding: '8px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        borderRadius: '9999px',
-                        background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-                        color: '#ffffff',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)'
-                      }}
-                      onClick={() => handleApproveProduct(l.id, l.title)}
-                    >
-                      <CheckCircle2 size={14} /> Approve Product
-                    </button>
+                    <>
+                      <button
+                        style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)' }}
+                        onClick={() => handleApproveProduct(l.id, l.title)}
+                      >
+                        <CheckCircle2 size={13} /> Approve
+                      </button>
+                      <button
+                        style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)' }}
+                        onClick={async () => {
+                          const reason = prompt('Please describe what the supplier needs to fix:');
+                          if (!reason) return;
+                          try {
+                            const res = await fetch('/api/admin/listings/request-fix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: l.id, reason }) });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.error || 'Failed to request fix');
+                            setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'NEEDS_FIX' } : item)));
+                            triggerAction(`Requested Fixes for: "${l.title}"`);
+                          } catch (e: any) { triggerAction(`Error: ${e.message}`); }
+                        }}
+                      >
+                        <Edit size={13} /> Fix
+                      </button>
+                      <button
+                        style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(225, 29, 72, 0.3)' }}
+                        onClick={async () => {
+                          const reason = prompt('Please enter the reason for rejection:');
+                          if (!reason) return;
+                          try {
+                            const res = await fetch('/api/admin/listings/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: l.id, reason }) });
+                            const data = await res.json();
+                            if (!res.ok) throw new Error(data.error || 'Failed to reject listing');
+                            setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'REJECTED' } : item)));
+                            triggerAction(`Product Rejected: "${l.title}"`);
+                          } catch (e: any) { triggerAction(`Error: ${e.message}`); }
+                        }}
+                      >
+                        <PowerOff size={13} /> Reject
+                      </button>
+                    </>
+                  ) : l.status === 'PENDING_DELETION' ? (
+                    <>
+                      <button
+                        style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}
+                        onClick={() => setDeleteConfirmId(l.id)}
+                      >
+                        <Trash2 size={13} /> Delete
+                      </button>
+                      <button
+                        style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(100, 116, 139, 0.3)' }}
+                        onClick={async () => {
+                          try {
+                            const res = await fetch('/api/admin/listings/reject-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: l.id }) });
+                            if (!res.ok) throw new Error('Failed to reject deletion');
+                            setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'PUBLISHED' } : item)));
+                            triggerAction(`Deletion Rejected for: "${l.title}"`);
+                          } catch (e: any) { triggerAction(`Error: ${e.message}`); }
+                        }}
+                      >
+                        <X size={13} /> Reject
+                      </button>
+                    </>
                   ) : (
                     <button
-                      style={{
-                        flex: 1,
-                        padding: '8px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        borderRadius: '9999px',
-                        background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
-                        color: '#ffffff',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
-                      }}
+                      style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)' }}
                       onClick={() => setEditingListing(l)}
                     >
                       <Edit size={14} /> Edit Listing
                     </button>
                   )}
 
-                  <button
-                    style={{
-                      padding: '8px 12px',
-                      fontSize: '0.82rem',
-                      fontWeight: 800,
-                      borderRadius: '9999px',
-                      background: l.status === 'LIVE' ? '#fff1f2' : '#ecfdf5',
-                      color: l.status === 'LIVE' ? '#e11d48' : '#047857',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                    onClick={() => handleToggleStatus(l.id, l.status, l.title)}
-                    title={l.status === 'LIVE' ? 'Deactivate Product' : 'Activate Product'}
-                  >
-                    <PowerOff size={14} />
-                  </button>
+                  {l.status !== 'PENDING_APPROVAL' && l.status !== 'PENDING_DELETION' && (
+                    <button
+                      style={{
+                        padding: '8px 12px',
+                        fontSize: '0.82rem',
+                        fontWeight: 800,
+                        borderRadius: '9999px',
+                        background: l.status === 'LIVE' ? '#fff1f2' : '#ecfdf5',
+                        color: l.status === 'LIVE' ? '#e11d48' : '#047857',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                      onClick={() => handleToggleStatus(l.id, l.status, l.title)}
+                      title={l.status === 'LIVE' ? 'Deactivate Product' : 'Activate Product'}
+                    >
+                      <PowerOff size={14} />
+                    </button>
+                  )}
                 </div>
 
               </div>
@@ -644,25 +682,154 @@ export default function ListingsManagementPage() {
                   <td style={{ textAlign: 'center' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                       {l.status === 'PENDING_APPROVAL' ? (
-                        <button
-                          style={{
-                            padding: '6px 14px',
-                            fontSize: '0.82rem',
-                            fontWeight: 800,
-                            borderRadius: '9999px',
-                            background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-                            color: '#ffffff',
-                            border: 'none',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
-                          }}
-                          onClick={() => handleApproveProduct(l.id, l.title)}
-                        >
-                          <CheckCircle2 size={13} color="#ffffff" /> Approve
-                        </button>
+                        <>
+                          <button
+                            style={{
+                              padding: '6px 14px',
+                              fontSize: '0.82rem',
+                              fontWeight: 800,
+                              borderRadius: '9999px',
+                              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
+                            }}
+                            onClick={() => handleApproveProduct(l.id, l.title)}
+                          >
+                            <CheckCircle2 size={13} color="#ffffff" /> Approve
+                          </button>
+                          <button
+                            style={{
+                              padding: '6px 14px',
+                              fontSize: '0.82rem',
+                              fontWeight: 800,
+                              borderRadius: '9999px',
+                              background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
+                            }}
+                            onClick={async () => {
+                              const reason = prompt('Please describe what the supplier needs to fix:');
+                              if (!reason) return;
+                              try {
+                                const res = await fetch('/api/admin/listings/request-fix', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ productId: l.id, reason })
+                                });
+                                const data = await res.json();
+                                if (!res.ok) throw new Error(data.error || 'Failed to request fix');
+                                setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'NEEDS_FIX' } : item)));
+                                triggerAction(`Requested Fixes for: "${l.title}"`);
+                              } catch (e: any) {
+                                console.error(e);
+                                triggerAction(`Error: ${e.message}`);
+                              }
+                            }}
+                          >
+                            <Edit size={13} color="#ffffff" /> Request Fix
+                          </button>
+                          <button
+                            style={{
+                              padding: '6px 14px',
+                              fontSize: '0.82rem',
+                              fontWeight: 800,
+                              borderRadius: '9999px',
+                              background: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              boxShadow: '0 4px 12px rgba(225, 29, 72, 0.35)'
+                            }}
+                            onClick={async () => {
+                              const reason = prompt('Please enter the reason for rejection:');
+                              if (!reason) return;
+                              try {
+                                const res = await fetch('/api/admin/listings/reject', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ productId: l.id, reason })
+                                });
+                                const data = await res.json();
+                                if (!res.ok) throw new Error(data.error || 'Failed to reject listing');
+                                setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'REJECTED' } : item)));
+                                triggerAction(`Product Rejected: "${l.title}"`);
+                              } catch (e: any) {
+                                console.error(e);
+                                triggerAction(`Error: ${e.message}`);
+                              }
+                            }}
+                          >
+                            <PowerOff size={13} color="#ffffff" /> Reject
+                          </button>
+                        </>
+                      ) : l.status === 'PENDING_DELETION' ? (
+                        <>
+                          <button
+                            style={{
+                              padding: '6px 14px',
+                              fontSize: '0.82rem',
+                              fontWeight: 800,
+                              borderRadius: '9999px',
+                              background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.35)'
+                            }}
+                            onClick={() => setDeleteConfirmId(l.id)}
+                          >
+                            <Trash2 size={13} color="#ffffff" /> Confirm Delete
+                          </button>
+                          <button
+                            style={{
+                              padding: '6px 14px',
+                              fontSize: '0.82rem',
+                              fontWeight: 800,
+                              borderRadius: '9999px',
+                              background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              boxShadow: '0 4px 12px rgba(100, 116, 139, 0.35)'
+                            }}
+                            onClick={async () => {
+                              try {
+                                const res = await fetch('/api/admin/listings/reject-delete', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ productId: l.id })
+                                });
+                                if (!res.ok) throw new Error('Failed to reject deletion');
+                                setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'PUBLISHED' } : item)));
+                                triggerAction(`Deletion Rejected for: "${l.title}"`);
+                              } catch (e: any) {
+                                console.error(e);
+                                triggerAction(`Error: ${e.message}`);
+                              }
+                            }}
+                          >
+                            <X size={13} color="#ffffff" /> Reject Delete
+                          </button>
+                        </>
                       ) : (
                         <button
                           style={{
@@ -986,6 +1153,50 @@ export default function ListingsManagementPage() {
         </div>
       )}
 
+      {/* Custom Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
+            <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <Trash2 size={32} color="#ef4444" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>Permanently Delete?</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', margin: '0 0 24px 0', lineHeight: 1.5 }}>
+              Are you sure you want to approve this deletion? This action cannot be undone and the product will be permanently removed from the database.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setDeleteConfirmId(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/admin/listings/delete', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productId: deleteConfirmId })
+                    });
+                    if (!res.ok) throw new Error('Failed to delete listing');
+                    setListings((prev) => prev.filter((item) => item.id !== deleteConfirmId));
+                    setDeleteConfirmId(null);
+                    triggerAction(`Product Deleted successfully`);
+                  } catch (e: any) {
+                    console.error(e);
+                    setDeleteConfirmId(null);
+                    triggerAction(`Error: ${e.message}`);
+                  }
+                }}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.3)' }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

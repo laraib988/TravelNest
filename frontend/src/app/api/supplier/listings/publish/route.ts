@@ -42,7 +42,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: product }, { status: 200 });
   } catch (error: any) {
-    console.error('Publish error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Publish error details:', error);
+    return NextResponse.json({ 
+      error: error.message || 'Database error occurred',
+      details: error.details || error.hint || 'No additional details' 
+    }, { status: 500 });
   }
 }

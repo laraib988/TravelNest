@@ -30,7 +30,8 @@ export async function GET(request: Request) {
       image: p.basic_info?.photos?.heroImage || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
       price: `$${p.transport_pricing?.[0]?.amount || 0}`,
       status: p.status,
-      lastUpdated: new Date(p.updated_at).toLocaleDateString()
+      lastUpdated: new Date(p.updated_at).toLocaleDateString(),
+      admin_feedback: p.logistics?.admin_feedback || null
     }));
 
     return NextResponse.json(mappedListings, { status: 200 });
