@@ -101,7 +101,7 @@ export default function SupplierVerificationPage() {
     try {
       // If it's a Supabase UUID (usually > 30 chars), update Supabase
       if (supplierId.length > 30) {
-         let supaStatus = newState;
+         let supaStatus: string = newState;
          if (newState === 'SUBMITTED_PENDING_REVIEW') supaStatus = 'PENDING';
          if (newState === 'APPROVED_VERIFIED') supaStatus = 'APPROVED';
          
