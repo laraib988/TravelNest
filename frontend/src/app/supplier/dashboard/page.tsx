@@ -128,7 +128,7 @@ export default function SupplierDashboard() {
         {activeTab === 'DASHBOARD' && (
           <>
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>
-              Welcome back, {user?.user_metadata?.name || 'Partner'}!
+              Welcome back, {user?.name || 'Partner'}!
             </h1>
             <p style={{ color: '#64748b', marginBottom: '32px' }}>Here is what's happening with your tours today.</p>
 
