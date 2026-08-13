@@ -230,6 +230,7 @@ export function useAuth() {
       signup: async () => true,
       checkUserExists: async () => false,
       logout: () => {},
+      loading: false,
     };
   }
   return context;
