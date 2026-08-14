@@ -20,22 +20,59 @@ export async function GET(request: Request) {
       .from('products')
       .select('*')
       .eq('supplier_id', userId)
+      .neq('status', 'PENDING_DELETION')
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
 
-    const mappedListings = products.map(p => ({
-      id: p.id,
-      title: p.basic_info?.title || 'Draft Listing',
-      image: p.basic_info?.photos?.heroImage || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
-      price: `$${p.transport_pricing?.[0]?.amount || 0}`,
-      status: p.status,
-      lastUpdated: new Date(p.updated_at).toLocaleDateString(),
-      admin_feedback: p.logistics?.admin_feedback || null
-    }));
+    const clones = products.filter(p => p.logistics?.parent_id);
+    const parents = products.filter(p => !p.logistics?.parent_id);
+
+    const mappedListings = parents.map(p => {
+      let minPriceAmount = 0;
+      let pricingType = 'per person';
+
+      if (p.transport_pricing && p.transport_pricing.length > 0) {
+        const minOption = p.transport_pricing.reduce((min: any, current: any) => {
+          return parseFloat(current.amount || '0') < parseFloat(min.amount || '0') ? current : min;
+        });
+        minPriceAmount = parseFloat(minOption.amount || '0');
+        pricingType = (minOption.pricingType || 'per person').toLowerCase();
+      }
+
+      const displayPrice = p.transport_pricing && p.transport_pricing.length > 0 
+        ? `$${minPriceAmount} ${pricingType}`
+        : '$0 per person';
+
+      const validHeroImage = p.basic_info?.photos?.heroImage?.startsWith('blob:') 
+          ? null 
+          : p.basic_info?.photos?.heroImage;
+
+      // Handle conceptual merging of edits
+      const pendingClone = clones.find(c => c.logistics.parent_id === p.id && (c.status === 'PENDING_APPROVAL' || c.status === 'DRAFT'));
+      let displayStatus = p.status;
+      let editUrlId = p.id;
+
+      if (pendingClone) {
+        displayStatus = 'EDIT_PENDING';
+        editUrlId = pendingClone.id; // When they click edit, take them to the draft clone
+      }
+
+      return {
+        id: p.id,
+        editUrlId,
+        title: p.basic_info?.title || 'Draft Listing',
+        image: validHeroImage || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
+        price: displayPrice,
+        status: displayStatus,
+        lastUpdated: new Date(p.updated_at).toLocaleDateString(),
+        admin_feedback: p.logistics?.admin_feedback || null
+      };
+    });
 
     return NextResponse.json(mappedListings, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

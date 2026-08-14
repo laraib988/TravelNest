@@ -60,7 +60,8 @@ export default function CreateListingPage() {
     travellers: '',
     pricingType: '',
     amount: '',
-    duration: ''
+    duration: '',
+    availableUnits: ''
   });
 
   // Step 4 State (Logistics)
@@ -70,7 +71,10 @@ export default function CreateListingPage() {
     dropOffLocation: '',
     availability: [] as string[],
     timeFrameFrom: '',
-    timeFrameTo: ''
+    timeFrameTo: '',
+    bookingType: 'Instant Confirmation',
+    paymentOption: 'Pay Now',
+    timeInterval: '30'
   });
 
   // Step 5 State (Itinerary)
@@ -196,7 +200,7 @@ export default function CreateListingPage() {
   const saveTransportOption = () => {
     if (!currentTransport.title || !currentTransport.amount) return;
     setTransportOptions([...transportOptions, { ...currentTransport, id: Date.now().toString() }]);
-    setCurrentTransport({ title: '', transportType: '', makeVariant: '', attributes: [], travellers: '', pricingType: '', amount: '', duration: '' });
+    setCurrentTransport({ title: '', transportType: '', makeVariant: '', attributes: [], travellers: '', pricingType: '', amount: '', duration: '', availableUnits: '' });
   };
 
   const removeTransportOption = (id: string) => {
@@ -234,10 +238,27 @@ export default function CreateListingPage() {
     }
 
     if (isHero) {
-      setPhotos(prev => ({ ...prev, heroImage: URL.createObjectURL(files[0]) }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotos(prev => ({ ...prev, heroImage: reader.result as string }));
+      };
+      reader.readAsDataURL(files[0]);
     } else {
-      const newGallery = Array.from(files).map(f => URL.createObjectURL(f));
-      setPhotos(prev => ({ ...prev, gallery: [...prev.gallery, ...newGallery] }));
+      const promises = Array.from(files).map(f => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(f);
+        });
+      });
+      Promise.all(promises).then(results => {
+        setPhotos(prev => {
+          const spaceLeft = 4 - prev.gallery.length;
+          if (spaceLeft <= 0) return prev;
+          const allowedResults = results.slice(0, spaceLeft);
+          return { ...prev, gallery: [...prev.gallery, ...allowedResults] };
+        });
+      });
     }
   };
 
@@ -245,7 +266,7 @@ export default function CreateListingPage() {
   const inputStyle = { width: '100%', padding: '14px 18px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', background: '#f8fafc', outline: 'none', transition: 'border 0.2s' };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 24px' }}>
+    <div style={{ maxWidth: '1200px', width: '100%', margin: '40px auto', padding: '0 24px' }}>
       
       {/* HEADER & SAVING STATUS */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
@@ -258,7 +279,7 @@ export default function CreateListingPage() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '40px' }}>
+      <div style={{ display: 'flex', gap: '40px', width: '100%' }}>
         
         {/* LEFT SIDEBAR STEPPER */}
         <div style={{ width: '280px', flexShrink: 0 }}>
@@ -268,7 +289,17 @@ export default function CreateListingPage() {
               const isActive = currentStep === stepNum;
               const isPast = currentStep > stepNum;
               return (
-                <div key={stepNum} style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: idx === STEPS.length - 1 ? 0 : '24px', opacity: isActive || isPast ? 1 : 0.5 }}>
+                <div 
+                  key={stepNum} 
+                  onClick={() => isPast && setCurrentStep(stepNum)}
+                  style={{ 
+                    display: 'flex', alignItems: 'center', gap: '16px', 
+                    marginBottom: idx === STEPS.length - 1 ? 0 : '24px', 
+                    opacity: isActive || isPast ? 1 : 0.5,
+                    cursor: isPast ? 'pointer' : 'default',
+                    transition: 'opacity 0.2s'
+                  }}
+                >
                   <div style={{ 
                     width: '32px', height: '32px', borderRadius: '50%', 
                     background: isActive ? '#0f172a' : isPast ? '#10b981' : '#f1f5f9',
@@ -287,7 +318,7 @@ export default function CreateListingPage() {
         </div>
 
         {/* RIGHT MAIN CONTENT AREA */}
-        <div style={{ flex: 1, background: '#ffffff', borderRadius: '24px', padding: '40px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div style={{ flex: 1, minWidth: 0, width: '100%', background: '#ffffff', borderRadius: '24px', padding: '40px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
           
           {currentStep === 1 && (
             <div>
@@ -321,6 +352,16 @@ export default function CreateListingPage() {
                       <option value="Luxury">Luxury</option>
                     </select>
                   </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Description</label>
+                  <textarea 
+                    value={basicInfo.shortDescription} 
+                    onChange={e => setBasicInfo({...basicInfo, shortDescription: e.target.value})}
+                    placeholder="Provide a comprehensive description of the tour..." 
+                    style={{ ...inputStyle, minHeight: '120px', resize: 'vertical' }}
+                  />
                 </div>
 
                 <div style={{ marginTop: '20px', padding: '30px', background: '#f1f5f9', borderRadius: '16px' }}>
@@ -382,17 +423,24 @@ export default function CreateListingPage() {
 
                 <div style={{ background: '#f8fafc', padding: '30px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a', margin: '0 0 10px 0' }}>Gallery Images</h3>
-                  <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>Upload additional images to show off your tour. (Max 2MB per file).</p>
+                  <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>Upload additional images to show off your tour. (Max 4 images, 2MB per file).</p>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                     {photos.gallery.map((src, i) => (
-                      <div key={i} style={{ height: '120px', borderRadius: '12px', background: `url(${src}) center/cover` }} />
+                      <div key={i} style={{ height: '120px', borderRadius: '12px', background: `url(${src}) center/cover`, position: 'relative' }}>
+                        <button 
+                          onClick={() => setPhotos(prev => ({...prev, gallery: prev.gallery.filter((_, idx) => idx !== i)}))}
+                          style={{ position: 'absolute', top: '4px', right: '4px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '10px' }}
+                        >✕</button>
+                      </div>
                     ))}
-                    <div style={{ position: 'relative', height: '120px', border: '2px dashed #cbd5e1', borderRadius: '12px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#64748b' }}>
-                      <Plus size={24} />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 600, marginTop: '8px' }}>Add Photos</span>
-                      <input type="file" accept="image/*" multiple onChange={(e) => handlePhotoUpload(e, false)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
-                    </div>
+                    {photos.gallery.length < 4 && (
+                      <div style={{ position: 'relative', height: '120px', border: '2px dashed #cbd5e1', borderRadius: '12px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#64748b' }}>
+                        <Plus size={24} />
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, marginTop: '8px' }}>Add Photos</span>
+                        <input type="file" accept="image/*" multiple onChange={(e) => handlePhotoUpload(e, false)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -585,6 +633,21 @@ export default function CreateListingPage() {
                     </div>
                   </div>
 
+                  {currentTransport.pricingType && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
+                        {currentTransport.pricingType === 'Per Person' ? 'How many seats are available?' : 'How many vehicles are available?'}
+                      </label>
+                      <input 
+                        type="number" 
+                        value={currentTransport.availableUnits || ''} 
+                        onChange={e => setCurrentTransport({...currentTransport, availableUnits: e.target.value})} 
+                        placeholder="e.g. 10" 
+                        style={{...inputStyle, maxWidth: '300px'}} 
+                      />
+                    </div>
+                  )}
+
                   <div>
                     <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Tour Duration</label>
                     <select value={currentTransport.duration} onChange={e => setCurrentTransport({...currentTransport, duration: e.target.value})} style={{...inputStyle, maxWidth: '300px'}}>
@@ -689,7 +752,7 @@ export default function CreateListingPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Time Frame (From)</label>
                       <input type="time" value={logistics.timeFrameFrom} onChange={e => setLogistics({...logistics, timeFrameFrom: e.target.value})} style={inputStyle} />
@@ -698,8 +761,34 @@ export default function CreateListingPage() {
                       <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Time Frame (To)</label>
                       <input type="time" value={logistics.timeFrameTo} onChange={e => setLogistics({...logistics, timeFrameTo: e.target.value})} style={inputStyle} />
                     </div>
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Pickup Interval</label>
+                      <select value={logistics.timeInterval} onChange={e => setLogistics({...logistics, timeInterval: e.target.value})} style={inputStyle}>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60">1 hour</option>
+                      </select>
+                    </div>
                   </div>
-                  <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '10px', margin: 0 }}>This time frame will apply to all selected days above.</p>
+                  <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '10px', margin: 0 }}>This time frame will apply to all selected days above. Note: Customers will see and select pickup times in the specified interval within this frame.</p>
+
+                  <div style={{ marginTop: '32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Booking Type</label>
+                      <select value={logistics.bookingType} onChange={e => setLogistics({...logistics, bookingType: e.target.value})} style={inputStyle}>
+                        <option value="Instant Confirmation">Instant Confirmation</option>
+                        <option value="Manual Confirmation">Manual Confirmation</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Payment Option</label>
+                      <select value={logistics.paymentOption} onChange={e => setLogistics({...logistics, paymentOption: e.target.value})} style={inputStyle}>
+                        <option value="Pay Now">Pay Now</option>
+                        <option value="Reserve Now Pay Later">Reserve Now Pay Later</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -937,17 +1026,32 @@ export default function CreateListingPage() {
                       setPublishError(null);
                       setIsPublishing(true);
                       
-                      let currentId = productId;
-                      if (!currentId) {
-                        const saveRes = await saveDraft();
-                        if (saveRes && saveRes.success) {
-                          currentId = saveRes.id;
-                        } else {
-                          setPublishError(saveRes?.error || 'Failed to save before publishing');
-                          setIsPublishing(false);
-                          return;
-                        }
+                      // Validate all required fields
+                      const errors = [];
+                      if (!basicInfo.title) errors.push('Title is missing.');
+                      if (!basicInfo.category) errors.push('Category is missing.');
+                      if (!basicInfo.shortDescription) errors.push('Description is missing.');
+                      if (!photos.heroImage) errors.push('Hero image is missing.');
+                      if (transportOptions.length === 0) errors.push('At least one pricing option is required.');
+                      if (!logistics.pickupLocation) errors.push('Pickup location is missing.');
+                      if (!logistics.timeFrameFrom || !logistics.timeFrameTo) errors.push('Time frame is incomplete.');
+                      if (itinerary.length === 0) errors.push('At least one itinerary item is required.');
+                      
+                      if (errors.length > 0) {
+                        setPublishError('Please fill out all required fields: ' + errors.join(' '));
+                        setIsPublishing(false);
+                        return;
                       }
+                      
+                      // Always force a save before publishing to ensure latest data is in DB
+                      const saveRes = await saveDraft();
+                      if (!saveRes || !saveRes.success) {
+                        setPublishError(saveRes?.error || 'Failed to save before publishing');
+                        setIsPublishing(false);
+                        return;
+                      }
+                      
+                      const currentId = saveRes.id || productId;
 
                       try {
                         const controller = new AbortController();

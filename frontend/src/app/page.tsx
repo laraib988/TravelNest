@@ -93,15 +93,12 @@ export default function HomePage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [listingsRes, destsRes, supabaseListingsRes] = await Promise.all([
-          fetchFromAPI('/listings'),
+        const [destsRes, supabaseListingsRes] = await Promise.all([
           fetchFromAPI('/listings/destinations'),
           fetch('/api/public/listings').then(res => res.json()).catch(() => [])
         ]);
         
-        // Combine Supabase listings with mock listings
-        const combinedListings = [...(supabaseListingsRes || []), ...(listingsRes || [])];
-        setListings(combinedListings);
+        setListings(supabaseListingsRes || []);
         
         setDestinations(destsRes || []);
 
@@ -132,7 +129,7 @@ export default function HomePage() {
     if (!searchQuery.trim()) {
       setActiveSearchTerm('');
       setLoading(true);
-      const res = await fetchFromAPI('/listings');
+      const res = await fetch('/api/public/listings').then(res => res.json()).catch(() => []);
       setListings(res || []);
       setLoading(false);
       return;
@@ -140,7 +137,7 @@ export default function HomePage() {
 
     setSearching(true);
     try {
-      const res = await fetchFromAPI(`/listings?search=${encodeURIComponent(searchQuery)}`);
+      const res = await fetch(`/api/public/listings?search=${encodeURIComponent(searchQuery)}`).then(res => res.json()).catch(() => []);
       setListings(res || []);
       setActiveSearchTerm(searchQuery);
       
@@ -157,7 +154,7 @@ export default function HomePage() {
     setSearchQuery(city);
     setSearching(true);
     try {
-      const res = await fetchFromAPI(`/listings?search=${encodeURIComponent(city)}`);
+      const res = await fetch(`/api/public/listings?search=${encodeURIComponent(city)}`).then(res => res.json()).catch(() => []);
       setListings(res || []);
       setActiveSearchTerm(city);
       const elem = document.getElementById('experiences-section');
@@ -179,7 +176,7 @@ export default function HomePage() {
     setOnlyFreeCancel(false);
     setLoading(true);
     try {
-      const res = await fetchFromAPI('/listings');
+      const res = await fetch('/api/public/listings').then(res => res.json()).catch(() => []);
       setListings(res || []);
     } catch (err) {
       console.error(err);
@@ -515,28 +512,30 @@ export default function HomePage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
           {listings.slice(0, 3).map((item) => (
-            <div key={item.id} className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative' }}>
-              <div style={{ height: '200px', position: 'relative' }}>
-                <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
-                  Likely to Sell Out
+            <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none' }}>
+              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+                <div style={{ height: '200px', position: 'relative' }}>
+                  <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
+                    Likely to Sell Out
+                  </div>
+                </div>
+                <div style={{ padding: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                    <Star size={14} color="#d97706" fill="#d97706" />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>{item.cached_rating_avg}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '14px' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From {formatPrice(item.base_price)}</span>
+                    <div className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>
+                      Book Slots
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div style={{ padding: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
-                  <Star size={14} color="#d97706" fill="#d97706" />
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{item.cached_rating_avg}</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
-                </div>
-                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '14px' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From {formatPrice(item.base_price)}</span>
-                  <Link href={`/tours/${item.slug}`} className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>
-                    Book Slots
-                  </Link>
-                </div>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -707,80 +706,80 @@ export default function HomePage() {
             }}
           >
             {filteredListings.filter(item => item.id !== 'list-bali-sunset').map((item) => (
-              <div 
-                key={item.id} 
-                className="card-panel card-interactive" 
-                style={{ 
-                  flex: '0 0 calc(25% - 18px)', 
-                  minWidth: '270px', 
-                  overflow: 'hidden', 
-                  display: 'flex', 
-                  flexDirection: 'column' 
-                }}
-              >
-                
-                {/* IMAGE & BADGES */}
-                <div style={{ height: '200px', position: 'relative' }}>
-                  <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none' }}>
+                <div 
+                  className="card-panel card-interactive" 
+                  style={{ 
+                    flex: '0 0 calc(25% - 18px)', 
+                    minWidth: '270px', 
+                    overflow: 'hidden', 
+                    display: 'flex', 
+                    flexDirection: 'column' 
+                  }}
+                >
                   
-                  <button
-                    onClick={(e) => toggleWishlist(item.id, e)}
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      right: '12px',
-                      background: '#ffffff',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '34px',
-                      height: '34px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      boxShadow: 'var(--shadow-sm)',
-                    }}
-                  >
-                    <Heart size={16} color={wishlist[item.id] ? '#f43f5e' : '#64748b'} fill={wishlist[item.id] ? '#f43f5e' : 'none'} />
-                  </button>
+                  {/* IMAGE & BADGES */}
+                  <div style={{ height: '200px', position: 'relative' }}>
+                    <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    
+                    <button
+                      onClick={(e) => { e.preventDefault(); toggleWishlist(item.id, e); }}
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        background: '#ffffff',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '34px',
+                        height: '34px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: 'var(--shadow-sm)',
+                      }}
+                    >
+                      <Heart size={16} color={wishlist[item.id] ? '#f43f5e' : '#64748b'} fill={wishlist[item.id] ? '#f43f5e' : 'none'} />
+                    </button>
 
-                  <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', padding: '3px 8px', borderRadius: 'var(--radius-pill)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#0f172a', fontWeight: 700, boxShadow: 'var(--shadow-sm)' }}>
-                    <Star size={13} color="#d97706" fill="#d97706" /> {item.cached_rating_avg} ({item.cached_review_count})
-                  </div>
+                    <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', padding: '3px 8px', borderRadius: 'var(--radius-pill)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#0f172a', fontWeight: 700, boxShadow: 'var(--shadow-sm)' }}>
+                      <Star size={13} color="#d97706" fill="#d97706" /> {item.cached_rating_avg} ({item.cached_review_count})
+                    </div>
 
-                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-primary)', color: '#fff', padding: '3px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem', fontWeight: 700 }}>
-                    {item.category_name || item.category}
-                  </div>
-                </div>
-
-                {/* CONTENT */}
-                <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <h3 style={{ fontSize: '1.05rem', marginBottom: '6px', lineHeight: 1.35, color: '#0f172a', fontWeight: 700 }}>{item.title}</h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {item.summary}
-                    </p>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> {item.duration_minutes / 60} {t('hours')}</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} color="#059669" /> {t('kyc_verified')}</span>
+                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-primary)', color: '#fff', padding: '3px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem', fontWeight: 700 }}>
+                      {item.category_name || item.category}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-light)' }}>
+                  {/* CONTENT */}
+                  <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('from')}</span>
-                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                        {formatPrice(item.base_price)}
+                      <h3 style={{ fontSize: '1.05rem', marginBottom: '6px', lineHeight: 1.35, color: '#0f172a', fontWeight: 700 }}>{item.title}</h3>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {item.summary}
+                      </p>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> {item.duration_minutes / 60} {t('hours')}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} color="#059669" /> {t('kyc_verified')}</span>
                       </div>
                     </div>
-                    <Link href={`/tours/${item.slug}`} className="btn-secondary" style={{ padding: '7px 14px', fontSize: '0.82rem' }}>
-                      {t('view_slots')}
-                    </Link>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-light)' }}>
+                      <div>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('from')}</span>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                          {formatPrice(item.base_price)}
+                        </div>
+                      </div>
+                      <div className="btn-secondary" style={{ padding: '7px 14px', fontSize: '0.82rem' }}>
+                        {t('view_slots')}
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-              </div>
+              </Link>
             ))}
           </div>
         )}

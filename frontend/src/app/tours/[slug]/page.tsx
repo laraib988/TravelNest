@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
-import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, Heart } from 'lucide-react';
+import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, Heart, XCircle } from 'lucide-react';
 
 export default function TourDetailPage() {
   const params = useParams();
@@ -22,6 +22,7 @@ export default function TourDetailPage() {
   const [aiQuestion, setAiQuestion] = useState('');
   const [aiAnswer, setAiAnswer] = useState('');
   const [askingAi, setAskingAi] = useState(false);
+  const [relevantProducts, setRelevantProducts] = useState<any[]>([]);
 
   // SRS 3.7: Reviews & Ratings State
   const [reviews, setReviews] = useState<any[]>([]);
@@ -33,9 +34,19 @@ export default function TourDetailPage() {
   const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     async function loadTour() {
       try {
-        const res = await fetchFromAPI(`/listings/${slug}`);
+        let res;
+        try {
+          res = await fetchFromAPI(`/listings/${slug}`);
+        } catch (backendErr) {
+          // Fallback to Next.js API for Supabase products
+          const nextRes = await fetch(`/api/public/listings/${slug}`);
+          if (!nextRes.ok) throw new Error('Not found in Supabase');
+          res = await nextRes.json();
+        }
+
         setTour(res);
         if (res.options && res.options.length > 0) {
           setSelectedOption(res.options[0]);
@@ -48,6 +59,15 @@ export default function TourDetailPage() {
           const reviewsRes = await fetchFromAPI(`/reviews?listing_id=${res.id}`);
           setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
         } catch { setReviews([]); }
+        
+        // Fetch relevant products
+        try {
+          const allListings = await fetch('/api/public/listings').then(r => r.json());
+          if (Array.isArray(allListings)) {
+            const others = allListings.filter(item => item.id !== res.id).slice(0, 4);
+            setRelevantProducts(others);
+          }
+        } catch { setRelevantProducts([]); }
       } catch (err: any) {
         console.error('Error loading listing:', err);
       } finally {
@@ -93,11 +113,33 @@ export default function TourDetailPage() {
     } catch {}
   };
 
+  useEffect(() => {
+    if (selectedOption && quantity > (Number(selectedOption.max_capacity) || 10)) {
+      setSelectedOption(null);
+    }
+  }, [quantity, selectedOption]);
+
   const handleAcquireHold = async () => {
     if (!selectedSlot || !selectedOption) return;
     setHolding(true);
     setErrorMsg('');
     try {
+      const checkoutParams = new URLSearchParams({
+        option_id: selectedOption.id,
+        option_name: selectedOption.title || selectedOption.name || 'Standard Option',
+        price: (selectedOption.price_modifier || selectedOption.price || tour.base_price).toString(),
+        title: tour.title,
+        date: selectedSlot.start_time || selectedSlot.date_time || new Date().toISOString(),
+        time_from: tour.time_from || '08:00',
+        time_to: tour.time_to || '18:00',
+        payment_option: tour.payment_option || 'Pay Now',
+        time_interval: tour.time_interval || '30'
+      });
+      // Mock hold for dynamically generated slots that don't exist in the backend DB
+      if (selectedSlot.id.startsWith('slot-') || selectedSlot.id.startsWith('custom-') || selectedSlot.id.startsWith('gen-')) {
+         router.push(`/checkout?hold_id=hold_${Date.now()}&expires=${Date.now() + 900000}&${checkoutParams.toString()}`);
+         return;
+      }
       const holdRes = await fetchFromAPI('/availability/hold', {
         method: 'POST',
         body: JSON.stringify({
@@ -107,7 +149,7 @@ export default function TourDetailPage() {
         }),
       });
 
-      router.push(`/checkout?hold_id=${holdRes.hold_id}&expires=${holdRes.expires_at}&option_id=${selectedOption.id}`);
+      router.push(`/checkout?hold_id=${holdRes.hold_id}&expires=${holdRes.expires_at}&${checkoutParams.toString()}`);
     } catch (err: any) {
       setErrorMsg(err.message || 'Slot locked by another customer. Please choose another date.');
     } finally {
@@ -140,8 +182,8 @@ export default function TourDetailPage() {
     return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--brand-accent)' }}>Experience not found.</div>;
   }
 
-  const remainingSeats = selectedSlot ? selectedSlot.total_capacity - (selectedSlot.booked_capacity + selectedSlot.held_capacity) : 0;
-  const currentPrice = selectedOption ? selectedOption.price : tour.base_price;
+  const remainingSeats = selectedSlot ? (selectedSlot.capacity_left ?? 10) : 10;
+  const currentPrice = selectedOption ? (selectedOption.price_modifier || selectedOption.price) : tour.base_price;
 
   // SRS 8.3: JSON-LD Structured Data (Product + AggregateRating + FAQ Schema)
   const jsonLd = {
@@ -173,7 +215,7 @@ export default function TourDetailPage() {
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
           <span className="badge-emerald">{tour.category_name}</span>
-          <span className="badge-amber">⚡ {tour.confirmation_type === 'INSTANT' ? 'Instant Voucher Confirmation' : '24H Supplier SLA Confirmation'}</span>
+          <span className="badge-amber">⚡ {tour.confirmation_type || 'Instant Confirmation'}</span>
           {tour.merchandising_badges?.map((badge: string, i: number) => (
             <span key={i} className="badge-rose">{badge}</span>
           ))}
@@ -181,16 +223,24 @@ export default function TourDetailPage() {
         <h1 style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#0f172a' }}>{tour.title}</h1>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '20px', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={16} color="#d97706" fill="#d97706" /> <strong style={{ color: '#0f172a' }}>{tour.cached_rating_avg}</strong> ({tour.cached_review_count} reviews)</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={16} /> {tour.duration_minutes / 60} Hours</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={16} /> {tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={16} color="var(--brand-primary)" /> {tour.meeting_point?.address}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><ShieldCheck size={16} color="#059669" /> Verified Supplier</span>
         </div>
       </div>
 
       {/* GALLERY */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', height: '400px', marginBottom: '40px' }}>
-        <img src={tour.images[0]?.url} alt={tour.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        <img src={tour.images[1]?.url || tour.images[0]?.url} alt="Secondary View" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', height: '450px', marginBottom: '40px' }}>
+        <img src={tour.images[0]?.url} alt={tour.title} style={{ width: '100%', height: '100%', objectFit: 'fill', borderRadius: 'var(--radius-md)' }} />
+        {tour.images.length > 1 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '16px' }}>
+            {tour.images.slice(1, 5).map((img: any, i: number) => (
+              <img key={i} src={img.url} alt={`Gallery ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'fill', borderRadius: 'var(--radius-md)' }} />
+            ))}
+          </div>
+        ) : (
+          <img src={tour.images[0]?.url} alt="Secondary View" style={{ width: '100%', height: '100%', objectFit: 'fill', borderRadius: 'var(--radius-md)' }} />
+        )}
       </div>
 
       {/* TWO COLUMN CONTENT & BOOKING PANEL */}
@@ -224,30 +274,56 @@ export default function TourDetailPage() {
             </div>
           )}
 
-          <h2 style={{ fontSize: '1.6rem', marginBottom: '16px', color: '#0f172a' }}>Experience Overview</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7, marginBottom: '32px' }}>
-            {tour.description}
-          </p>
+          {tour.description && tour.description !== 'No description provided.' && (
+            <>
+              <h2 style={{ fontSize: '1.6rem', marginBottom: '16px', color: '#0f172a' }}>Experience Overview</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7, marginBottom: '32px' }}>
+                {tour.description}
+              </p>
+            </>
+          )}
 
-          <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>What's Included</h3>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
-            {tour.inclusions?.map((item: string, idx: number) => (
-              <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1rem', color: '#334155' }}>
-                <CheckCircle2 size={18} color="#059669" /> {item}
-              </li>
-            ))}
-          </ul>
+          {tour.highlights?.length > 0 && (
+            <div style={{ marginBottom: '40px' }}>
+              <h2 style={{ fontSize: '1.6rem', marginBottom: '16px', color: '#0f172a' }}>Highlights</h2>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {tour.highlights.filter((h: string) => h.trim().length > 0).map((item: string, idx: number) => (
+                  <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '1.05rem', color: '#334155' }}>
+                    <Sparkles size={18} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '4px' }} /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>Know Before You Go</h3>
-          <div className="card-panel" style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '40px' }}>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', color: 'var(--text-secondary)' }}>
-              {tour.know_before_you_go?.map((item: string, idx: number) => (
-                <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <AlertCircle size={18} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '2px' }} /> {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {(tour.inclusions?.length > 0 || tour.know_before_you_go?.length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '40px' }}>
+              {tour.inclusions?.length > 0 && (
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>What's Included</h3>
+                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {tour.inclusions.map((item: string, idx: number) => (
+                      <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '1rem', color: '#334155' }}>
+                        <CheckCircle2 size={18} color="#059669" style={{ flexShrink: 0, marginTop: '2px' }} /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {tour.know_before_you_go?.length > 0 && (
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>What's Excluded / To Know</h3>
+                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', color: 'var(--text-secondary)' }}>
+                    {tour.know_before_you_go.map((item: string, idx: number) => (
+                      <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                        <XCircle size={18} color="#e11d48" style={{ flexShrink: 0, marginTop: '2px' }} /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* SRS 9.14: "ASK AI ABOUT THIS PLACE" CONTEXTUAL Q&A WIDGET */}
           <div className="card-panel" style={{ padding: '24px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
@@ -274,6 +350,70 @@ export default function TourDetailPage() {
               </div>
             )}
           </div>
+
+          {/* ═══════════ ITINERARY SECTION ═══════════ */}
+          {tour.itinerary && tour.itinerary.length > 0 && (
+            <div style={{ marginTop: '40px', padding: '24px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+              <h2 style={{ fontSize: '1.6rem', color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <MapPin size={24} color="var(--brand-primary)" /> Tour Itinerary
+              </h2>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', marginLeft: '12px' }}>
+                <div style={{ position: 'absolute', left: '0', top: '10px', bottom: '10px', width: '2px', background: '#e2e8f0', zIndex: 0 }}></div>
+                
+                {(() => {
+                  const fullItinerary = [
+                    {
+                      locationName: 'Pickup: ' + (tour.meeting_point?.address || 'Designated Location'),
+                      description: 'Meet your guide and group to begin your journey.',
+                      isLogistics: true
+                    },
+                    ...tour.itinerary,
+                    {
+                      locationName: 'Drop-off: ' + (tour.dropoff_point?.address || 'Designated Location'),
+                      description: 'Your tour concludes here. We hope you had a great time!',
+                      isLogistics: true
+                    }
+                  ];
+                  
+                  return fullItinerary.map((item: any, idx: number) => (
+                    <div key={idx} style={{ display: 'flex', gap: '20px', marginBottom: idx === fullItinerary.length - 1 ? 0 : '30px', position: 'relative', zIndex: 1 }}>
+                      <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#ffffff', border: '3px solid var(--brand-primary)', flexShrink: 0, transform: 'translateX(-11px)' }}></div>
+                      <div style={{ flex: 1, paddingBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '8px' }}>
+                          <h3 style={{ fontSize: '1.15rem', color: '#0f172a', margin: 0, fontWeight: 700 }}>{item.locationName}</h3>
+                          {item.timeToSpend && (
+                            <span style={{ fontSize: '0.85rem', color: '#64748b', background: '#f1f5f9', padding: '4px 10px', borderRadius: '100px', fontWeight: 600 }}>{item.timeToSpend}</span>
+                          )}
+                        </div>
+                        
+                        {item.attractionType && (
+                          <div style={{ fontSize: '0.85rem', color: 'var(--brand-primary)', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            {item.attractionType}
+                          </div>
+                        )}
+                        
+                        {item.description && (
+                          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5, margin: '0 0 12px 0' }}>{item.description}</p>
+                        )}
+                        
+                        {!item.isLogistics && item.hasEntryFee && (
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#fef2f2', color: '#b91c1c', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                            <span>Entry Fee: ${item.entryFeeAmount}</span>
+                          </div>
+                        )}
+                        {!item.isLogistics && item.hasEntryFee === false && (
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', color: '#047857', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                            <span>Free Entry</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+          )}
 
           {/* ═══════════ SRS 3.7: REVIEWS & RATINGS SECTION ═══════════ */}
           <div style={{ marginTop: '40px' }}>
@@ -411,56 +551,82 @@ export default function TourDetailPage() {
           <div className="card-panel" style={{ padding: '30px', position: 'sticky', top: '100px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Price per traveler</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{selectedOption?.pricing_type || 'Price per traveler'}</span>
                 <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
                   ${currentPrice} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 400 }}>{tour.currency}</span>
                 </div>
               </div>
               <div className="badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Lock size={12} /> Redis Atomic Lock
+                <Lock size={12} /> Secure Payment
               </div>
             </div>
 
             {/* SRS 3.3 / 4.4: MULTI-OPTION SKU SELECTOR */}
-            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '8px', color: '#0f172a' }}>Select Ticket Option / Variant</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-              {tour.options?.map((opt: any) => {
-                const isOptSelected = selectedOption?.id === opt.id;
-                return (
-                  <div
-                    key={opt.id}
-                    onClick={() => setSelectedOption(opt)}
-                    style={{
-                      padding: '12px 14px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: isOptSelected ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
-                      background: isOptSelected ? '#f0f9ff' : '#ffffff',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>{opt.name}</div>
-                      {opt.inclusions_addon && <div style={{ fontSize: '0.75rem', color: '#059669' }}>Includes VIP transfers</div>}
-                    </div>
-                    <strong style={{ color: 'var(--brand-primary)', fontSize: '0.95rem' }}>${opt.price}</strong>
-                  </div>
-                );
-              })}
-            </div>
+            {tour.options?.length > 0 && tour.options[0].title && (
+              <>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '8px', color: '#0f172a' }}>Select Ticket Option / Variant</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                  {tour.options.map((opt: any) => {
+                    const isOptSelected = selectedOption?.id === opt.id;
+                    const maxCap = Number(opt.max_capacity) || 10;
+                    const exceedsCapacity = quantity > maxCap;
+                    return (
+                      <div
+                        key={opt.id}
+                        onClick={() => {
+                          if (!exceedsCapacity) setSelectedOption(opt);
+                        }}
+                        style={{
+                          padding: '12px 14px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: isOptSelected ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
+                          background: isOptSelected ? '#f0f9ff' : '#ffffff',
+                          cursor: exceedsCapacity ? 'not-allowed' : 'pointer',
+                          opacity: exceedsCapacity ? 0.5 : 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          transition: 'opacity 0.2s',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>{opt.title || opt.name}</div>
+                          {opt.description && <div style={{ fontSize: '0.75rem', color: '#059669' }}>{opt.description}</div>}
+                          <div style={{ fontSize: '0.75rem', color: exceedsCapacity ? '#dc2626' : '#059669', marginTop: '4px' }}>
+                            {opt.available_units || '10'} {opt.pricing_type === 'Per Person' ? 'seats' : 'vehicles'} available {exceedsCapacity && `(Max capacity: ${maxCap})`}
+                          </div>
+                        </div>
+                        <strong style={{ color: 'var(--brand-primary)', fontSize: '0.95rem' }}>${opt.price_modifier || opt.price}</strong>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
             {/* DATE & TIME SLOT SELECTOR */}
-            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '8px', color: '#0f172a' }}>Select Date & Time Slot</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-              {tour.available_slots?.map((slot: any) => {
-                const avail = slot.total_capacity - (slot.booked_capacity + slot.held_capacity);
-                const isSelected = selectedSlot?.id === slot.id;
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>Select Date & Time Slot</label>
+              <input 
+                type="date" 
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const d = new Date(e.target.value);
+                    setSelectedSlot({ id: `custom-${d.getTime()}`, capacity_left: 10, start_time: d.toISOString() });
+                  }
+                }}
+                style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.8rem', color: '#0f172a' }} 
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px', maxHeight: '250px', overflowY: 'auto' }}>
+              {Array.from({length: 7}).map((_, i) => {
+                const date = new Date(Date.now() + i * 86400000);
+                const slotId = `slot-${i}`;
+                const isSelected = selectedSlot?.id === slotId;
                 return (
                   <div
-                    key={slot.id}
-                    onClick={() => setSelectedSlot(slot)}
+                    key={slotId}
+                    onClick={() => setSelectedSlot({ id: slotId, capacity_left: 10 })}
                     style={{
                       padding: '12px 16px',
                       borderRadius: 'var(--radius-sm)',
@@ -473,10 +639,7 @@ export default function TourDetailPage() {
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>{new Date(slot.start_time).toLocaleString()}</div>
-                      <div style={{ fontSize: '0.8rem', color: avail > 3 ? '#059669' : '#d97706', fontWeight: 600 }}>
-                        {avail > 0 ? `${avail} seats available` : 'Sold Out'}
-                      </div>
+                      <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>{date.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at 10:00 AM</div>
                     </div>
                   </div>
                 );
@@ -512,7 +675,7 @@ export default function TourDetailPage() {
               className="btn-primary"
               style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.05rem' }}
             >
-              {holding ? 'Acquiring Redis Lock...' : remainingSeats > 0 ? 'Lock Inventory & Checkout' : 'Sold Out'}
+              {holding ? 'Acquiring Lock...' : remainingSeats > 0 ? 'Checkout' : 'Sold Out'}
               <ArrowRight size={18} />
             </button>
 
@@ -522,6 +685,31 @@ export default function TourDetailPage() {
           </div>
         </div>
       </div>
+      {/* RELEVANT PRODUCTS ROW */}
+      {relevantProducts.length > 0 && (
+        <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid #e2e8f0', marginBottom: '40px' }}>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>Relevant Products</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
+            {relevantProducts.map(p => (
+              <a key={p.id} href={`/tours/${p.slug || p.id}`} style={{ textDecoration: 'none', display: 'block', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', background: '#fff', transition: 'transform 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
+                <div style={{ height: '160px', width: '100%', overflow: 'hidden' }}>
+                  <img src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: '16px' }}>
+                  <h3 style={{ fontSize: '1.05rem', color: '#0f172a', marginBottom: '8px', lineHeight: 1.4, height: '44px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.title}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                    <Star size={14} color="#d97706" fill="#d97706" /> {p.cached_rating_avg || 5.0} ({p.cached_review_count || 0})
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                    From ${p.price || p.base_price || 150}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

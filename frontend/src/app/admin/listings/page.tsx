@@ -6,7 +6,8 @@ import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
 import {
   LayoutGrid, List, Search, Plus, ExternalLink, Star, Edit, PowerOff,
-  CheckCircle2, Clock, MapPin, Tag, ShieldCheck, RefreshCw, X, Sparkles, Filter, Trash2
+  CheckCircle2, Clock, MapPin, Tag, ShieldCheck, RefreshCw, X, Sparkles, Filter, Trash2,
+  ArrowLeft, Image as ImageIcon, Check, Users, Activity, Info, Calendar, Car
 } from 'lucide-react';
 
 interface Listing {
@@ -27,6 +28,7 @@ interface Listing {
   images: Array<{ url: string; alt: string }>;
   confirmation_type: string;
   status: 'LIVE' | 'PENDING_APPROVAL' | 'DRAFT' | 'DEACTIVATED';
+  raw_data?: any;
 }
 
 export default function ListingsManagementPage() {
@@ -46,6 +48,7 @@ export default function ListingsManagementPage() {
   
   // Modal state
   const [editingListing, setEditingListing] = useState<Listing | null>(null);
+  const [previewListing, setPreviewListing] = useState<Listing | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newTourForm, setNewTourForm] = useState({
     title: '',
@@ -82,93 +85,7 @@ export default function ListingsManagementPage() {
           }))
         );
       } else {
-        const fallbackListings: Listing[] = [
-          {
-            id: 'list-bali-sunset',
-            supplier_id: 'sup-bali-cruises',
-            destination_id: 'dest-bali',
-            category_id: 'cat-water',
-            category_name: 'Luxury Catamarans',
-            title: 'Bali Sunset Catamaran Dinner Cruise & Live Music',
-            slug: 'bali-sunset-catamaran',
-            summary: 'Experience magical Uluwatu sunset views with gourmet seafood buffet on ocean luxury catamaran.',
-            base_price: 120,
-            currency: 'USD',
-            duration_minutes: 240,
-            cached_rating_avg: 4.9,
-            cached_review_count: 128,
-            merchandising_badges: ['BESTSELLER', 'INSTANT_CONFIRMATION'],
-            images: [
-              { url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80', alt: 'Bali Catamaran' }
-            ],
-            confirmation_type: 'INSTANT',
-            status: 'LIVE',
-          },
-          {
-            id: 'list-lahore-walled-city',
-            supplier_id: 'sup-lahore-heritage',
-            destination_id: 'dest-lahore',
-            category_id: 'cat-heritage',
-            category_name: 'Culture & Heritage',
-            title: 'Walled City Lahore Heritage Walking Tour & Royal Kitchens',
-            slug: 'lahore-walled-city-heritage',
-            summary: 'Guided heritage stroll through Delhi Gate, Shahi Hammam, Badshahi Mosque and Haveli dinner.',
-            base_price: 45,
-            currency: 'USD',
-            duration_minutes: 180,
-            cached_rating_avg: 4.8,
-            cached_review_count: 94,
-            merchandising_badges: ['FEATURED', 'LOCAL_GUIDE'],
-            images: [
-              { url: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=600&q=80', alt: 'Lahore Badshahi Mosque' }
-            ],
-            confirmation_type: 'MANUAL_SUPPLIER_APPROVAL',
-            status: 'PENDING_APPROVAL',
-          },
-          {
-            id: 'list-dubai-desert-safari',
-            supplier_id: 'sup-arabian-adventures',
-            destination_id: 'dest-dubai',
-            category_id: 'cat-desert',
-            category_name: 'Desert Safaris',
-            title: 'Red Dune Desert Safari, Quad Biking & BBQ Starry Night',
-            slug: 'dubai-red-dune-safari',
-            summary: 'Thrilling 4x4 dune bashing, camel riding, falconry, live Tanoura dance show & BBQ feast.',
-            base_price: 85,
-            currency: 'USD',
-            duration_minutes: 360,
-            cached_rating_avg: 4.95,
-            cached_review_count: 310,
-            merchandising_badges: ['TOP_RATED'],
-            images: [
-              { url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80', alt: 'Dubai Desert' }
-            ],
-            confirmation_type: 'INSTANT',
-            status: 'LIVE',
-          },
-          {
-            id: 'list-paris-louvre',
-            supplier_id: 'sup-paris-museums',
-            destination_id: 'dest-paris',
-            category_id: 'cat-art',
-            category_name: 'Art & Museums',
-            title: 'Skip-The-Line Louvre Museum Guided Tour & Mona Lisa',
-            slug: 'louvre-guided-tour',
-            summary: 'Priority access through secret entrances with expert art historian guide.',
-            base_price: 75,
-            currency: 'USD',
-            duration_minutes: 150,
-            cached_rating_avg: 4.7,
-            cached_review_count: 215,
-            merchandising_badges: ['SKIP_THE_LINE'],
-            images: [
-              { url: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=600&q=80', alt: 'Louvre Paris' }
-            ],
-            confirmation_type: 'INSTANT',
-            status: 'PENDING_APPROVAL',
-          },
-        ];
-        setListings(fallbackListings);
+        setListings([]);
       }
     } catch (err) {
       console.error(err);
@@ -484,7 +401,10 @@ export default function ListingsManagementPage() {
               }}
             >
               {/* Image Banner */}
-              <div style={{ position: 'relative', height: '190px', background: '#0f172a' }}>
+              <div 
+                style={{ position: 'relative', height: '190px', background: '#0f172a', cursor: 'pointer' }}
+                onClick={() => setPreviewListing(l)}
+              >
                 <img
                   src={l.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'}
                   alt={l.title}
@@ -508,9 +428,13 @@ export default function ListingsManagementPage() {
               {/* Card Body */}
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
                 <div>
-                  <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.4, height: '44px', overflow: 'hidden' }}>
+                  <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.4, height: '44px', overflow: 'hidden', position: 'relative' }}>
                     {l.title}
+                    {l.raw_data?.logistics?.parent_id && <span style={{ marginLeft: '6px', fontSize: '0.65rem', background: '#e0e7ff', color: '#3730a3', padding: '2px 6px', borderRadius: '4px', verticalAlign: 'middle', fontWeight: 700 }}>Edited</span>}
                   </h3>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', fontFamily: 'monospace' }}>
+                    ID: {l.id.startsWith('TN') ? l.id : 'TN' + l.id.replace(/-/g, '').substring(0, 8).toUpperCase()}
+                  </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '14px', paddingBottom: '14px', borderBottom: '1px solid #f1f5f9' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.84rem', fontWeight: 800, color: '#d97706' }}>
@@ -653,10 +577,15 @@ export default function ListingsManagementPage() {
                     />
                   </td>
                   <td>
-                    <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.92rem', maxWidth: '280px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div 
+                      onClick={() => setPreviewListing(l)}
+                      style={{ fontWeight: 800, color: '#2563eb', fontSize: '0.92rem', maxWidth: '280px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'pointer' }}
+                    >
                       {l.title}
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Supplier: {l.supplier_id}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                      ID: {l.id.startsWith('TN') ? l.id : 'TN' + l.id.replace(/-/g, '').substring(0, 8).toUpperCase()} • Supplier: {l.supplier_id}
+                    </div>
                   </td>
                   <td>
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', background: '#f1f5f9', padding: '4px 10px', borderRadius: '6px' }}>
@@ -952,6 +881,286 @@ export default function ListingsManagementPage() {
               >
                 Save Changes
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Listing Immersive Overlay */}
+      {previewListing && previewListing.raw_data && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '40px 20px', animation: 'admin-fade-in 0.3s ease-out forwards' }}>
+          
+          <div style={{ background: '#f8fafc', width: '100%', maxWidth: '1080px', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column' }}>
+            
+            {/* Sticky Header */}
+            <div style={{ height: '70px', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', position: 'sticky', top: 0, zIndex: 50 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                <button onClick={() => setPreviewListing(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem', padding: '8px 12px', borderRadius: '8px', transition: 'background 0.2s' }} onMouseOver={(e) => e.currentTarget.style.background = '#f1f5f9'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                  <ArrowLeft size={20} /> Back
+                </button>
+                <div style={{ width: '1px', height: '24px', background: '#e2e8f0' }} />
+                <div style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>{previewListing.category_name || 'Category'}</div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => setPreviewListing(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#ffffff', color: '#64748b', fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={(e) => e.currentTarget.style.background = '#f1f5f9'} onMouseOut={(e) => e.currentTarget.style.background = '#ffffff'}>Close Preview</button>
+                {previewListing.status === 'PENDING_APPROVAL' && (
+                  <button onClick={() => { handleApproveProduct(previewListing.id, previewListing.title); setPreviewListing(null); }} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#10b981', color: '#ffffff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }} onMouseOver={(e) => e.currentTarget.style.background = '#059669'} onMouseOut={(e) => e.currentTarget.style.background = '#10b981'}>
+                    <CheckCircle2 size={18} /> Approve & Publish
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Cover Image & Title */}
+            <div style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
+              {previewListing.raw_data?.basic_info?.photos?.heroImage && (
+                <div style={{ width: '100%', height: '350px', backgroundImage: `url(${previewListing.raw_data.basic_info.photos.heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+              )}
+              <div style={{ padding: '40px 48px' }}>
+                <h1 style={{ color: '#0f172a', fontSize: '2.2rem', fontWeight: 900, lineHeight: 1.2, margin: '0 0 16px 0' }}>{previewListing.title}</h1>
+                <div style={{ display: 'flex', gap: '24px', color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={18} color="#3b82f6" /> {previewListing.raw_data?.logistics?.pickupLocation || 'Multiple Locations'}</span>
+                  {previewListing.duration_minutes > 0 && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={18} color="#f59e0b" /> {Math.floor(previewListing.duration_minutes / 60)}h {previewListing.duration_minutes % 60}m</span>
+                  )}
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Users size={18} color="#8b5cf6" /> Supplier ID: {previewListing.supplier_id}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Layout */}
+            <div style={{ padding: '40px 48px', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '48px', alignItems: 'flex-start' }}>
+              
+              {/* Left Column */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                
+                {/* Tour Description */}
+                {(previewListing.raw_data?.basic_info?.summary || previewListing.raw_data?.basic_info?.shortDescription) && (
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Info size={22} color="#3b82f6" /> Tour Description
+                    </h3>
+                    <p style={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.8, margin: 0 }}>
+                      {previewListing.raw_data.basic_info.summary || previewListing.raw_data.basic_info.shortDescription}
+                    </p>
+                  </div>
+                )}
+
+                {/* Tour Highlights */}
+                {previewListing.raw_data?.basic_info?.highlights?.filter((h: string) => h.trim().length > 0).length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sparkles size={22} color="#8b5cf6" /> Tour Highlights
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+                      {previewListing.raw_data.basic_info.highlights.filter((h: string) => h.trim().length > 0).map((h: string, i: number) => (
+                        <div key={i} style={{ padding: '16px 20px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                          <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0 }} />
+                          <span style={{ color: '#334155', fontWeight: 600, fontSize: '0.95rem' }}>{h}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Photo Gallery */}
+                {previewListing.raw_data?.basic_info?.photos?.gallery?.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ImageIcon size={22} color="#ec4899" /> Photo Gallery
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                      {previewListing.raw_data.basic_info.photos.gallery.map((url: string, idx: number) => (
+                        <div key={idx} style={{ height: '140px', borderRadius: '12px', background: `url(${url}) center/cover`, border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Trip Details Grid */}
+                {(previewListing.raw_data?.experience_details?.guideType || previewListing.raw_data?.experience_details?.activityType || previewListing.raw_data?.experience_details?.language) && (
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Activity size={22} color="#f59e0b" /> Trip Details
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      {previewListing.raw_data.experience_details.guideType && (
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px' }}>
+                          <Users size={24} color="#64748b" />
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Guide Type</div>
+                            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 600, marginTop: '4px' }}>{previewListing.raw_data.experience_details.guideType}</div>
+                          </div>
+                        </div>
+                      )}
+                      {previewListing.raw_data.experience_details.activityType && (
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px' }}>
+                          <Activity size={24} color="#64748b" />
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Activity Type</div>
+                            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 600, marginTop: '4px' }}>{previewListing.raw_data.experience_details.activityType}</div>
+                          </div>
+                        </div>
+                      )}
+                      {previewListing.raw_data.experience_details.language && (
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', gridColumn: 'span 2' }}>
+                          <Info size={24} color="#64748b" />
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Languages</div>
+                            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 600, marginTop: '4px' }}>{previewListing.raw_data.experience_details.language}</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Included / Excluded */}
+                {(previewListing.raw_data?.experience_details?.included || previewListing.raw_data?.experience_details?.excluded) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                    {previewListing.raw_data.experience_details.included && (
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Check size={20} color="#10b981" /> Included
+                        </h4>
+                        <ul style={{ margin: 0, paddingLeft: '24px', color: '#334155', lineHeight: 1.8, fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>
+                          <li>{previewListing.raw_data.experience_details.included.replace(/\n/g, '\n')}</li>
+                        </ul>
+                      </div>
+                    )}
+                    {previewListing.raw_data.experience_details.excluded && (
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <X size={20} color="#ef4444" /> Excluded
+                        </h4>
+                        <ul style={{ margin: 0, paddingLeft: '24px', color: '#334155', lineHeight: 1.8, fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>
+                          <li>{previewListing.raw_data.experience_details.excluded.replace(/\n/g, '\n')}</li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Vehicle & Pricing */}
+                {previewListing.raw_data?.transport_pricing?.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Car size={22} color="#14b8a6" /> Vehicle & Pricing
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {previewListing.raw_data.transport_pricing.map((opt: any) => (
+                        <div key={opt.id} style={{ padding: '24px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Vehicle Details</div>
+                            <div style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 800, marginTop: '4px' }}>{opt.title}</div>
+                            <div style={{ fontSize: '0.9rem', color: '#475569', marginTop: '2px' }}>{opt.transportType}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Duration / Max Pax</div>
+                            <div style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 800, marginTop: '4px' }}>{opt.duration}</div>
+                            <div style={{ fontSize: '0.9rem', color: '#475569', marginTop: '2px' }}>Up to {opt.travellers} travellers</div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Pricing</div>
+                            <div style={{ fontSize: '1.5rem', color: '#059669', fontWeight: 900, marginTop: '4px' }}>${opt.amount}</div>
+                            <div style={{ fontSize: '0.9rem', color: '#475569', marginTop: '2px', fontWeight: 600 }}>{opt.pricingType}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pick-up & Drop-off Location */}
+                {(previewListing.raw_data?.logistics?.pickupLocation || previewListing.raw_data?.logistics?.dropOffLocation || previewListing.raw_data?.logistics?.timeFrameFrom) && (
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <MapPin size={22} color="#ef4444" /> Pick-up & Drop-off Location
+                    </h3>
+                    <div style={{ padding: '24px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                      <div>
+                        {previewListing.raw_data.logistics.pickupLocation && (
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Pick-up</div>
+                            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={16} color="#94a3b8" /> {previewListing.raw_data.logistics.pickupLocation}</div>
+                          </div>
+                        )}
+                        {(previewListing.raw_data.logistics.dropOffLocation || previewListing.raw_data.logistics.dropOffSameAsPickup) && (
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Drop-off</div>
+                            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={16} color="#94a3b8" /> {previewListing.raw_data.logistics.dropOffSameAsPickup ? 'Same as Pickup' : previewListing.raw_data.logistics.dropOffLocation}</div>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        {previewListing.raw_data.logistics.availability?.length > 0 && (
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Available Days</div>
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                              {previewListing.raw_data.logistics.availability.map((d: string) => (
+                                <span key={d} style={{ background: '#1e293b', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600 }}>{d}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {previewListing.raw_data.logistics.timeFrameFrom && (
+                          <div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Time Slots</div>
+                            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 600 }}>{previewListing.raw_data.logistics.timeFrameFrom} - {previewListing.raw_data.logistics.timeFrameTo || 'N/A'}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              {/* Right Column (Sidebar) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'sticky', top: '94px' }}>
+                
+                {/* Status Box */}
+                <div style={{ background: previewListing.status === 'LIVE' ? '#ecfdf5' : previewListing.status === 'PENDING_APPROVAL' ? '#fffbeb' : '#ffffff', border: `1px solid ${previewListing.status === 'LIVE' ? '#a7f3d0' : previewListing.status === 'PENDING_APPROVAL' ? '#fde68a' : '#e2e8f0'}`, borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: previewListing.status === 'LIVE' ? '#059669' : previewListing.status === 'PENDING_APPROVAL' ? '#d97706' : '#64748b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {previewListing.status === 'LIVE' ? <CheckCircle2 size={20} /> : <Clock size={20} />} 
+                    {previewListing.status === 'LIVE' ? 'Product is Live' : previewListing.status === 'PENDING_APPROVAL' ? 'Pending Approval' : 'Deactivated'}
+                  </h3>
+                  <div style={{ fontSize: '0.9rem', color: '#475569', lineHeight: 1.6 }}>
+                    {previewListing.status === 'PENDING_APPROVAL' 
+                      ? 'This product is waiting for admin review. Click "Approve & Publish" in the top bar to make it live on the marketplace.'
+                      : 'This product has been processed. You can toggle its status from the main dashboard.'}
+                  </div>
+                </div>
+
+                {/* Itinerary */}
+                {previewListing.raw_data?.itinerary?.length > 0 && (
+                  <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Calendar size={20} color="#3b82f6" /> Itinerary
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                      {previewListing.raw_data.itinerary.map((item: any, idx: number) => (
+                        <div key={item.id} style={{ display: 'flex', gap: '16px', paddingBottom: '24px', position: 'relative' }}>
+                          {idx !== previewListing.raw_data.itinerary.length - 1 && (
+                            <div style={{ position: 'absolute', left: '15px', top: '32px', bottom: 0, width: '2px', background: '#e2e8f0' }} />
+                          )}
+                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#eff6ff', color: '#2563eb', border: '2px solid #bfdbfe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', flexShrink: 0, zIndex: 2 }}>
+                            {idx + 1}
+                          </div>
+                          <div style={{ paddingTop: '4px' }}>
+                            <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>{item.locationName}</div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', margin: '4px 0', fontWeight: 600 }}>
+                              {item.attractionType} • {item.timeToSpend} {item.hasEntryFee ? <span style={{ color: '#ef4444' }}>• Entry: ${item.entryFeeAmount}</span> : '• Free Entry'}
+                            </div>
+                            <div style={{ fontSize: '0.9rem', color: '#475569', lineHeight: 1.5, marginTop: '8px' }}>{item.description}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
             </div>
           </div>
         </div>

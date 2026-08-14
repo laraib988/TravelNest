@@ -16,35 +16,64 @@ export async function POST(request: Request) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseAdmin = createClient(supabaseUrl!, supabaseServiceKey!);
 
-    const { data, error } = await supabaseAdmin
+    const { data: draftData, error: draftErr } = await supabaseAdmin
       .from('products')
-      .update({ status: 'PUBLISHED', updated_at: new Date().toISOString() })
+      .select('*')
       .eq('id', productId)
-      .select();
+      .single();
 
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
+    if (draftErr || !draftData) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    const product = data[0];
+    const parentId = draftData.logistics?.parent_id;
+    let finalProduct = draftData;
 
-    // If this was an edit to a live product (clone), delete the old parent product to replace it
-    const parentId = product.logistics?.parent_id;
     if (parentId) {
-      await supabaseAdmin.from('products').delete().eq('id', parentId);
+      // It's an edit clone. Update the original parent product with draft's data and delete the clone.
+      const { id, created_at, supplier_id, ...updateFields } = draftData;
+      updateFields.status = 'PUBLISHED';
+      updateFields.updated_at = new Date().toISOString();
+
+      // Remove parent_id from logistics so it doesn't linger
+      if (updateFields.logistics) {
+        delete updateFields.logistics.parent_id;
+      }
+
+      const { data: updatedParent, error: updateErr } = await supabaseAdmin
+        .from('products')
+        .update(updateFields)
+        .eq('id', parentId)
+        .select()
+        .single();
+      
+      if (updateErr) throw updateErr;
+      finalProduct = updatedParent;
+
+      // Delete the temporary clone
+      await supabaseAdmin.from('products').delete().eq('id', productId);
+    } else {
+      // It's a brand new product. Just publish it directly.
+      const { data: publishedDraft, error: pubErr } = await supabaseAdmin
+        .from('products')
+        .update({ status: 'PUBLISHED', updated_at: new Date().toISOString() })
+        .eq('id', productId)
+        .select()
+        .single();
+        
+      if (pubErr) throw pubErr;
+      finalProduct = publishedDraft;
     }
 
     // Notify Supplier
     await supabaseAdmin.from('notifications').insert({
-      user_id: product.supplier_id,
+      user_id: finalProduct.supplier_id,
       type: 'SUCCESS',
       title: 'Listing Approved!',
-      message: `Congratulations! Your listing "${product.basic_info?.title || 'Draft'}" has been approved and is now live.`
+      message: `Congratulations! Your listing "${finalProduct.basic_info?.title || 'Draft'}" has been approved and is now live.`
     });
 
-    return NextResponse.json({ success: true, data: product }, { status: 200 });
+    return NextResponse.json({ success: true, data: finalProduct }, { status: 200 });
   } catch (error: any) {
     console.error('Approve error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

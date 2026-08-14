@@ -75,6 +75,8 @@ export default function SupplierDashboard() {
         return <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Request Approved</span>;
       case 'PENDING_APPROVAL':
         return <span style={{ background: '#fef3c7', color: '#92400e', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Pending Approval</span>;
+      case 'EDIT_PENDING':
+        return <span style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Edit Pending</span>;
       case 'DRAFT':
         return <span style={{ background: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Draft</span>;
       case 'NEEDS_FIX':
@@ -185,9 +187,9 @@ export default function SupplierDashboard() {
                   <div style={{ flex: 1, marginLeft: '20px' }}>
                     <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{item.title}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.85rem', color: '#64748b' }}>
-                      <span style={{ fontWeight: 600, color: '#334155' }}>{item.price} per person</span>
+                      <span style={{ fontWeight: 600, color: '#334155' }}>{item.price}</span>
                       <span>•</span>
-                      <span>ID: {item.id}</span>
+                      <span>ID: {item.id.startsWith('TN') ? item.id : 'TN' + item.id.replace(/-/g, '').substring(0, 8).toUpperCase()}</span>
                       <span>•</span>
                       <span>Updated {item.lastUpdated}</span>
                     </div>
@@ -209,7 +211,7 @@ export default function SupplierDashboard() {
 
                   {/* Actions Dropdown Simulation */}
                   <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
-                    <button onClick={() => router.push(`/supplier/listings/create?id=${item.id}`)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit Listing">
+                    <button onClick={() => router.push(`/supplier/listings/create?id=${item.editUrlId || item.id}`)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit Listing">
                       <Edit size={16} />
                     </button>
                     {item.status === 'PUBLISHED' && (
@@ -255,9 +257,9 @@ export default function SupplierDashboard() {
             <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
               <Trash2 size={32} color="#ef4444" />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>Request Deletion?</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>Delete Listing?</h3>
             <p style={{ color: '#475569', fontSize: '0.95rem', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-              Are you sure you want to permanently delete this listing? This request will be sent to the admin for final approval.
+              Are you sure you want to permanently delete this listing? This action cannot be undone and it will be removed for customers immediately.
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 
@@ -269,20 +271,20 @@ export default function SupplierDashboard() {
               <button 
                 onClick={async () => {
                   try {
-                    const res = await fetch('/api/supplier/listings/request-delete', {
+                    const res = await fetch('/api/supplier/listings/delete', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ userId: user?.id, productId: deleteConfirmId })
                     });
                     if (res.ok) {
-                      setListings(prev => prev.map(l => l.id === deleteConfirmId ? { ...l, status: 'PENDING_DELETION' } : l));
+                      setListings(prev => prev.filter(l => l.id !== deleteConfirmId));
                       setDeleteConfirmId(null);
                     } else {
                       const data = await res.json();
                       alert('Error: ' + data.error);
                     }
                   } catch (err) {
-                    alert('Network error requesting deletion');
+                    alert('Network error deleting listing');
                   }
                 }}
                 style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.3)' }}

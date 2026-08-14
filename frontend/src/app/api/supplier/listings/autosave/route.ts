@@ -52,6 +52,11 @@ export async function POST(request: Request) {
       }
 
       // Otherwise, update existing draft/pending
+      const updatedLogistics = logistics || {};
+      if (currentProduct.logistics?.parent_id) {
+        updatedLogistics.parent_id = currentProduct.logistics.parent_id;
+      }
+
       const { data, error } = await supabaseAdmin
         .from('products')
         .update({
@@ -59,7 +64,7 @@ export async function POST(request: Request) {
           basic_info: { ...(basic_info || {}), photos: photos || {} },
           experience_details: experience_details || {},
           transport_pricing: transport_pricing || [],
-          logistics: logistics || {},
+          logistics: updatedLogistics,
           itinerary: itinerary || [],
           updated_at: new Date().toISOString()
         })
@@ -70,9 +75,9 @@ export async function POST(request: Request) {
 
       if (error) throw error;
       return NextResponse.json({ success: true, data }, { status: 200 });
+    }
 
-    } else {
-      // Create new draft
+    // Create new draft
       const { data, error } = await supabaseAdmin
         .from('products')
         .insert({
@@ -90,7 +95,6 @@ export async function POST(request: Request) {
 
       if (error) throw error;
       return NextResponse.json({ success: true, data }, { status: 201 });
-    }
   } catch (error: any) {
     console.error('Autosave error details:', error);
     return NextResponse.json({ 

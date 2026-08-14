@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, QrCode, Download, Smartphone, Tag } from 'lucide-react';
@@ -24,13 +24,63 @@ function CheckoutContent() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
 
+  const tourTitle = searchParams.get('title') || 'Tour Experience';
+  const tourOptionName = searchParams.get('option_name') || 'Standard Ticket';
+  const tourDate = searchParams.get('date') || new Date().toISOString();
+  const basePrice = parseFloat(searchParams.get('price') || '278.00');
+
+  const paymentOption = searchParams.get('payment_option') || 'Pay Now';
+  const [customerPaymentChoice, setCustomerPaymentChoice] = useState(paymentOption === 'Reserve Now Pay Later' ? 'pay_later' : 'pay_now');
+
   const [formData, setFormData] = useState({
     lead_name: 'Ayesha Khan',
     lead_email: 'ayesha.khan@example.com',
     lead_phone: '+92 300 1234567',
-    special_requirements: 'Seafood allergy; require vegetarian dinner option.',
+    special_requirements: '',
+    pickup_time: '',
+    pickup_location: '',
+    dropoff_location: '',
+    same_as_pickup: false,
     card_number: '4242 •••• •••• 4242',
   });
+
+  const timeFromStr = searchParams.get('time_from') || '06:00 AM';
+  const timeToStr = searchParams.get('time_to') || '10:00 AM';
+  const timeIntervalStr = searchParams.get('time_interval') || '30';
+
+  const timeOptions = useMemo(() => {
+    const parseTime = (str: string) => {
+      const isAMPM = str.match(/am|pm/i);
+      const parts = str.match(/(\d+):(\d+)/);
+      if (!parts) return 0;
+      let h = parseInt(parts[1], 10);
+      const m = parseInt(parts[2], 10);
+      if (isAMPM) {
+         if (str.toLowerCase().includes('pm') && h < 12) h += 12;
+         if (str.toLowerCase().includes('am') && h === 12) h = 0;
+      }
+      return h * 60 + m;
+    };
+    const formatTime = (minutes: number) => {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      return `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${ampm}`;
+    };
+    const startMins = parseTime(timeFromStr);
+    const endMins = parseTime(timeToStr);
+    const intervalMins = parseInt(timeIntervalStr, 10) || 30;
+
+    const options = [];
+    // Ensure we don't infinitely loop or lock up if interval is 0 or negative
+    if (intervalMins > 0) {
+      for (let m = startMins; m <= endMins; m += intervalMins) {
+        options.push(formatTime(m));
+      }
+    }
+    return options.length > 0 ? options : ['06:00 AM'];
+  }, [timeFromStr, timeToStr, timeIntervalStr]);
 
   // SRS 3.4 / 3.8: Coupon / Promo Code State
   const [couponCode, setCouponCode] = useState('');
@@ -47,7 +97,7 @@ function CheckoutContent() {
     try {
       const res = await fetchFromAPI('/promotions/coupons/validate', {
         method: 'POST',
-        body: JSON.stringify({ code: couponCode, cart_total: 278.00 }),
+        body: JSON.stringify({ code: couponCode, cart_total: basePrice }),
       });
       if (res.valid) {
         setDiscountAmount(res.discount_amount);
@@ -226,44 +276,123 @@ function CheckoutContent() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Dietary or Mobility Notes</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Pickup Location</label>
+              <input
+                type="text"
+                placeholder="e.g., Hotel Name or Address"
+                value={formData.pickup_location}
+                onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value, dropoff_location: formData.same_as_pickup ? e.target.value : formData.dropoff_location })}
+                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
+              />
+            </div>
+            
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Drop-off Location</label>
+                <label style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: '#475569' }}>
+                  <input type="checkbox" checked={formData.same_as_pickup} onChange={(e) => setFormData({...formData, same_as_pickup: e.target.checked, dropoff_location: e.target.checked ? formData.pickup_location : ''})} /> Same as pickup
+                </label>
+              </div>
+              <input
+                type="text"
+                placeholder="e.g., Hotel Name or Address"
+                disabled={formData.same_as_pickup}
+                value={formData.dropoff_location}
+                onChange={(e) => setFormData({ ...formData, dropoff_location: e.target.value })}
+                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: formData.same_as_pickup ? '#e2e8f0' : '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Pickup Time</label>
+              <select 
+                required
+                value={formData.pickup_time}
+                onChange={(e) => setFormData({...formData, pickup_time: e.target.value})}
+                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
+              >
+                <option value="" disabled>Select a pickup time</option>
+                {timeOptions.map((t, idx) => <option key={idx} value={t}>{t}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Additional Requirements</label>
               <textarea
                 value={formData.special_requirements}
                 onChange={(e) => setFormData({ ...formData, special_requirements: e.target.value })}
+                placeholder="e.g., Any dietary restrictions, mobility needs, or special requests"
                 style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none', height: '80px' }}
               />
             </div>
           </div>
 
           <h2 style={{ fontSize: '1.4rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
-            <CreditCard size={20} color="var(--brand-primary)" /> Tokenized Payment Method
+            <CreditCard size={20} color="var(--brand-primary)" /> Payment Details
           </h2>
 
-          <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#f0f9ff', border: '1px solid #bae6fd', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0369a1' }}>Stripe / Adyen PCI-DSS Element</span>
-              <Lock size={14} color="#059669" />
+          {paymentOption === 'Reserve Now Pay Later' && (
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+              <label style={{ flex: 1, padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_later' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_later' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_later'} onChange={() => setCustomerPaymentChoice('pay_later')} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                  <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.05rem' }}>Reserve Now, Pay Later</span>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '28px' }}>Secure your spot today and pay closer to the date. No money charged now.</div>
+              </label>
+
+              <label style={{ flex: 1, padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_now' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_now' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_now'} onChange={() => setCustomerPaymentChoice('pay_now')} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                  <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.05rem' }}>Pay Now</span>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '28px' }}>Pay the full amount today and complete your reservation instantly.</div>
+              </label>
             </div>
-            <input
-              type="text"
-              readOnly
-              value={formData.card_number}
-              style={{ width: '100%', padding: '10px', background: 'transparent', border: 'none', color: '#0284c7', fontWeight: 700, outline: 'none' }}
-            />
-          </div>
+          )}
+
+          {customerPaymentChoice === 'pay_now' ? (
+            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#f0f9ff', border: '1px solid #bae6fd', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0369a1' }}>Stripe / Adyen PCI-DSS Element</span>
+                <Lock size={14} color="#059669" />
+              </div>
+              <input
+                type="text"
+                readOnly
+                value={formData.card_number}
+                style={{ width: '100%', padding: '10px', background: 'transparent', border: 'none', color: '#0284c7', fontWeight: 700, outline: 'none' }}
+              />
+            </div>
+          ) : (
+            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <Clock size={20} color="#64748b" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <strong style={{ display: 'block', color: '#334155', marginBottom: '4px' }}>No payment required right now</strong>
+                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Your card details are not needed yet. We will send you a secure payment link 3 days before the experience.</span>
+              </div>
+            </div>
+          )}
 
           <button type="submit" disabled={submitting || timeLeft <= 0} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.1rem' }}>
-            {submitting ? 'Processing Payment Intent...' : 'Pay & Confirm Reservation'}
+            {submitting ? 'Processing...' : (customerPaymentChoice === 'pay_later' ? 'Confirm Reservation (Pay Later)' : 'Pay & Confirm Reservation')}
           </button>
         </form>
 
         {/* ORDER SUMMARY */}
         <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '24px', height: 'fit-content', border: '1px solid #cbd5e1', background: '#ffffff' }}>
           <h3 style={{ fontSize: '1.2rem', marginBottom: '16px', color: '#0f172a' }}>Order Summary</h3>
+          
+          <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
+            <h4 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700, marginBottom: '6px' }}>{tourTitle}</h4>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '4px' }}><strong>Option:</strong> {tourOptionName}</div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}><strong>Date:</strong> {new Date(tourDate).toLocaleDateString()}</div>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0', marginBottom: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
               <span>Subtotal</span>
-              <span style={{ color: '#0f172a', fontWeight: 600 }}>$278.00 USD</span>
+              <span style={{ color: '#0f172a', fontWeight: 600 }}>${basePrice.toFixed(2)} USD</span>
             </div>
             {discountAmount > 0 && (
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#059669', fontWeight: 600 }}>
@@ -301,7 +430,7 @@ function CheckoutContent() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
             <span>Total Payable</span>
-            <span>${(278.00 - discountAmount).toFixed(2)} USD</span>
+            <span>${Math.max(0, basePrice - discountAmount).toFixed(2)} USD</span>
           </div>
         </div>
       </div>
