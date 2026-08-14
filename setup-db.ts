@@ -11,7 +11,7 @@ async function run() {
         const query = `
         -- 1. Create Products Table
         CREATE TABLE IF NOT EXISTS public.products (
-            id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+            id TEXT PRIMARY KEY,
             supplier_id TEXT NOT NULL,
             status TEXT DEFAULT 'DRAFT',
             current_step INTEGER DEFAULT 1,

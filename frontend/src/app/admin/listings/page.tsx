@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import {
   LayoutGrid, List, Search, Plus, ExternalLink, Star, Edit, PowerOff,
   CheckCircle2, Clock, MapPin, Tag, ShieldCheck, RefreshCw, X, Sparkles, Filter, Trash2,
-  ArrowLeft, Image as ImageIcon, Check, Users, Activity, Info, Calendar, Car
+  ArrowLeft, Image as ImageIcon, Check, Users, Activity, Info, Calendar, Car, HelpCircle
 } from 'lucide-react';
 
 interface Listing {
@@ -1038,6 +1038,23 @@ export default function ListingsManagementPage() {
                         </ul>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* FAQs */}
+                {previewListing.raw_data?.experience_details?.faqs?.length > 0 && (
+                  <div style={{ marginTop: '30px' }}>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <HelpCircle size={22} color="#f59e0b" /> Frequently Asked Questions
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {previewListing.raw_data.experience_details.faqs.map((faq: any, idx: number) => (
+                        <div key={idx} style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                          <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{faq.question}</div>
+                          <div style={{ color: '#475569', fontSize: '0.95rem' }}>{faq.answer}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 

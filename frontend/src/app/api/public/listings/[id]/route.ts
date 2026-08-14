@@ -95,7 +95,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
       raw_data: p,
       ai_review_summary: null,
       highlights: p.basic_info?.highlights || [],
-      itinerary: p.itinerary || []
+      itinerary: p.itinerary || [],
+      faqs: p.experience_details?.faqs || []
     };
 
     return NextResponse.json(mappedListing, { status: 200 });

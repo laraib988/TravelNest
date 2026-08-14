@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, Save, Trash2, Plus, ChevronLeft } from 'lucide-react';
 
-const STEPS = ['Basic Info', 'Photos', 'Experience', 'Transport & Pricing', 'Logistics', 'Itinerary', 'Review'];
+const STEPS = ['Basic Info', 'Photos', 'Experience', 'Transport & Pricing', 'Logistics', 'Itinerary', 'FAQs', 'Review'];
 
 export default function CreateListingPage() {
   const { user } = useAuth();
@@ -47,7 +47,8 @@ export default function CreateListingPage() {
     },
     thingsToCarry: [] as string[],
     included: '',
-    excluded: ''
+    excluded: '',
+    faqs: [] as { question: string, answer: string }[]
   });
 
   // Step 3 State (Transport & Pricing)
@@ -102,7 +103,7 @@ export default function CreateListingPage() {
             if (data && !data.error) {
               setBasicInfo(data.basic_info || basicInfo);
               setPhotos(data.basic_info?.photos || photos);
-              setExperienceDetails(data.experience_details || experienceDetails);
+              setExperienceDetails({ ...experienceDetails, ...(data.experience_details || {}), faqs: data.experience_details?.faqs || [] });
               setTransportOptions(data.transport_pricing || transportOptions);
               setLogistics(data.logistics || logistics);
               setItinerary(data.itinerary || itinerary);
@@ -119,7 +120,7 @@ export default function CreateListingPage() {
     if (!user) return { success: false };
     setSaveStatus('saving');
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
     try {
       const res = await fetch('/api/supplier/listings/autosave', {
         method: 'POST',
@@ -916,6 +917,62 @@ export default function CreateListingPage() {
           {currentStep === 7 && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Frequently Asked Questions</h2>
+                <button 
+                  onClick={() => setExperienceDetails({...experienceDetails, faqs: [...experienceDetails.faqs, { question: '', answer: '' }]})}
+                  style={{ background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', padding: '10px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Plus size={16} /> Add FAQ
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {experienceDetails.faqs.map((faq, index) => (
+                  <div key={index} style={{ padding: '24px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <label style={{ fontWeight: 700, color: '#0f172a' }}>Question {index + 1}</label>
+                      <button onClick={() => {
+                        const newFaqs = [...experienceDetails.faqs];
+                        newFaqs.splice(index, 1);
+                        setExperienceDetails({...experienceDetails, faqs: newFaqs});
+                      }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    <input 
+                      placeholder="e.g. What should I wear?" 
+                      value={faq.question}
+                      onChange={e => {
+                        const newFaqs = [...experienceDetails.faqs];
+                        newFaqs[index].question = e.target.value;
+                        setExperienceDetails({...experienceDetails, faqs: newFaqs});
+                      }}
+                      style={inputStyle} 
+                    />
+                    <textarea 
+                      placeholder="Answer..." 
+                      value={faq.answer}
+                      onChange={e => {
+                        const newFaqs = [...experienceDetails.faqs];
+                        newFaqs[index].answer = e.target.value;
+                        setExperienceDetails({...experienceDetails, faqs: newFaqs});
+                      }}
+                      style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} 
+                    />
+                  </div>
+                ))}
+                {experienceDetails.faqs.length === 0 && (
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                    No FAQs added yet. Click "Add FAQ" to start.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 8 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                 <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Final Review</h2>
                 <span style={{ background: '#fef08a', color: '#854d0e', padding: '6px 12px', borderRadius: '100px', fontSize: '0.85rem', fontWeight: 700 }}>Draft Mode</span>
               </div>
@@ -1055,7 +1112,7 @@ export default function CreateListingPage() {
 
                       try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 8000);
+                        const timeoutId = setTimeout(() => controller.abort(), 30000);
                         
                         const res = await fetch('/api/supplier/listings/publish', { 
                           method: 'POST', 
@@ -1095,7 +1152,7 @@ export default function CreateListingPage() {
             >
               <ChevronLeft size={18} /> Back
             </button>
-            {currentStep < 7 && (
+            {currentStep < 8 && (
               <button 
                 onClick={() => setCurrentStep(prev => Math.min(prev + 1, STEPS.length))}
                 style={{ background: '#0f172a', color: '#ffffff', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}

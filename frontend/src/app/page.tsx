@@ -516,9 +516,11 @@ export default function HomePage() {
               <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
-                    Likely to Sell Out
-                  </div>
+                  {item.selling_point && (
+                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
+                      {item.selling_point}
+                    </div>
+                  )}
                 </div>
                 <div style={{ padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
@@ -527,8 +529,14 @@ export default function HomePage() {
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
                   </div>
                   <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
+                  
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.confirmation_type || 'Instant Confirmation'}</span>
+                    <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.payment_option || 'Pay Now'}</span>
+                  </div>
+
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '14px' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From {formatPrice(item.base_price)}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From <strong style={{ fontSize: '1rem', color: '#0f172a' }}>${item.base_price} {item.currency || 'USD'}</strong> <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>/ {item.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span></span>
                     <div className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>
                       Book Slots
                     </div>

@@ -1052,7 +1052,8 @@ class MockDatabaseStore {
     { id: 'coup-1', code: 'WELCOME20', type: 'PERCENTAGE', value: 20, min_spend: 50, max_discount: 40, valid_from: '2026-08-01T00:00:00Z', valid_to: '2026-08-31T23:59:59Z', usage_limit: 1000, used_count: 150, applicable_categories: [] },
     { id: 'coup-2', code: 'SUMMER15', type: 'PERCENTAGE', value: 15, min_spend: 100, max_discount: 50, valid_from: '2026-06-01T00:00:00Z', valid_to: '2026-08-31T23:59:59Z', usage_limit: 500, used_count: 320, applicable_categories: ['cat-tours', 'cat-tickets'] },
     { id: 'coup-3', code: 'FLASH50', type: 'FIXED', value: 50, min_spend: 200, valid_from: '2026-08-05T00:00:00Z', valid_to: '2026-08-10T23:59:59Z', usage_limit: 100, used_count: 45, applicable_categories: [] },
-    { id: 'coup-4', code: 'TRAVEL10', type: 'PERCENTAGE', value: 10, min_spend: 0, max_discount: 25, valid_from: '2026-01-01T00:00:00Z', valid_to: '2026-12-31T23:59:59Z', usage_limit: 5000, used_count: 1200, applicable_categories: [] }
+    { id: 'coup-4', code: 'TRAVEL10', type: 'PERCENTAGE', value: 10, min_spend: 0, max_discount: 25, valid_from: '2026-01-01T00:00:00Z', valid_to: '2026-12-31T23:59:59Z', usage_limit: 5000, used_count: 1200, applicable_categories: [] },
+    { id: 'coup-5', code: 'TRAVELNEST2026', type: 'PERCENTAGE', value: 15, min_spend: 0, max_discount: 200, valid_from: '2026-01-01T00:00:00Z', valid_to: '2026-12-31T23:59:59Z', usage_limit: 5000, used_count: 0, applicable_categories: [] }
   ];
 
   notifications: Notification[] = [

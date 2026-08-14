@@ -133,7 +133,9 @@ export default function TourDetailPage() {
         time_from: tour.time_from || '08:00',
         time_to: tour.time_to || '18:00',
         payment_option: tour.payment_option || 'Pay Now',
-        time_interval: tour.time_interval || '30'
+        time_interval: tour.time_interval || '30',
+        quantity: quantity.toString(),
+        pricing_type: selectedOption.pricing_type || 'Per Person'
       });
       // Mock hold for dynamically generated slots that don't exist in the backend DB
       if (selectedSlot.id.startsWith('slot-') || selectedSlot.id.startsWith('custom-') || selectedSlot.id.startsWith('gen-')) {
@@ -415,6 +417,23 @@ export default function TourDetailPage() {
             </div>
           )}
 
+          {/* ═══════════ NEW: FAQs SECTION ═══════════ */}
+          {tour.faqs && tour.faqs.length > 0 && (
+            <div style={{ marginTop: '40px' }}>
+              <h2 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <HelpCircle size={22} color="var(--brand-primary)" /> Frequently Asked Questions
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {tour.faqs.map((faq: any, idx: number) => (
+                  <div key={idx} style={{ padding: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                    <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '8px', fontSize: '1.05rem' }}>{faq.question}</div>
+                    <div style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6 }}>{faq.answer}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ═══════════ SRS 3.7: REVIEWS & RATINGS SECTION ═══════════ */}
           <div style={{ marginTop: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -548,12 +567,11 @@ export default function TourDetailPage() {
 
         {/* RIGHT COLUMN: REAL-TIME OPTION SELECTOR & REDIS SLOT LOCK */}
         <div>
-          <div className="card-panel" style={{ padding: '30px', position: 'sticky', top: '100px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
+          <div className="card-panel" style={{ padding: '30px', position: 'sticky', top: '100px', background: '#ffffff', border: '1px solid #cbd5e1', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{selectedOption?.pricing_type || 'Price per traveler'}</span>
                 <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                  ${currentPrice} <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 400 }}>{tour.currency}</span>
+                  ${currentPrice} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{tour.currency} / {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
                 </div>
               </div>
               <div className="badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -618,7 +636,7 @@ export default function TourDetailPage() {
                 style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.8rem', color: '#0f172a' }} 
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px', maxHeight: '250px', overflowY: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px', maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }}>
               {Array.from({length: 7}).map((_, i) => {
                 const date = new Date(Date.now() + i * 86400000);
                 const slotId = `slot-${i}`;
@@ -628,18 +646,19 @@ export default function TourDetailPage() {
                     key={slotId}
                     onClick={() => setSelectedSlot({ id: slotId, capacity_left: 10 })}
                     style={{
-                      padding: '12px 16px',
+                      padding: '12px',
                       borderRadius: 'var(--radius-sm)',
                       border: isSelected ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
                       background: isSelected ? '#f0f9ff' : '#f8fafc',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      justifyContent: 'center',
+                      textAlign: 'center'
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>{date.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at 10:00 AM</div>
+                      <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>{date.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
                     </div>
                   </div>
                 );
