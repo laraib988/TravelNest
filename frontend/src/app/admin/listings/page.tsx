@@ -27,7 +27,7 @@ interface Listing {
   merchandising_badges: string[];
   images: Array<{ url: string; alt: string }>;
   confirmation_type: string;
-  status: 'LIVE' | 'PENDING_APPROVAL' | 'DRAFT' | 'DEACTIVATED';
+  status: 'LIVE' | 'PENDING_APPROVAL' | 'DRAFT' | 'DEACTIVATED' | 'NEEDS_FIX' | 'PENDING_DELETION' | 'REJECTED';
   raw_data?: any;
 }
 
