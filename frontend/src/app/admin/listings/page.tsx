@@ -39,6 +39,8 @@ export default function ListingsManagementPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [actionModal, setActionModal] = useState<{ type: 'FIX' | 'REJECT'; productId: string; title: string } | null>(null);
+  const [actionReason, setActionReason] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [search, setSearch] = useState('');
@@ -460,32 +462,18 @@ export default function ListingsManagementPage() {
                       </button>
                       <button
                         style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)' }}
-                        onClick={async () => {
-                          const reason = prompt('Please describe what the supplier needs to fix:');
-                          if (!reason) return;
-                          try {
-                            const res = await fetch('/api/admin/listings/request-fix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: l.id, reason }) });
-                            const data = await res.json();
-                            if (!res.ok) throw new Error(data.error || 'Failed to request fix');
-                            setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'NEEDS_FIX' } : item)));
-                            triggerAction(`Requested Fixes for: "${l.title}"`);
-                          } catch (e: any) { triggerAction(`Error: ${e.message}`); }
+                        onClick={() => {
+                          setActionReason('');
+                          setActionModal({ type: 'FIX', productId: l.id, title: l.title });
                         }}
                       >
                         <Edit size={13} /> Fix
                       </button>
                       <button
                         style={{ flex: 1, padding: '8px', fontSize: '0.82rem', fontWeight: 800, borderRadius: '9999px', background: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(225, 29, 72, 0.3)' }}
-                        onClick={async () => {
-                          const reason = prompt('Please enter the reason for rejection:');
-                          if (!reason) return;
-                          try {
-                            const res = await fetch('/api/admin/listings/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: l.id, reason }) });
-                            const data = await res.json();
-                            if (!res.ok) throw new Error(data.error || 'Failed to reject listing');
-                            setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'REJECTED' } : item)));
-                            triggerAction(`Product Rejected: "${l.title}"`);
-                          } catch (e: any) { triggerAction(`Error: ${e.message}`); }
+                        onClick={() => {
+                          setActionReason('');
+                          setActionModal({ type: 'REJECT', productId: l.id, title: l.title });
                         }}
                       >
                         <PowerOff size={13} /> Reject
@@ -646,23 +634,9 @@ export default function ListingsManagementPage() {
                               gap: '4px',
                               boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
                             }}
-                            onClick={async () => {
-                              const reason = prompt('Please describe what the supplier needs to fix:');
-                              if (!reason) return;
-                              try {
-                                const res = await fetch('/api/admin/listings/request-fix', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ productId: l.id, reason })
-                                });
-                                const data = await res.json();
-                                if (!res.ok) throw new Error(data.error || 'Failed to request fix');
-                                setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'NEEDS_FIX' } : item)));
-                                triggerAction(`Requested Fixes for: "${l.title}"`);
-                              } catch (e: any) {
-                                console.error(e);
-                                triggerAction(`Error: ${e.message}`);
-                              }
+                            onClick={() => {
+                              setActionReason('');
+                              setActionModal({ type: 'FIX', productId: l.id, title: l.title });
                             }}
                           >
                             <Edit size={13} color="#ffffff" /> Request Fix
@@ -682,23 +656,9 @@ export default function ListingsManagementPage() {
                               gap: '4px',
                               boxShadow: '0 4px 12px rgba(225, 29, 72, 0.35)'
                             }}
-                            onClick={async () => {
-                              const reason = prompt('Please enter the reason for rejection:');
-                              if (!reason) return;
-                              try {
-                                const res = await fetch('/api/admin/listings/reject', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ productId: l.id, reason })
-                                });
-                                const data = await res.json();
-                                if (!res.ok) throw new Error(data.error || 'Failed to reject listing');
-                                setListings((prev) => prev.map((item) => (item.id === l.id ? { ...item, status: 'REJECTED' } : item)));
-                                triggerAction(`Product Rejected: "${l.title}"`);
-                              } catch (e: any) {
-                                console.error(e);
-                                triggerAction(`Error: ${e.message}`);
-                              }
+                            onClick={() => {
+                              setActionReason('');
+                              setActionModal({ type: 'REJECT', productId: l.id, title: l.title });
                             }}
                           >
                             <PowerOff size={13} color="#ffffff" /> Reject
@@ -1418,6 +1378,83 @@ export default function ListingsManagementPage() {
                 style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.3)' }}
               >
                 Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Action (Fix/Reject) Modal */}
+      {actionModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', maxWidth: '440px', width: '90%', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+            <div style={{ width: '64px', height: '64px', background: actionModal.type === 'FIX' ? '#fffbeb' : '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              {actionModal.type === 'FIX' ? <Edit size={32} color="#d97706" /> : <PowerOff size={32} color="#e11d48" />}
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>
+              {actionModal.type === 'FIX' ? 'Request Fixes' : 'Reject Product'}
+            </h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', margin: '0 0 24px 0', lineHeight: 1.5 }}>
+              {actionModal.type === 'FIX' 
+                ? `Provide details on what the supplier needs to fix for "${actionModal.title}". They will be notified.`
+                : `Provide a reason for rejecting "${actionModal.title}". They will be notified.`}
+            </p>
+            
+            <textarea
+              placeholder={actionModal.type === 'FIX' ? "e.g. Please correct the spelling of the title..." : "e.g. This product violates our terms..."}
+              value={actionReason}
+              onChange={(e) => setActionReason(e.target.value)}
+              style={{ width: '100%', minHeight: '100px', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '24px', resize: 'vertical', fontFamily: 'inherit' }}
+            />
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => { setActionModal(null); setActionReason(''); }}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  if (!actionReason.trim()) {
+                    alert('Please provide a reason.');
+                    return;
+                  }
+                  const endpoint = actionModal.type === 'FIX' ? '/api/admin/listings/request-fix' : '/api/admin/listings/reject';
+                  const newStatus = actionModal.type === 'FIX' ? 'NEEDS_FIX' : 'REJECTED';
+                  const actionName = actionModal.type === 'FIX' ? 'Requested Fixes for' : 'Product Rejected';
+                  
+                  try {
+                    const res = await fetch(endpoint, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productId: actionModal.productId, reason: actionReason.trim() })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Request failed');
+                    
+                    setListings((prev) => prev.map((item) => (item.id === actionModal.productId ? { ...item, status: newStatus } : item)));
+                    setActionModal(null);
+                    setActionReason('');
+                    triggerAction(`${actionName}: "${actionModal.title}"`);
+                  } catch (e: any) {
+                    console.error(e);
+                    triggerAction(`Error: ${e.message}`);
+                  }
+                }}
+                style={{ 
+                  flex: 1, 
+                  padding: '12px', 
+                  borderRadius: '8px', 
+                  border: 'none', 
+                  background: actionModal.type === 'FIX' ? 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' : 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)', 
+                  color: '#fff', 
+                  fontWeight: 700, 
+                  cursor: 'pointer',
+                  boxShadow: actionModal.type === 'FIX' ? '0 4px 6px -1px rgba(217, 119, 6, 0.3)' : '0 4px 6px -1px rgba(225, 29, 72, 0.3)'
+                }}
+              >
+                {actionModal.type === 'FIX' ? 'Send Request' : 'Confirm Reject'}
               </button>
             </div>
           </div>

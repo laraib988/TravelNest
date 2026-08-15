@@ -90,6 +90,14 @@ export default function CreateListingPage() {
     images: []
   });
 
+  // State to prevent autosave before initial fetch completes
+  const [isInitialLoad, setIsInitialLoad] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).has('id');
+    }
+    return false;
+  });
+
   // Load existing listing if editing
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -109,15 +117,19 @@ export default function CreateListingPage() {
               setItinerary(data.itinerary || itinerary);
               setCurrentStep(data.current_step || 1);
             }
+            setIsInitialLoad(false);
           })
-          .catch(err => console.error('Error fetching listing:', err));
+          .catch(err => {
+            console.error('Error fetching listing:', err);
+            setIsInitialLoad(false);
+          });
       }
     }
   }, [user]);
 
   // Auto-Save Logic with Debounce
   const saveDraft = useCallback(async () => {
-    if (!user) return { success: false };
+    if (!user || isInitialLoad) return { success: false };
     setSaveStatus('saving');
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -157,7 +169,7 @@ export default function CreateListingPage() {
       setSaveStatus('error');
       return { success: false, error: e.name === 'AbortError' ? 'Network timeout: Supabase is unreachable' : e.message };
     }
-  }, [user, productId, currentStep, basicInfo, photos, experienceDetails, transportOptions, logistics, itinerary]);
+  }, [user, isInitialLoad, productId, currentStep, basicInfo, photos, experienceDetails, transportOptions, logistics, itinerary]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
