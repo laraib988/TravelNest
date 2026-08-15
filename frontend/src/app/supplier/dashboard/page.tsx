@@ -4,6 +4,12 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 
 // Dummy Data for Listings
 const DUMMY_LISTINGS = [
@@ -45,10 +51,13 @@ export default function SupplierDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS'>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS' | 'BOOKINGS'>('DASHBOARD');
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  
+  const [supplierBookings, setSupplierBookings] = useState<any[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -61,6 +70,41 @@ export default function SupplierDashboard() {
         .catch(() => setLoading(false));
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user && activeTab === 'BOOKINGS') {
+      setLoadingBookings(true);
+      fetch(`/api/supplier/bookings?supplierId=${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setSupplierBookings(data);
+          setLoadingBookings(false);
+        })
+        .catch(() => setLoadingBookings(false));
+
+      // Real-time Supabase subscription for new bookings
+      const channel = supabase
+        .channel('supplier_bookings_updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'bookings',
+            filter: `supplier_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('New real-time booking received:', payload.new);
+            setSupplierBookings((prev) => [payload.new, ...prev]);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, activeTab]);
 
   const handleLogout = () => {
     logout();
@@ -115,7 +159,10 @@ export default function SupplierDashboard() {
             >
               <Calendar size={18} /> My Listings
             </div>
-            <div style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+            <div 
+              onClick={() => setActiveTab('BOOKINGS')}
+              style={{ padding: '12px 16px', background: activeTab === 'BOOKINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'BOOKINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'BOOKINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+            >
               <Users size={18} /> Bookings
             </div>
             <div style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
@@ -247,8 +294,105 @@ export default function SupplierDashboard() {
             </div>
           </>
         )}
-
       </div>
+
+        {activeTab === 'BOOKINGS' && (
+          <div style={{ flex: 1, padding: '40px', overflowY: 'auto', background: '#f8fafc' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+              <div>
+                <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>Customer Bookings</h1>
+                <p style={{ color: '#64748b', margin: 0 }}>Manage your tour reservations and customers.</p>
+              </div>
+            </div>
+
+            <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              {loadingBookings ? (
+                <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                  Loading bookings...
+                </div>
+              ) : supplierBookings.length === 0 ? (
+                <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                  No bookings found yet. Keep sharing your tours!
+                </div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
+                      <th style={{ padding: '16px 24px', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Customer & Option</th>
+                      <th style={{ padding: '16px 24px', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Date & Time</th>
+                      <th style={{ padding: '16px 24px', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Payment / Guests</th>
+                      <th style={{ padding: '16px 24px', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Status</th>
+                      <th style={{ padding: '16px 24px', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {supplierBookings.map((b, idx) => (
+                      <tr key={b.id} style={{ borderBottom: idx < supplierBookings.length - 1 ? '1px solid #e2e8f0' : 'none' }}>
+                        <td style={{ padding: '16px 24px' }}>
+                          <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{b.traveler_details?.lead_name || 'Guest'}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>{b.listing_title || b.option_name}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', marginTop: '2px' }}>Ref: {b.booking_reference}</div>
+                        </td>
+                        <td style={{ padding: '16px 24px' }}>
+                          <div style={{ fontWeight: 600, color: '#334155', fontSize: '0.9rem' }}>
+                            {new Date(b.slot_start_time).toLocaleDateString()}
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                            {new Date(b.slot_start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px 24px' }}>
+                          <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>${b.gross_amount} {b.currency}</div>
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+                            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{b.total_travelers} Traveler(s)</span>
+                            <span className={b.payment_status === 'RESERVED' ? 'badge-info' : 'badge-emerald'} style={{ fontSize: '0.65rem', padding: '2px 6px' }}>{b.payment_status || 'PAID'}</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px 24px' }}>
+                          {b.status === 'CONFIRMED' ? (
+                            <span className="badge-emerald">Confirmed</span>
+                          ) : b.status === 'PENDING_SUPPLIER_APPROVAL' ? (
+                            <span className="badge-warning">Pending Approval</span>
+                          ) : b.status === 'CANCELLED' ? (
+                            <span className="badge-error">Cancelled</span>
+                          ) : b.status === 'CANCELLED_REFUND_PENDING' ? (
+                            <span className="badge-error">Cancelled (Refund Pending)</span>
+                          ) : b.status === 'REJECTED' ? (
+                            <span className="badge-error">Rejected</span>
+                          ) : (
+                            <span className="badge-secondary">{b.status}</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                          {b.status === 'PENDING_SUPPLIER_APPROVAL' && (
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button 
+                                onClick={async () => {
+                                  await fetch(`/api/bookings/${b.id}/status`, { method: 'PATCH', body: JSON.stringify({ action: 'approve' }) });
+                                }}
+                                style={{ padding: '6px 12px', borderRadius: '6px', background: '#dcfce7', color: '#166534', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                              >
+                                Approve
+                              </button>
+                              <button 
+                                onClick={async () => {
+                                  await fetch(`/api/bookings/${b.id}/status`, { method: 'PATCH', body: JSON.stringify({ action: 'reject' }) });
+                                }}
+                                style={{ padding: '6px 12px', borderRadius: '6px', background: '#fee2e2', color: '#991b1b', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
 
       {/* Custom Delete Confirmation Modal */}
       {deleteConfirmId && (

@@ -36,6 +36,7 @@ function CheckoutContent() {
     : basePrice * quantity;
 
   const paymentOption = searchParams.get('payment_option') || 'Pay Now';
+  const confirmationType = searchParams.get('confirmation_type') || 'Instant Confirmation';
   const [customerPaymentChoice, setCustomerPaymentChoice] = useState(paymentOption === 'Reserve Now Pay Later' ? 'pay_later' : 'pay_now');
 
   const [formData, setFormData] = useState({
@@ -139,51 +140,41 @@ function CheckoutContent() {
     
     try {
       if (customerPaymentChoice === 'pay_now') {
-        // If Stripe payment is selected, we simulate processing time
         await new Promise(resolve => setTimeout(resolve, 2000));
       } else {
-        // Reserve Now Pay Later
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      // If this is a dynamically generated hold ID from the UI (starts with hold_), bypass the strict backend check
-      if (holdId && holdId.startsWith('hold_')) {
-        setConfirmedBooking({
-          id: `book-${Date.now()}`,
-          booking_reference: `TN-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-          customer_id: 'cust-current-user',
-          listing_id: 'mock-listing',
-          option_id: searchParams.get('option_id') || 'mock-opt',
-          option_name: searchParams.get('option_name') || 'Standard Ticket',
-          slot_id: 'mock-slot',
-          slot_start_time: searchParams.get('date') || new Date().toISOString(),
+      const listingId = searchParams.get('listing_id') || 'mock-listing';
+      const supplierId = searchParams.get('supplier_id') || 'mock-supplier';
+      const optionId = searchParams.get('option_id') || 'mock-opt';
+
+      const res = await fetch('/api/public/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          listing_id: listingId,
+          supplier_id: supplierId,
+          option_id: optionId,
+          option_name: tourOptionName,
+          slot_start_time: tourDate,
           total_travelers: quantity,
           gross_amount: subtotal,
           currency: 'USD',
-          status: 'CONFIRMED',
-          qr_voucher_code: `TN-QR-${Math.floor(10000 + Math.random() * 90000)}`,
-          traveler_details: {
-            lead_name: formData.lead_name,
-            lead_email: formData.lead_email,
-            lead_phone: formData.lead_phone,
-            special_requirements: formData.special_requirements,
-          },
-        });
-        return;
-      }
-
-      const res = await fetchFromAPI('/bookings', {
-        method: 'POST',
-        body: JSON.stringify({
-          hold_id: holdId,
           lead_name: formData.lead_name,
           lead_email: formData.lead_email,
           lead_phone: formData.lead_phone,
           special_requirements: formData.special_requirements,
           payment_token: `tok_stripe_sim_${Date.now()}`,
+          payment_status: customerPaymentChoice === 'pay_later' ? 'RESERVED' : 'PAID',
+          confirmation_type: confirmationType.toUpperCase().includes('MANUAL') ? 'MANUAL' : 'INSTANT',
         }),
       });
-      setConfirmedBooking(res);
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Checkout failed');
+
+      setConfirmedBooking(result.booking);
     } catch (err: any) {
       alert(err.message || 'Checkout failed');
     } finally {
@@ -195,19 +186,25 @@ function CheckoutContent() {
     return (
       <div style={{ maxWidth: '800px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
         <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '40px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
-          <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#d1fae5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+          <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '#fef3c7' : '#d1fae5', color: confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '#d97706' : '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <CheckCircle2 size={44} />
           </div>
-          <h1 style={{ fontSize: '2.2rem', marginBottom: '8px', color: '#0f172a', textAlign: 'center' }}>Booking Confirmed!</h1>
+          <h1 style={{ fontSize: '2.2rem', marginBottom: '8px', color: '#0f172a', textAlign: 'center' }}>
+            {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? 'Booking Submitted!' : 'Booking Confirmed!'}
+          </h1>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
-            Your electronic QR ticket voucher has been dispatched to <strong>{confirmedBooking.traveler_details.lead_email}</strong>.
+            {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' 
+              ? `Your booking request has been sent to the supplier. You will receive an email once it is approved.`
+              : `Your electronic QR ticket voucher has been dispatched to <strong>${confirmedBooking.traveler_details.lead_email}</strong>.`}
           </p>
 
           {/* QR VOUCHER CARD */}
           <div style={{ background: '#f8fafc', padding: '30px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', marginBottom: '32px' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '20px', marginBottom: '20px', gap: '16px' }}>
               <div>
-                <span className="badge-emerald" style={{ marginBottom: '8px', display: 'inline-block' }}>⚡ {confirmedBooking.confirmation_type === 'INSTANT' ? 'INSTANT VOUCHER CONFIRMED' : 'AWAITING 24H SLA'}</span>
+                <span className={confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"} style={{ marginBottom: '8px', display: 'inline-block' }}>
+                  {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT VOUCHER CONFIRMED'}
+                </span>
                 <h3 style={{ fontSize: '1.4rem', color: '#0f172a' }}>{confirmedBooking.option_name || 'VIP Package'}</h3>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Lead Guest: <strong>{confirmedBooking.traveler_details.lead_name}</strong> ({confirmedBooking.traveler_details.lead_phone})</span>
               </div>
@@ -236,7 +233,19 @@ function CheckoutContent() {
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>Status:</span>
-                <div><span className="badge-emerald">{confirmedBooking.status}</span></div>
+                <div>
+                  <span className={confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"}>
+                    {confirmedBooking.status}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <span style={{ color: 'var(--text-muted)' }}>Payment:</span>
+                <div>
+                  <span className={confirmedBooking.payment_status === 'RESERVED' ? "badge-info" : "badge-emerald"}>
+                    {confirmedBooking.payment_status || 'PAID'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -427,7 +436,7 @@ function CheckoutContent() {
           <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
             <h4 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 700, marginBottom: '6px' }}>{tourTitle}</h4>
             <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '4px' }}><strong>Option:</strong> {tourOptionName}</div>
-            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}><strong>Date:</strong> {new Date(tourDate).toLocaleDateString()}</div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}><strong>Date:</strong> {new Date(tourDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
             <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px' }}><strong>Guests:</strong> {quantity} Traveler{quantity > 1 ? 's' : ''}</div>
           </div>
 

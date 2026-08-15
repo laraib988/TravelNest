@@ -1,13 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { fetchFromAPI } from '@/lib/api-client';
+import { createClient } from '@supabase/supabase-js';
 import { useAuth } from '@/context/AuthContext';
 import {
   Search, Download, Eye, CheckCircle2, XCircle,
   RefreshCw, Copy, Calendar, Users, DollarSign, QrCode,
   FileText, ShieldCheck, Clock, Check, AlertCircle, ArrowUpRight
 } from 'lucide-react';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface BookingRecord {
   id: string;
@@ -23,8 +27,9 @@ interface BookingRecord {
   platform_fee: number;
   supplier_payout: number;
   currency: string;
-  status: 'PENDING_PAYMENT' | 'AWAITING_SUPPLIER_CONFIRMATION' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
-  confirmation_type: 'INSTANT' | 'REQUEST_BASED_24H_SLA';
+  status: string;
+  payment_status?: string;
+  confirmation_type: string;
   qr_voucher_code: string;
   traveler_details: {
     lead_name: string;
@@ -55,9 +60,13 @@ export default function BookingsManagementPage() {
   const loadBookings = async () => {
     setLoading(true);
     try {
-      const data = await fetchFromAPI('/bookings').catch(() => null);
-      if (Array.isArray(data) && data.length > 0) {
-        setBookings(data);
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (!error && Array.isArray(data) && data.length > 0) {
+        setBookings(data as any);
       } else {
         const fallbackBookings: BookingRecord[] = [
           {
@@ -163,11 +172,22 @@ export default function BookingsManagementPage() {
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
-  const handleUpdateStatus = (id: string, newStatus: BookingRecord['status'], ref: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
-    );
-    triggerAction(`Booking ${ref} updated to ${newStatus.replace(/_/g, ' ')}!`);
+  const handleUpdateStatus = async (id: string, newAction: string, ref: string) => {
+    try {
+      const res = await fetch(`/api/bookings/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ action: newAction })
+      });
+      if (res.ok) {
+        await loadBookings();
+        triggerAction(`Booking ${ref} updated successfully!`);
+      } else {
+        triggerAction(`Failed to update booking ${ref}`);
+      }
+    } catch (e) {
+      console.error(e);
+      triggerAction('Error updating status');
+    }
   };
 
   const handleExportCSV = () => {
@@ -196,19 +216,21 @@ export default function BookingsManagementPage() {
     switch (status) {
       case 'CONFIRMED': return 'admin-badge--confirmed';
       case 'PENDING_PAYMENT':
-      case 'AWAITING_SUPPLIER_CONFIRMATION': return 'admin-badge--pending';
-      case 'CANCELLED': return 'admin-badge--cancelled';
+      case 'PENDING_SUPPLIER_APPROVAL': return 'admin-badge--pending';
+      case 'CANCELLED': 
+      case 'CANCELLED_REFUND_PENDING': return 'admin-badge--cancelled';
       case 'COMPLETED': return 'admin-badge--completed';
       case 'REFUNDED': return 'admin-badge--draft';
+      case 'REJECTED': return 'admin-badge--cancelled';
       default: return '';
     }
   };
 
   const filteredBookings = bookings.filter((b) => {
     if (filter !== 'All') {
-      if (filter === 'Pending' && !['PENDING_PAYMENT', 'AWAITING_SUPPLIER_CONFIRMATION'].includes(b.status)) return false;
+      if (filter === 'Pending' && !['PENDING_PAYMENT', 'PENDING_SUPPLIER_APPROVAL'].includes(b.status)) return false;
       if (filter === 'Confirmed' && b.status !== 'CONFIRMED') return false;
-      if (filter === 'Cancelled' && b.status !== 'CANCELLED') return false;
+      if (filter === 'Cancelled' && !['CANCELLED', 'CANCELLED_REFUND_PENDING', 'REJECTED'].includes(b.status)) return false;
       if (filter === 'Completed' && b.status !== 'COMPLETED') return false;
       if (filter === 'Refunded' && b.status !== 'REFUNDED') return false;
     }
@@ -227,7 +249,7 @@ export default function BookingsManagementPage() {
 
   const totalGrossRevenue = bookings.reduce((sum, b) => sum + (b.gross_amount || 0), 0);
   const totalConfirmed = bookings.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').length;
-  const totalPending = bookings.filter(b => ['PENDING_PAYMENT', 'AWAITING_SUPPLIER_CONFIRMATION'].includes(b.status)).length;
+  const totalPending = bookings.filter(b => ['PENDING_PAYMENT', 'PENDING_SUPPLIER_APPROVAL'].includes(b.status)).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '1440px', margin: '0 auto' }}>
@@ -431,16 +453,21 @@ export default function BookingsManagementPage() {
                     </td>
 
                     <td>
-                      <span className={`admin-badge ${getStatusBadgeClass(b.status)}`}>
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></span>
-                        {b.status.replace(/_/g, ' ')}
-                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span className={`admin-badge ${getStatusBadgeClass(b.status)}`}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></span>
+                          {b.status.replace(/_/g, ' ')}
+                        </span>
+                        <span className={b.payment_status === 'RESERVED' ? 'badge-info' : 'badge-emerald'} style={{ fontSize: '0.65rem', padding: '2px 6px', width: 'fit-content', alignSelf: 'flex-start' }}>
+                          💳 {b.payment_status || 'PAID'}
+                        </span>
+                      </div>
                     </td>
 
                     {/* Action Column Buttons */}
                     <td style={{ textAlign: 'center' }}>
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
-                        {b.status === 'AWAITING_SUPPLIER_CONFIRMATION' && (
+                        {b.status === 'PENDING_SUPPLIER_APPROVAL' && (
                           <button
                             style={{
                               padding: '6px 14px',
@@ -456,7 +483,7 @@ export default function BookingsManagementPage() {
                               gap: '4px',
                               boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
                             }}
-                            onClick={() => handleUpdateStatus(b.id, 'CONFIRMED', b.booking_reference)}
+                            onClick={() => handleUpdateStatus(b.id, 'approve', b.booking_reference)}
                           >
                             <CheckCircle2 size={13} color="#ffffff" /> Confirm Order
                           </button>

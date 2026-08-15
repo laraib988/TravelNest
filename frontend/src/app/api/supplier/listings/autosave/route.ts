@@ -24,8 +24,12 @@ export async function POST(request: Request) {
         .eq('id', productId)
         .eq('supplier_id', userId)
         .single();
-        
-      if (fetchErr) throw fetchErr;
+      if (fetchErr) {
+        if (fetchErr.code === 'PGRST116') {
+          return NextResponse.json({ error: 'Listing not found or access denied.' }, { status: 404 });
+        }
+        throw fetchErr;
+      }
 
       if (currentProduct.status === 'PUBLISHED' || currentProduct.status === 'APPROVED') {
         // Create a new clone draft for the edits, pointing to the original

@@ -167,7 +167,7 @@ export default function CreateListingPage() {
     } catch (e: any) {
       clearTimeout(timeoutId);
       setSaveStatus('error');
-      return { success: false, error: e.name === 'AbortError' ? 'Network timeout: Supabase is unreachable' : e.message };
+      return { success: false, error: e.name === 'AbortError' ? 'Network timeout: Request took too long (Dev server might be compiling)' : e.message };
     }
   }, [user, isInitialLoad, productId, currentStep, basicInfo, photos, experienceDetails, transportOptions, logistics, itinerary]);
 

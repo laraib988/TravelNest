@@ -56,6 +56,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     const mappedListing = {
       id: p.id,
+      supplier_id: p.supplier_id || p.user_id || 'unknown-supplier',
       title: p.basic_info?.title || p.title || 'Tour Experience',
       description: p.basic_info?.summary || p.basic_info?.shortDescription || 'No description provided.',
       images: allImages,
@@ -89,8 +90,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
         id: 'opt-1', title: 'Standard Admission', description: 'Entry ticket', price_modifier: 150, pricing_type: 'Price per traveler', available_units: '10'
       }],
       available_slots: [
-        { id: 'slot-1', date_time: new Date(Date.now() + 86400000).toISOString(), capacity_left: 10, option_id: null },
-        { id: 'slot-2', date_time: new Date(Date.now() + 172800000).toISOString(), capacity_left: 5, option_id: null },
+        { id: 'slot-1', start_time: new Date(Date.now() + 86400000).toISOString(), capacity_left: 10, option_id: null },
+        { id: 'slot-2', start_time: new Date(Date.now() + 172800000).toISOString(), capacity_left: 5, option_id: null },
       ],
       raw_data: p,
       ai_review_summary: null,

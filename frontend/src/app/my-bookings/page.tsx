@@ -117,9 +117,14 @@ export default function MyBookingsPage() {
                   <div style={{ padding: '24px', display: 'flex', gap: '24px', flex: 1, minWidth: '300px' }}>
                     <img src={booking.tour_image} alt={booking.title} style={{ width: '120px', height: '120px', borderRadius: '16px', objectFit: 'cover' }} />
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <span className={getStatusBadgeClass(booking.status)} style={{ display: 'inline-block', width: 'fit-content', marginBottom: '8px' }}>
-                        ⚡ {booking.status}
-                      </span>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <span className={getStatusBadgeClass(booking.status)} style={{ display: 'inline-block', width: 'fit-content', marginBottom: '8px' }}>
+                          ⚡ {booking.status === 'PENDING_SUPPLIER_APPROVAL' ? 'PENDING APPROVAL' : booking.status}
+                        </span>
+                        <span className={booking.payment_status === 'RESERVED' ? 'badge-info' : 'badge-emerald'} style={{ display: 'inline-block', width: 'fit-content', marginBottom: '8px', padding: '4px 12px' }}>
+                          💳 {booking.payment_status || 'PAID'}
+                        </span>
+                      </div>
                       <h3 style={{ fontSize: '1.25rem', marginBottom: '10px', fontWeight: 700, color: '#0f172a' }}>{booking.title}</h3>
                       <div style={{ display: 'flex', gap: '16px', color: '#64748b', fontSize: '0.85rem' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> {booking.date}</span>
@@ -145,6 +150,8 @@ export default function MyBookingsPage() {
                     <div>
                       <h4 style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '6px' }}>Traveler Details</h4>
                       <p style={{ fontWeight: 700, color: '#0f172a' }}>Lead Guest: {booking.lead_name}</p>
+                      <h4 style={{ color: '#64748b', fontSize: '0.85rem', margin: '16px 0 6px 0' }}>Booking Reference</h4>
+                      <p style={{ fontWeight: 700, color: '#0f172a' }}>{booking.booking_reference || booking.id}</p>
                     </div>
                     {booking.status === 'CONFIRMED' && (
                       <div style={{ background: '#ffffff', padding: '16px', borderRadius: '16px', textAlign: 'center', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow-sm)' }}>
@@ -153,8 +160,29 @@ export default function MyBookingsPage() {
                       </div>
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                      {booking.status === 'CONFIRMED' && (
-                        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff1f2', color: '#be123c', border: '1px solid #fecdd3', padding: '10px 20px', borderRadius: '16px', fontWeight: 700, cursor: 'pointer' }}>
+                      {['CONFIRMED', 'PENDING_SUPPLIER_APPROVAL'].includes(booking.status) && (
+                        <button 
+                          onClick={async () => {
+                            const isPaid = booking.payment_status === 'PAID';
+                            const msg = isPaid 
+                              ? 'Are you sure you want to cancel this booking? A refund will be processed within 14 days.'
+                              : 'Are you sure you want to cancel this reservation?';
+                            if (window.confirm(msg)) {
+                              try {
+                                const res = await fetch(`/api/bookings/${booking.id}/status`, {
+                                  method: 'PATCH',
+                                  body: JSON.stringify({ action: 'cancel' })
+                                });
+                                if (res.ok) {
+                                  fetchBookings();
+                                }
+                              } catch (e) {
+                                console.error('Error cancelling', e);
+                              }
+                            }
+                          }}
+                          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff1f2', color: '#be123c', border: '1px solid #fecdd3', padding: '10px 20px', borderRadius: '16px', fontWeight: 700, cursor: 'pointer' }}
+                        >
                           <AlertTriangle size={16} /> Cancel Booking
                         </button>
                       )}

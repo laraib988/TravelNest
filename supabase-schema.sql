@@ -31,3 +31,31 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 
 -- Optional: Add index for notifications
 CREATE INDEX IF NOT EXISTS notifications_user_id_idx ON public.notifications(user_id);
+
+-- 3. Create Bookings Table
+CREATE TABLE IF NOT EXISTS public.bookings (
+    id TEXT PRIMARY KEY,
+    booking_reference TEXT NOT NULL,
+    customer_id TEXT NOT NULL,
+    supplier_id TEXT NOT NULL,
+    listing_id TEXT NOT NULL,
+    option_id TEXT NOT NULL,
+    option_name TEXT,
+    slot_id TEXT NOT NULL,
+    slot_start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    total_travelers INTEGER NOT NULL,
+    gross_amount NUMERIC NOT NULL,
+    platform_fee NUMERIC NOT NULL,
+    supplier_payout NUMERIC NOT NULL,
+    currency TEXT DEFAULT 'USD',
+    status TEXT DEFAULT 'CONFIRMED',
+    confirmation_type TEXT DEFAULT 'INSTANT',
+    qr_voucher_code TEXT,
+    traveler_details JSONB DEFAULT '{}'::jsonb,
+    payment_intent_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS bookings_supplier_id_idx ON public.bookings(supplier_id);
+CREATE INDEX IF NOT EXISTS bookings_customer_id_idx ON public.bookings(customer_id);
