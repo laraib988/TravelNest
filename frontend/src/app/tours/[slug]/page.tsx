@@ -622,20 +622,25 @@ export default function TourDetailPage() {
                   {tour.options.map((opt: any) => {
                     const isOptSelected = selectedOption?.id === opt.id;
                     const maxCap = Number(opt.max_capacity) || 10;
-                    const exceedsCapacity = quantity > maxCap;
+                    const availableUnitsRaw = Number(opt.available_units) || 10;
+                    const available = Math.max(0, availableUnitsRaw);
+                    const isGroup = opt.pricing_type !== 'Per Person';
+                    const unitsNeeded = isGroup ? 1 : quantity;
+                    const exceedsCapacity = quantity > maxCap || unitsNeeded > available;
+                    
                     return (
                       <div
                         key={opt.id}
                         onClick={() => {
-                          if (!exceedsCapacity) setSelectedOption(opt);
+                          if (!exceedsCapacity && available > 0) setSelectedOption(opt);
                         }}
                         style={{
                           padding: '12px 14px',
                           borderRadius: 'var(--radius-sm)',
                           border: isOptSelected ? '2px solid var(--brand-primary)' : '1px solid #cbd5e1',
                           background: isOptSelected ? '#f0f9ff' : '#ffffff',
-                          cursor: exceedsCapacity ? 'not-allowed' : 'pointer',
-                          opacity: exceedsCapacity ? 0.5 : 1,
+                          cursor: (exceedsCapacity || available === 0) ? 'not-allowed' : 'pointer',
+                          opacity: (exceedsCapacity || available === 0) ? 0.5 : 1,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -645,8 +650,10 @@ export default function TourDetailPage() {
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>{opt.title || opt.name}</div>
                           {opt.description && <div style={{ fontSize: '0.75rem', color: '#059669' }}>{opt.description}</div>}
-                          <div style={{ fontSize: '0.75rem', color: exceedsCapacity ? '#dc2626' : '#059669', marginTop: '4px' }}>
-                            {opt.available_units || '10'} {opt.pricing_type === 'Per Person' ? 'seats' : 'vehicles'} available {exceedsCapacity && `(Max capacity: ${maxCap})`}
+                          <div style={{ fontSize: '0.75rem', color: (exceedsCapacity || available === 0) ? '#dc2626' : '#059669', marginTop: '4px' }}>
+                            {available === 0 ? 'Sold Out' : `${available} ${isGroup ? 'vehicles' : 'seats'} available`} 
+                            {quantity > maxCap && ` (Max capacity: ${maxCap})`}
+                            {(unitsNeeded > available && available > 0 && quantity <= maxCap) && ` (Not enough availability)`}
                           </div>
                         </div>
                         <strong style={{ color: 'var(--brand-primary)', fontSize: '0.95rem' }}>${opt.price_modifier || opt.price}</strong>

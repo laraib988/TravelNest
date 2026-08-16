@@ -47,6 +47,7 @@ const DUMMY_LISTINGS = [
   }
 ];
 
+
 export default function SupplierDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -56,16 +57,36 @@ export default function SupplierDashboard() {
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>('PAYOUTS');
+  const [selectedPayout, setSelectedPayout] = useState<any>(null);
   const [financeSearch, setFinanceSearch] = useState('');
   
   const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [showBankForm, setShowBankForm] = useState(false);
   const [toastMessage, setToastMessage] = useState<{title: string, message: string, type: 'success' | 'error'} | null>(null);
 
+  useEffect(() => {
+    if (user && user.id) {
+      const fetchAccounts = async () => {
+        try {
+          const res = await fetch(`/api/supplier/bank-details?supplierId=${user.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setBankAccounts(data || []);
+          }
+        } catch (e) {
+          console.error('Error fetching bank accounts:', e);
+        }
+      };
+      fetchAccounts();
+    }
+  }, [user]);
+
   const triggerToast = (title: string, message: string, type: 'success' | 'error' = 'success') => {
     setToastMessage({ title, message, type });
     setTimeout(() => setToastMessage(null), 4000);
   };
+
+  
 
   
   const [supplierBookings, setSupplierBookings] = useState<any[]>([]);
@@ -84,7 +105,7 @@ export default function SupplierDashboard() {
   }, [user]);
 
   useEffect(() => {
-    if (user && (activeTab === 'BOOKINGS' || activeTab === 'FINANCE')) {
+    if (user) {
       setLoadingBookings(true);
       fetch(`/api/supplier/bookings?supplierId=${user.id}`)
         .then(res => res.json())
@@ -213,11 +234,18 @@ export default function SupplierDashboard() {
               </div>
               <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Total Bookings</div>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginTop: '8px' }}>0</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginTop: '8px' }}>
+                  {supplierBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').length}
+                </div>
               </div>
               <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Revenue (This Month)</div>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginTop: '8px' }}>$0.00</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginTop: '8px' }}>
+                  ${supplierBookings.filter(b => {
+                    const d = new Date(b.created_at || b.slot_start_time);
+                    return (b.status === 'CONFIRMED' || b.status === 'COMPLETED') && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+                  }).reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                </div>
               </div>
             </div>
 
@@ -275,34 +303,54 @@ export default function SupplierDashboard() {
             {/* CHART (CSS Based) */}
             <div style={{ padding: '40px 0', borderTop: '1px dashed #cbd5e1', borderBottom: '1px dashed #cbd5e1', marginBottom: '40px', position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '240px', paddingLeft: '40px' }}>
-                {/* Y-Axis labels */}
-                <div style={{ position: 'absolute', left: 0, top: '40px', bottom: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', width: '30px', textAlign: 'right' }}>
-                  <span>6000</span>
-                  <span>4500</span>
-                  <span>3000</span>
-                  <span>1500</span>
-                  <span>0</span>
-                </div>
-                {/* Grid lines */}
-                <div style={{ position: 'absolute', left: '40px', right: 0, top: '40px', bottom: '40px', zIndex: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  {[...Array(5)].map((_, i) => <div key={i} style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '0' }} />)}
-                </div>
-                
-                {/* Bars */}
-                {[ 
-                  { label: 'Oct', val1: 4200, val2: 1000 },
-                  { label: 'Nov', val1: 3800, val2: 900 },
-                  { label: 'Dec', val1: 5200, val2: 1200 },
-                  { label: 'Jan', val1: 4600, val2: 1100 }
-                ].map((m, i) => (
-                  <div key={i} style={{ zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '240px' }}>
-                      <div style={{ width: '60px', background: '#818cf8', height: `${(m.val1/6000)*100}%`, borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}></div>
-                      <div style={{ width: '60px', background: '#86efac', height: `${(m.val2/6000)*100}%`, borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}></div>
-                    </div>
-                    <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>{m.label}</span>
-                  </div>
-                ))}
+                {(() => {
+                  const chartData = [...Array(4)].map((_, i) => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - (3 - i));
+                    const monthName = d.toLocaleString('default', { month: 'short' });
+                    const m = d.getMonth();
+                    const y = d.getFullYear();
+                    
+                    const monthBookings = supplierBookings.filter(b => {
+                      const bd = new Date(b.created_at || b.slot_start_time);
+                      return bd.getMonth() === m && bd.getFullYear() === y;
+                    });
+                    
+                    const val1 = monthBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0);
+                    const val2 = monthBookings.filter(b => b.status === 'PENDING').reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0);
+                    
+                    return { label: monthName, val1, val2 };
+                  });
+                  const maxVal = Math.max(100, Math.ceil(Math.max(...chartData.map(d => Math.max(d.val1, d.val2))) / 100) * 100);
+                  
+                  return (
+                    <>
+                      {/* Y-Axis labels */}
+                      <div style={{ position: 'absolute', left: 0, top: '40px', bottom: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', width: '40px', textAlign: 'right' }}>
+                        <span>{maxVal}</span>
+                        <span>{Math.round(maxVal * 0.75)}</span>
+                        <span>{Math.round(maxVal * 0.5)}</span>
+                        <span>{Math.round(maxVal * 0.25)}</span>
+                        <span>0</span>
+                      </div>
+                      {/* Grid lines */}
+                      <div style={{ position: 'absolute', left: '50px', right: 0, top: '40px', bottom: '40px', zIndex: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        {[...Array(5)].map((_, i) => <div key={i} style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '0' }} />)}
+                      </div>
+                      
+                      {/* Bars */}
+                      {chartData.map((m, i) => (
+                        <div key={i} style={{ zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginLeft: i === 0 ? '50px' : '0' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '240px' }}>
+                            <div style={{ width: '60px', background: '#818cf8', height: `${(m.val1/maxVal)*100}%`, borderTopLeftRadius: '4px', borderTopRightRadius: '4px', minHeight: m.val1 > 0 ? '4px' : '0' }}></div>
+                            <div style={{ width: '60px', background: '#86efac', height: `${(m.val2/maxVal)*100}%`, borderTopLeftRadius: '4px', borderTopRightRadius: '4px', minHeight: m.val2 > 0 ? '4px' : '0' }}></div>
+                          </div>
+                          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>{m.label}</span>
+                        </div>
+                      ))}
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
@@ -436,10 +484,12 @@ export default function SupplierDashboard() {
                                paymentId: `PAY-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(3, '0')}`,
                                amount: 0,
                                method: Math.random() > 0.5 ? 'Bank Transfer' : 'PayPal',
-                               status: date.getMonth() === new Date().getMonth() ? 'Processing' : 'Completed'
+                               status: date.getMonth() === new Date().getMonth() ? 'Processing' : 'Completed',
+                               bookings: []
                             };
                          }
                          acc[key].amount += Number(b.supplier_payout || 0);
+                         acc[key].bookings.push(b);
                          return acc;
                       }, {})).map((p: any, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
@@ -456,10 +506,39 @@ export default function SupplierDashboard() {
                           </td>
                           <td style={{ padding: '16px', textAlign: 'right' }}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                              <button onClick={() => setSelectedPayout(p)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                                 <Eye size={14} /> View
                               </button>
-                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                              <button onClick={() => {
+                                const win = window.open('', '_blank');
+                                if (!win) return;
+                                win.document.write(`
+                                  <html>
+                                    <head>
+                                      <title>Payout ${p.paymentId}</title>
+                                      <style>
+                                        body { font-family: sans-serif; padding: 40px; color: #333; }
+                                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                                        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+                                      </style>
+                                    </head>
+                                    <body onload="window.print(); window.close();">
+                                      <h1>TravelNest Supplier Payout</h1>
+                                      <p><strong>Payment ID:</strong> ${p.paymentId}</p>
+                                      <p><strong>Date:</strong> ${p.dateStr}</p>
+                                      <p><strong>Total Amount:</strong> $${p.amount.toFixed(2)}</p>
+                                      <p><strong>Method:</strong> ${p.method}</p>
+                                      <p><strong>Status:</strong> ${p.status}</p>
+                                      <h3>Bookings Included</h3>
+                                      <table>
+                                        <tr><th>Booking Ref</th><th>Date</th><th>Amount</th></tr>
+                                        ${p.bookings.map((b: any) => `<tr><td>${b.booking_reference}</td><td>${new Date(b.created_at || b.slot_start_time).toLocaleDateString()}</td><td>$${Number(b.supplier_payout || 0).toFixed(2)}</td></tr>`).join('')}
+                                      </table>
+                                    </body>
+                                  </html>
+                                `);
+                                win.document.close();
+                              }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                                 <Download size={14} /> PDF
                               </button>
                             </div>
@@ -522,10 +601,12 @@ export default function SupplierDashboard() {
                                dueDateStr: `${dueDate.toLocaleString('default', { month: 'short' })} 29, ${dueDate.getFullYear()}`,
                                invoiceId: `INV-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(3, '0')}`,
                                amount: 0,
-                               status: date.getMonth() === new Date().getMonth() ? 'Processing' : 'Paid'
+                               status: date.getMonth() === new Date().getMonth() ? 'Processing' : 'Paid',
+                               bookings: []
                             };
                          }
                          acc[key].amount += Number(b.supplier_payout || 0);
+                         acc[key].bookings.push(b);
                          return acc;
                       }, {})).map((p: any, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
@@ -542,10 +623,39 @@ export default function SupplierDashboard() {
                           </td>
                           <td style={{ padding: '16px', textAlign: 'right' }}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                              <button onClick={() => setSelectedPayout(p)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                                 <Eye size={14} /> View
                               </button>
-                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                              <button onClick={() => {
+                                const win = window.open('', '_blank');
+                                if (!win) return;
+                                win.document.write(`
+                                  <html>
+                                    <head>
+                                      <title>Invoice ${p.invoiceId}</title>
+                                      <style>
+                                        body { font-family: sans-serif; padding: 40px; color: #333; }
+                                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                                        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+                                      </style>
+                                    </head>
+                                    <body onload="window.print(); window.close();">
+                                      <h1>TravelNest Supplier Invoice</h1>
+                                      <p><strong>Invoice #:</strong> ${p.invoiceId}</p>
+                                      <p><strong>Date:</strong> ${p.dateStr}</p>
+                                      <p><strong>Due Date:</strong> ${p.dueDateStr}</p>
+                                      <p><strong>Total Amount:</strong> $${p.amount.toFixed(2)}</p>
+                                      <p><strong>Status:</strong> ${p.status}</p>
+                                      <h3>Bookings Included</h3>
+                                      <table>
+                                        <tr><th>Booking Ref</th><th>Date</th><th>Amount</th></tr>
+                                        ${p.bookings.map((b: any) => `<tr><td>${b.booking_reference}</td><td>${new Date(b.created_at || b.slot_start_time).toLocaleDateString()}</td><td>$${Number(b.supplier_payout || 0).toFixed(2)}</td></tr>`).join('')}
+                                      </table>
+                                    </body>
+                                  </html>
+                                `);
+                                win.document.close();
+                              }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                                 <Download size={14} /> PDF
                               </button>
                             </div>
@@ -994,6 +1104,52 @@ export default function SupplierDashboard() {
                 Yes, Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payout Details Modal */}
+      {selectedPayout && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ background: '#fff', padding: '32px', borderRadius: '24px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Payout Details A-Z</h2>
+              <button onClick={() => setSelectedPayout(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <EyeOff size={24} color="#64748b" />
+              </button>
+            </div>
+            
+            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ color: '#64748b', fontWeight: 600 }}>Payment ID:</span>
+                <span style={{ fontWeight: 800, color: '#0f172a' }}>{selectedPayout.paymentId}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ color: '#64748b', fontWeight: 600 }}>Date:</span>
+                <span style={{ fontWeight: 800, color: '#0f172a' }}>{selectedPayout.dateStr}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ color: '#64748b', fontWeight: 600 }}>Status:</span>
+                <span style={{ fontWeight: 800, color: selectedPayout.status === 'Completed' ? '#166534' : '#92400e' }}>{selectedPayout.status}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ color: '#64748b', fontWeight: 600 }}>Total Payout:</span>
+                <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.2rem' }}>${selectedPayout.amount.toFixed(2)} USD</span>
+              </div>
+            </div>
+
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px' }}>Included Bookings</h3>
+            {selectedPayout.bookings.map((b: any, idx: number) => (
+              <div key={idx} style={{ padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 800, color: '#0f172a' }}>Ref: {b.booking_reference}</span>
+                  <span style={{ fontWeight: 800, color: '#059669' }}>${Number(b.supplier_payout || 0).toFixed(2)}</span>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  Booked on {new Date(b.created_at || b.slot_start_time).toLocaleDateString()}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

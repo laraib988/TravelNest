@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     let query = supabaseAdmin
       .from('products')
       .select('*')
-      .eq('status', 'PUBLISHED')
+      .in('status', ['PUBLISHED', 'APPROVED'])
       .order('updated_at', { ascending: false });
 
     const { data: products, error } = await query;
@@ -40,18 +40,18 @@ export async function GET(req: Request) {
     }
 
     const mappedListings = filteredProducts.map(p => {
-      const title = p.basic_info?.title || 'Beautiful Tour Experience';
+      const title = p.basic_info?.title || 'Untitled Product';
       const slugifiedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       
-      let minPrice = 150;
+      let minPrice = 0;
       let minPricingType = 'Per Person';
       if (p.transport_pricing && p.transport_pricing.length > 0) {
         const sorted = p.transport_pricing.slice().sort((a: any, b: any) => (Number(a.amount)||999999) - (Number(b.amount)||999999));
-        minPrice = Number(sorted[0].amount) || 999999;
+        minPrice = Number(sorted[0].amount) || 0;
         minPricingType = sorted[0].pricingType || 'Per Person';
       } else if (p.pricing && p.pricing.length > 0) {
         const sorted = p.pricing.slice().sort((a: any, b: any) => (Number(a.price) || Number(a.amount)||999999) - (Number(b.price) || Number(b.amount)||999999));
-        minPrice = Number(sorted[0].price) || Number(sorted[0].amount) || 999999;
+        minPrice = Number(sorted[0].price) || Number(sorted[0].amount) || 0;
         minPricingType = sorted[0].pricingType || 'Per Person';
       } else if (p.base_price) {
         minPrice = p.base_price;
@@ -61,19 +61,19 @@ export async function GET(req: Request) {
         id: p.id,
         title,
         images: [
-          { url: p.basic_info?.photos?.heroImage || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80', alt: title }
+          { url: p.basic_info?.photos?.heroImage || 'https://placehold.co/600x400?text=No+Image', alt: title }
         ],
         price: minPrice,
         base_price: minPrice,
         pricing_type: minPricingType,
         currency: 'USD',
-        cached_rating_avg: 5.0,
-        cached_review_count: 0,
-        duration_minutes: 120,
-        merchandising_badges: ['NEW'],
-        slug: `${slugifiedTitle}-${p.id}`,
-        destination_id: 'dest-global',
-        category_name: 'Adventures',
+        cached_rating_avg: p.cached_rating_avg !== undefined ? p.cached_rating_avg : 5.0,
+        cached_review_count: p.cached_review_count !== undefined ? p.cached_review_count : 0,
+        duration_minutes: p.basic_info?.durationMinutes || 120,
+        merchandising_badges: p.merchandising_badges || ['NEW'],
+        slug: p.slug || `${slugifiedTitle}-${p.id}`,
+        destination_id: p.destination_id || 'dest-global',
+        category_name: p.category_name || p.basic_info?.category || 'Adventures',
         selling_point: p.basic_info?.sellingPoints || p.basic_info?.category || 'Best Seller',
         confirmation_type: p.logistics?.bookingType || 'Instant Confirmation',
         payment_option: p.logistics?.paymentOption || 'Pay Now'

@@ -510,8 +510,8 @@ export default function HomePage() {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Most booked verified experiences globally</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-          {listings.slice(0, 3).map((item) => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+          {listings.slice(0, 4).map((item) => (
             <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none' }}>
               <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
