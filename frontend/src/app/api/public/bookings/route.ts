@@ -6,6 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { 
       listing_id, 
+      listing_title,
       supplier_id, 
       option_id, 
       option_name, 
@@ -17,7 +18,9 @@ export async function POST(request: Request) {
       lead_email,
       lead_phone,
       special_requirements,
-      special_requirements,
+      pickup_time,
+      pickup_location,
+      dropoff_location,
       payment_token,
       payment_status,
       confirmation_type
@@ -55,7 +58,11 @@ export async function POST(request: Request) {
         lead_name: lead_name || 'Guest',
         lead_email,
         lead_phone: lead_phone || '',
-        special_requirements: special_requirements || ''
+        special_requirements: special_requirements || '',
+        pickup_time: pickup_time || '',
+        pickup_location: pickup_location || '',
+        dropoff_location: dropoff_location || '',
+        tour_name: listing_title || ''
       },
       payment_status: payment_status || 'PAID',
       payment_intent_id: payment_token || `pi_sim_${Date.now()}`
@@ -75,6 +82,23 @@ export async function POST(request: Request) {
         .single();
 
       if (!error && data) {
+        // Create notification for supplier
+        const notificationData = {
+          user_id: supplier_id,
+          type: 'INFO',
+          title: 'New Booking Received!',
+          message: `You have received a new booking for "${listing_title || 'a tour'}". Reference: ${booking_reference}`,
+          is_read: false
+        };
+        
+        const { error: notifError } = await supabaseAdmin
+          .from('notifications')
+          .insert(notificationData);
+          
+        if (notifError) {
+          console.error('Failed to create supplier notification:', notifError);
+        }
+
         // Successfully saved to Supabase
         return NextResponse.json({ success: true, booking: data }, { status: 201 });
       }

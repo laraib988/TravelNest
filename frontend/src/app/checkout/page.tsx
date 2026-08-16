@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
-import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, QrCode, Download, Smartphone, Tag } from 'lucide-react';
+import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, Download, Smartphone, Tag } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -24,6 +24,12 @@ function CheckoutContent() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
 
+  useEffect(() => {
+    if (confirmedBooking) {
+      window.scrollTo(0, 0);
+    }
+  }, [confirmedBooking]);
+
   const tourTitle = searchParams.get('title') || 'Tour Experience';
   const tourOptionName = searchParams.get('option_name') || 'Standard Ticket';
   const tourDate = searchParams.get('date') || new Date().toISOString();
@@ -40,15 +46,15 @@ function CheckoutContent() {
   const [customerPaymentChoice, setCustomerPaymentChoice] = useState(paymentOption === 'Reserve Now Pay Later' ? 'pay_later' : 'pay_now');
 
   const [formData, setFormData] = useState({
-    lead_name: 'Ayesha Khan',
-    lead_email: 'ayesha.khan@example.com',
-    lead_phone: '+92 300 1234567',
+    lead_name: '',
+    lead_email: '',
+    lead_phone: '',
     special_requirements: '',
     pickup_time: '',
     pickup_location: '',
     dropoff_location: '',
     same_as_pickup: false,
-    card_number: '4242 •••• •••• 4242',
+    card_number: '',
   });
 
   const timeFromStr = searchParams.get('time_from') || '06:00 AM';
@@ -154,6 +160,7 @@ function CheckoutContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           listing_id: listingId,
+          listing_title: tourTitle,
           supplier_id: supplierId,
           option_id: optionId,
           option_name: tourOptionName,
@@ -165,6 +172,9 @@ function CheckoutContent() {
           lead_email: formData.lead_email,
           lead_phone: formData.lead_phone,
           special_requirements: formData.special_requirements,
+          pickup_time: formData.pickup_time,
+          pickup_location: formData.pickup_location,
+          dropoff_location: formData.same_as_pickup ? formData.pickup_location : formData.dropoff_location,
           payment_token: `tok_stripe_sim_${Date.now()}`,
           payment_status: customerPaymentChoice === 'pay_later' ? 'RESERVED' : 'PAID',
           confirmation_type: confirmationType.toUpperCase().includes('MANUAL') ? 'MANUAL' : 'INSTANT',
@@ -195,7 +205,7 @@ function CheckoutContent() {
           <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
             {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' 
               ? `Your booking request has been sent to the supplier. You will receive an email once it is approved.`
-              : `Your electronic QR ticket voucher has been dispatched to <strong>${confirmedBooking.traveler_details.lead_email}</strong>.`}
+              : `Your electronic ticket has been dispatched to <strong>${confirmedBooking.traveler_details.lead_email}</strong>.`}
           </p>
 
           {/* QR VOUCHER CARD */}
@@ -203,18 +213,10 @@ function CheckoutContent() {
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '20px', marginBottom: '20px', gap: '16px' }}>
               <div>
                 <span className={confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"} style={{ marginBottom: '8px', display: 'inline-block' }}>
-                  {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT VOUCHER CONFIRMED'}
+                  {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT BOOKING CONFIRMED'}
                 </span>
                 <h3 style={{ fontSize: '1.4rem', color: '#0f172a' }}>{confirmedBooking.option_name || 'VIP Package'}</h3>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Lead Guest: <strong>{confirmedBooking.traveler_details.lead_name}</strong> ({confirmedBooking.traveler_details.lead_phone})</span>
-              </div>
-
-              {/* QR CODE BOX */}
-              <div style={{ background: '#ffffff', padding: '14px', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1', textAlign: 'center', boxShadow: 'var(--shadow-sm)' }}>
-                <QrCode size={64} color="#0f172a" style={{ margin: '0 auto' }} />
-                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: 'var(--brand-primary)', marginTop: '4px' }}>
-                  {confirmedBooking.qr_voucher_code || 'TN-QR-BALI-99812'}
-                </span>
               </div>
             </div>
 
@@ -269,7 +271,7 @@ function CheckoutContent() {
 
   return (
     <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
-      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+      <Link href={searchParams.get('listing_id') ? `/tours/${searchParams.get('listing_id')}` : "/"} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
         <ArrowLeft size={16} /> Back to Experiences
       </Link>
 

@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { useAuth } from '@/context/AuthContext';
 import {
   Search, Download, Eye, CheckCircle2, XCircle,
-  RefreshCw, Copy, Calendar, Users, DollarSign, QrCode,
+  RefreshCw, Copy, Calendar, Users, DollarSign,
   FileText, ShieldCheck, Clock, Check, AlertCircle, ArrowUpRight
 } from 'lucide-react';
 
@@ -432,8 +432,13 @@ export default function BookingsManagementPage() {
                       <div style={{ fontSize: '0.78rem', color: '#64748b' }}>{b.traveler_details?.lead_email}</div>
                     </td>
 
-                    <td style={{ maxWidth: '240px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#334155', fontWeight: 600 }}>
-                      {b.option_name}
+                    <td style={{ maxWidth: '240px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#334155' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                        {b.traveler_details?.tour_name || b.listing_title || 'Activity Booking'}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
+                        Vehicle: {b.option_name}
+                      </div>
                     </td>
 
                     <td style={{ color: '#64748b', fontSize: '0.84rem' }}>
@@ -547,6 +552,25 @@ export default function BookingsManagementPage() {
                               </div>
                             )}
 
+                            {(b.traveler_details?.pickup_time || b.traveler_details?.pickup_location) && (
+                              <div style={{ marginTop: '16px', background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                <div style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 800, marginBottom: '6px' }}>
+                                  PICKUP DETAILS
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  {b.traveler_details?.pickup_time && (
+                                    <div style={{ fontSize: '0.85rem', color: '#334155' }}><strong>Time:</strong> {b.traveler_details.pickup_time}</div>
+                                  )}
+                                  {b.traveler_details?.pickup_location && (
+                                    <div style={{ fontSize: '0.85rem', color: '#334155' }}><strong>Location:</strong> {b.traveler_details.pickup_location}</div>
+                                  )}
+                                  {b.traveler_details?.dropoff_location && b.traveler_details.dropoff_location !== b.traveler_details.pickup_location && (
+                                    <div style={{ fontSize: '0.85rem', color: '#334155' }}><strong>Drop-off:</strong> {b.traveler_details.dropoff_location}</div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
                             {b.traveler_details?.guest_names && b.traveler_details.guest_names.length > 0 && (
                               <div style={{ marginTop: '16px' }}>
                                 <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700, marginBottom: '6px' }}>GUEST NAMES LIST</div>
@@ -561,28 +585,13 @@ export default function BookingsManagementPage() {
                             )}
                           </div>
 
-                          {/* Right Column: Voucher Code & Financials */}
+                          {/* Right Column: Financials */}
                           <div>
                             <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' }}>
-                              Voucher & Commission Ledger
+                              Financial Ledger
                             </h4>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <QrCode size={18} color="#0284c7" />
-                                  <span className="code-ref" style={{ fontSize: '0.9rem', color: '#0284c7' }}>{b.qr_voucher_code}</span>
-                                </div>
-
-                                <button
-                                  className="admin-filter-tab"
-                                  style={{ padding: '4px 10px', fontSize: '0.78rem' }}
-                                  onClick={() => handleCopyCode(b.qr_voucher_code)}
-                                >
-                                  {copiedCode === b.qr_voucher_code ? <Check size={14} color="#059669" /> : <Copy size={14} />}
-                                  {copiedCode === b.qr_voucher_code ? 'Copied!' : 'Copy Code'}
-                                </button>
-                              </div>
 
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '8px' }}>
                                 <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #f1f5f9' }}>

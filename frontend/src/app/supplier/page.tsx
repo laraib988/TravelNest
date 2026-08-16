@@ -20,7 +20,6 @@ import {
   DollarSign,
   Sparkles,
   Clock,
-  QrCode,
   FileText,
   PlusCircle
 } from 'lucide-react';
@@ -445,7 +444,6 @@ export default function SupplierPage() {
             {[
               { icon: PlusCircle, title: 'Listing Builder', desc: 'Create tours with photos, pricing tiers, time slots, and rich descriptions in minutes.', color: '#0284c7' },
               { icon: Calendar, title: 'Availability Calendar', desc: 'Manage daily slots, block dates, set seasonal pricing, and control inventory in real-time.', color: '#7c3aed' },
-              { icon: QrCode, title: 'QR Voucher Scanner', desc: 'Scan customer e-vouchers at the venue. Instant check-in with live booking validation.', color: '#059669' },
               { icon: BarChart3, title: 'Revenue Analytics', desc: 'Track gross sales, net earnings, platform fees, and payout history with visual insights.', color: '#d97706' },
               { icon: Sparkles, title: 'AI Description Writer', desc: 'Auto-generate SEO-optimized descriptions and pricing suggestions using AI.', color: '#e11d48' },
               { icon: Headphones, title: 'Priority Support', desc: 'Verified partners get dedicated account managers and priority customer support.', color: '#0f172a' },

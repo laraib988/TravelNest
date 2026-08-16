@@ -4,11 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchFromAPI } from '@/lib/api-client';
 import { 
-  QrCode, 
-  Calendar, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
   User, 
   Search, 
   ChevronRight,
@@ -18,9 +13,6 @@ import {
 export default function SupplierBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [scanModalOpen, setScanModalOpen] = useState(false);
-  const [qrCodeInput, setQrCodeInput] = useState('');
-  const [scanResult, setScanResult] = useState<any>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,24 +60,40 @@ export default function SupplierBookingsPage() {
     }
   };
 
-  const handleVerifyQR = () => {
-    if (!qrCodeInput.trim()) return;
-    const found = bookings.find(b => b.qr_voucher_code.toLowerCase().includes(qrCodeInput.trim().toLowerCase()) || b.booking_reference.toLowerCase().includes(qrCodeInput.trim().toLowerCase()));
-    if (found) {
-      setScanResult({ valid: true, booking: found, msg: '✓ VALID VOUCHER SCAN: Checked in successfully!' });
-    } else {
-      setScanResult({ valid: false, msg: '❌ INVALID VOUCHER CODE: No active booking found.' });
+  const handleAcceptSLA = async (id: string) => {
+    try {
+      const response = await fetch('/api/supplier/bookings/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId: id, status: 'CONFIRMED', supplierId: '8a290293-8ce5-4e7c-b604-aa3c6c95fc57' }) // using demo supplierId
+      });
+      if (response.ok) {
+        setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CONFIRMED' } : b));
+        setFeedbackMsg('✓ Booking SLA Request accepted and confirmed successfully!');
+      } else {
+        setFeedbackMsg('❌ Failed to confirm booking.');
+      }
+    } catch (err) {
+      setFeedbackMsg('❌ Error confirming booking.');
     }
   };
 
-  const handleAcceptSLA = (id: string) => {
-    setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CONFIRMED' } : b));
-    setFeedbackMsg('✓ Booking SLA Request accepted and confirmed successfully!');
-  };
-
-  const handleRejectSLA = (id: string) => {
-    setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
-    setFeedbackMsg('✓ Booking SLA Request rejected and customer refunded.');
+  const handleRejectSLA = async (id: string) => {
+    try {
+      const response = await fetch('/api/supplier/bookings/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId: id, status: 'CANCELLED', supplierId: '8a290293-8ce5-4e7c-b604-aa3c6c95fc57' }) // using demo supplierId
+      });
+      if (response.ok) {
+        setBookings(bookings.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
+        setFeedbackMsg('✓ Booking SLA Request rejected and customer refunded.');
+      } else {
+        setFeedbackMsg('❌ Failed to reject booking.');
+      }
+    } catch (err) {
+      setFeedbackMsg('❌ Error rejecting booking.');
+    }
   };
 
   return (
@@ -118,7 +126,7 @@ export default function SupplierBookingsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
           <Link href="/supplier" style={{ textDecoration: 'none', color: '#64748b' }}>Supplier Portal</Link>
           <ChevronRight size={14} color="#94a3b8" />
-          <span style={{ color: '#0f172a', fontWeight: 700 }}>Bookings & QR Voucher Scanner</span>
+          <span style={{ color: '#0f172a', fontWeight: 700 }}>Bookings</span>
         </div>
 
         {/* HEADING */}
@@ -128,20 +136,14 @@ export default function SupplierBookingsPage() {
               <ShieldCheck size={14} /> Real-Time Reservations & Check-In Inbox
             </div>
             <h1 style={{ fontSize: '2.4rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>
-              Supplier Bookings & Voucher Scanner
+              Supplier Bookings
             </h1>
             <p style={{ color: '#475569', marginTop: '6px', fontSize: '1rem' }}>
-              Manage 24h SLA requests, view traveler details, and scan customer QR vouchers at arrival.
+              Manage 24h SLA requests and view traveler details.
             </p>
           </div>
 
-          <button 
-            onClick={() => { setScanModalOpen(true); setScanResult(null); setQrCodeInput(''); }} 
-            className="btn-primary" 
-            style={{ padding: '12px 24px', fontSize: '0.92rem' }}
-          >
-            <QrCode size={18} /> Open QR Voucher Scanner
-          </button>
+
         </div>
 
         {/* BOOKINGS LIST */}
@@ -168,9 +170,6 @@ export default function SupplierBookingsPage() {
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Calendar size={14} /> {item.date || item.slot_start_time?.substring(0, 10) || '2026-08-15'} at {item.timeSlot || item.slot_start_time?.substring(11, 16) || '16:00'}
                     </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <QrCode size={14} color="#7c3aed" /> Voucher: <strong>{item.qr_voucher_code || 'TN-VOUCHER'}</strong>
-                    </span>
                   </div>
                 </div>
 
@@ -195,45 +194,6 @@ export default function SupplierBookingsPage() {
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {/* QR SCANNER MODAL */}
-        {scanModalOpen && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-            <div className="card-panel" style={{ width: '100%', maxWidth: '500px', padding: '32px', borderRadius: '24px', position: 'relative' }}>
-              <button onClick={() => setScanModalOpen(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
-              
-              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#f0f9ff', color: 'var(--brand-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', border: '1px solid #bae6fd' }}>
-                  <QrCode size={30} />
-                </div>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Scan Customer Voucher QR</h3>
-                <p style={{ color: '#64748b', fontSize: '0.88rem', marginTop: '4px' }}>Input QR code or reference string to mark customer check-in</p>
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                <input 
-                  type="text" 
-                  placeholder="e.g. TN-VOUCHER-BALI-8812" 
-                  value={qrCodeInput}
-                  onChange={e => setQrCodeInput(e.target.value)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #cbd5e1', outline: 'none', fontWeight: 700, textTransform: 'uppercase' }}
-                />
-                <button onClick={handleVerifyQR} className="btn-primary" style={{ padding: '12px 20px' }}>Verify</button>
-              </div>
-
-              {scanResult && (
-                <div style={{ padding: '16px', borderRadius: '12px', background: scanResult.valid ? '#ecfdf5' : '#fef2f2', border: `1px solid ${scanResult.valid ? '#a7f3d0' : '#fecdd3'}`, color: scanResult.valid ? '#047857' : '#b91c1c', fontSize: '0.9rem', fontWeight: 700 }}>
-                  {scanResult.msg}
-                  {scanResult.valid && (
-                    <div style={{ marginTop: '8px', fontSize: '0.82rem', color: '#0f172a', fontWeight: 600 }}>
-                      Lead Guest: {scanResult.booking.guest_name} • {scanResult.booking.travelers} Guests
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
           </div>
         )}
 

@@ -109,11 +109,11 @@ export default function CreateListingPage() {
           .then(res => res.json())
           .then(data => {
             if (data && !data.error) {
-              setBasicInfo(data.basic_info || basicInfo);
-              setPhotos(data.basic_info?.photos || photos);
-              setExperienceDetails({ ...experienceDetails, ...(data.experience_details || {}), faqs: data.experience_details?.faqs || [] });
+              setBasicInfo(prev => ({ ...prev, ...(data.basic_info || {}) }));
+              setPhotos(prev => ({ ...prev, ...(data.basic_info?.photos || {}) }));
+              setExperienceDetails(prev => ({ ...prev, ...(data.experience_details || {}), faqs: data.experience_details?.faqs || [] }));
               setTransportOptions(data.transport_pricing || transportOptions);
-              setLogistics(data.logistics || logistics);
+              setLogistics(prev => ({ ...prev, ...(data.logistics || {}) }));
               setItinerary(data.itinerary || itinerary);
               setCurrentStep(data.current_step || 1);
             }

@@ -49,9 +49,15 @@ export async function GET(request: Request) {
         
       if (listings) {
         const listingMap = listings.reduce((acc: any, l: any) => {
+          let imageUrl = null;
+          if (Array.isArray(l.basic_info?.photos)) {
+            imageUrl = l.basic_info?.photos?.[0]?.url;
+          } else if (l.basic_info?.photos?.gallery && Array.isArray(l.basic_info.photos.gallery)) {
+            imageUrl = l.basic_info.photos.gallery[0];
+          }
           acc[l.id] = {
             title: l.title,
-            image: l.basic_info?.photos?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'
+            image: imageUrl || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'
           };
           return acc;
         }, {});

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
@@ -51,10 +51,22 @@ export default function SupplierDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS' | 'BOOKINGS'>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS' | 'BOOKINGS' | 'FINANCE'>('DASHBOARD');
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>('PAYOUTS');
+  const [financeSearch, setFinanceSearch] = useState('');
+  
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [showBankForm, setShowBankForm] = useState(false);
+  const [toastMessage, setToastMessage] = useState<{title: string, message: string, type: 'success' | 'error'} | null>(null);
+
+  const triggerToast = (title: string, message: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage({ title, message, type });
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
   
   const [supplierBookings, setSupplierBookings] = useState<any[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
@@ -72,7 +84,7 @@ export default function SupplierDashboard() {
   }, [user]);
 
   useEffect(() => {
-    if (user && activeTab === 'BOOKINGS') {
+    if (user && (activeTab === 'BOOKINGS' || activeTab === 'FINANCE')) {
       setLoadingBookings(true);
       fetch(`/api/supplier/bookings?supplierId=${user.id}`)
         .then(res => res.json())
@@ -165,6 +177,12 @@ export default function SupplierDashboard() {
             >
               <Users size={18} /> Bookings
             </div>
+            <div 
+              onClick={() => setActiveTab('FINANCE')}
+              style={{ padding: '12px 16px', background: activeTab === 'FINANCE' ? '#f0f9ff' : 'transparent', color: activeTab === 'FINANCE' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'FINANCE' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+            >
+              <DollarSign size={18} /> Finance & Payouts
+            </div>
             <div style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
               <Settings size={18} /> Account Settings
             </div>
@@ -210,6 +228,509 @@ export default function SupplierDashboard() {
               </button>
             </div>
           </>
+        )}
+
+
+        {/* =========================================================================
+            FINANCE & PAYOUTS TAB
+           ========================================================================= */}
+        {activeTab === 'FINANCE' && (
+          <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>Finance & Payouts</h1>
+
+            {/* SUMMARY CARDS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+              <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>Total Earning</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
+                  ${supplierBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0).toLocaleString()}
+                </div>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '4px', borderRadius: '50%' }}><Clock size={14} /></div> Pending Payout
+                </div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
+                  ${supplierBookings.filter(b => b.status === 'CONFIRMED' && new Date(b.slot_start_time) > new Date()).reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0).toLocaleString()}
+                </div>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ background: '#fae8ff', color: '#c026d3', padding: '4px', borderRadius: '50%' }}><Banknote size={14} /></div> Loss from cancellation
+                </div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
+                  ${supplierBookings.filter(b => b.status === 'CANCELLED').reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0).toLocaleString()}
+                </div>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ background: '#fef9c3', color: '#ca8a04', padding: '4px', borderRadius: '50%' }}><CheckCircle size={14} /></div> Paid This Month
+                </div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
+                  ${supplierBookings.filter(b => (b.status === 'CONFIRMED' || b.status === 'COMPLETED') && new Date(b.created_at).getMonth() === new Date().getMonth()).reduce((acc, b) => acc + Number(b.supplier_payout || 0), 0).toLocaleString()}
+                </div>
+              </div>
+            </div>
+
+            {/* CHART (CSS Based) */}
+            <div style={{ padding: '40px 0', borderTop: '1px dashed #cbd5e1', borderBottom: '1px dashed #cbd5e1', marginBottom: '40px', position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '240px', paddingLeft: '40px' }}>
+                {/* Y-Axis labels */}
+                <div style={{ position: 'absolute', left: 0, top: '40px', bottom: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', width: '30px', textAlign: 'right' }}>
+                  <span>6000</span>
+                  <span>4500</span>
+                  <span>3000</span>
+                  <span>1500</span>
+                  <span>0</span>
+                </div>
+                {/* Grid lines */}
+                <div style={{ position: 'absolute', left: '40px', right: 0, top: '40px', bottom: '40px', zIndex: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  {[...Array(5)].map((_, i) => <div key={i} style={{ borderBottom: '1px dashed #e2e8f0', width: '100%', height: '0' }} />)}
+                </div>
+                
+                {/* Bars */}
+                {[ 
+                  { label: 'Oct', val1: 4200, val2: 1000 },
+                  { label: 'Nov', val1: 3800, val2: 900 },
+                  { label: 'Dec', val1: 5200, val2: 1200 },
+                  { label: 'Jan', val1: 4600, val2: 1100 }
+                ].map((m, i) => (
+                  <div key={i} style={{ zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '240px' }}>
+                      <div style={{ width: '60px', background: '#818cf8', height: `${(m.val1/6000)*100}%`, borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}></div>
+                      <div style={{ width: '60px', background: '#86efac', height: `${(m.val2/6000)*100}%`, borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}></div>
+                    </div>
+                    <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>{m.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* TABS */}
+            <div style={{ display: 'flex', gap: '12px', background: '#f1f5f9', padding: '6px', borderRadius: '100px', width: 'fit-content', marginBottom: '24px' }}>
+              {['PAYOUTS', 'INVOICES', 'CONFIRMATION', 'SETTINGS'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setFinanceTab(tab as any)}
+                  style={{
+                    padding: '10px 24px',
+                    borderRadius: '100px',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    background: financeTab === tab ? '#ffffff' : 'transparent',
+                    color: financeTab === tab ? '#0f172a' : '#64748b',
+                    boxShadow: financeTab === tab ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
+                  }}
+                >
+                  {tab === 'PAYOUTS' ? 'Bookings for Payout' : 
+                   tab === 'INVOICES' ? 'Invoices' : 
+                   tab === 'CONFIRMATION' ? 'Payment Confirmation' : 'Payment Setting'}
+                </button>
+              ))}
+            </div>
+
+            {financeTab === 'PAYOUTS' && (
+              <>
+                {/* SEARCH BAR */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '10px 16px', width: '320px' }}>
+                    <Search size={18} color="#94a3b8" />
+                    <input 
+                      type="text" 
+                      placeholder="Search bookings.." 
+                      value={financeSearch}
+                      onChange={e => setFinanceSearch(e.target.value)}
+                      style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', marginLeft: '12px', fontSize: '0.9rem' }}
+                    />
+                  </div>
+                  <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <SlidersHorizontal size={20} />
+                  </button>
+                </div>
+
+                {/* TABLE */}
+                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc', color: '#475569', fontSize: '0.8rem', fontWeight: 800 }}>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0', width: '40px' }}><input type="checkbox" /></th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Booking Reference</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Lead Traveler</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Product Code</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Activity Date</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Retail Price</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Net Price</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {supplierBookings
+                        .filter(b => b.booking_reference?.toLowerCase().includes(financeSearch.toLowerCase()) || b.traveler_details?.lead_name?.toLowerCase().includes(financeSearch.toLowerCase()))
+                        .map((b, i) => {
+                        const isUpcoming = new Date(b.slot_start_time) > new Date();
+                        const isPaid = !isUpcoming && b.status === 'CONFIRMED';
+                        
+                        return (
+                        <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                          <td style={{ padding: '16px' }}><input type="checkbox" /></td>
+                          <td style={{ padding: '16px', fontWeight: 600, color: '#0f172a' }}>{b.booking_reference}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{b.traveler_details?.lead_name || 'N/A'}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{b.listing_id.substring(0,8).toUpperCase()}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{new Date(b.slot_start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                          <td style={{ padding: '16px', fontWeight: 600, color: '#0f172a' }}>${b.gross_amount}</td>
+                          <td style={{ padding: '16px', fontWeight: 600, color: '#0f172a' }}>${b.supplier_payout}</td>
+                          <td style={{ padding: '16px' }}>
+                            {isPaid ? (
+                              <span style={{ color: '#059669', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Paid</span>
+                            ) : b.status === 'CANCELLED' ? (
+                              <span style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>Cancelled</span>
+                            ) : (
+                              <span style={{ color: '#2563eb', fontSize: '0.75rem', fontWeight: 800 }}>Ready for Payout</span>
+                            )}
+                          </td>
+                        </tr>
+                      )})}
+                      {supplierBookings.length === 0 && (
+                        <tr>
+                          <td colSpan={8} style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>No bookings found for payout.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+            
+
+            {financeTab === 'CONFIRMATION' && (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Payment Confirmations</h2>
+                  <button className="btn-primary" style={{ padding: '10px 16px', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', background: '#1e3a8a', border: 'none', color: '#fff', cursor: 'pointer' }}>
+                    <Download size={16} /> Download PDF
+                  </button>
+                </div>
+                
+                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc', color: '#0f172a', fontSize: '0.85rem', fontWeight: 800 }}>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Date</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Payment ID</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Amount</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Method</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Status</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.values(supplierBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').reduce((acc, b) => {
+                         const date = new Date(b.created_at || b.slot_start_time);
+                         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                         if (!acc[key]) {
+                            acc[key] = {
+                               dateStr: `${date.toLocaleString('default', { month: 'short' })} 14, ${date.getFullYear()}`,
+                               paymentId: `PAY-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(3, '0')}`,
+                               amount: 0,
+                               method: Math.random() > 0.5 ? 'Bank Transfer' : 'PayPal',
+                               status: date.getMonth() === new Date().getMonth() ? 'Processing' : 'Completed'
+                            };
+                         }
+                         acc[key].amount += Number(b.supplier_payout || 0);
+                         return acc;
+                      }, {})).map((p: any, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                          <td style={{ padding: '16px', color: '#0f172a' }}>{p.dateStr}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{p.paymentId}</td>
+                          <td style={{ padding: '16px', fontWeight: 800, color: '#0f172a' }}>${p.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{p.method}</td>
+                          <td style={{ padding: '16px' }}>
+                            {p.status === 'Completed' ? (
+                              <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Completed</span>
+                            ) : (
+                              <span style={{ background: '#fef3c7', color: '#92400e', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Processing</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '16px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                                <Eye size={14} /> View
+                              </button>
+                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                                <Download size={14} /> PDF
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {supplierBookings.length === 0 && (
+                        <tr>
+                          <td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>No payment confirmations yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                  
+                  <div style={{ padding: '16px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', borderTop: '1px solid #e2e8f0', background: '#fff' }}>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}><ChevronLeft size={18} color="#64748b" /></button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <span style={{ background: '#1e3a8a', color: '#fff', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.85rem', fontWeight: 700 }}>1</span>
+                      <span style={{ color: '#475569', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.85rem', border: '1px solid #e2e8f0' }}>2</span>
+                      <span style={{ color: '#475569', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.85rem', border: '1px solid #e2e8f0' }}>3</span>
+                    </div>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}><ChevronRight size={18} color="#64748b" /></button>
+                  </div>
+                </div>
+              </>
+            )}
+
+
+            {financeTab === 'INVOICES' && (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Invoices</h2>
+                  <button className="btn-primary" style={{ padding: '10px 16px', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', background: '#1e3a8a', border: 'none', color: '#fff', cursor: 'pointer' }}>
+                    <Download size={16} /> Download PDF
+                  </button>
+                </div>
+                
+                <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc', color: '#0f172a', fontSize: '0.85rem', fontWeight: 800 }}>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Date</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Invoice #</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Amount</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Due Date</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Status</th>
+                        <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.values(supplierBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'COMPLETED').reduce((acc, b) => {
+                         const date = new Date(b.created_at || b.slot_start_time);
+                         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                         if (!acc[key]) {
+                            const dueDate = new Date(date);
+                            dueDate.setDate(dueDate.getDate() + 15); // Net 15 terms
+                            
+                            acc[key] = {
+                               dateStr: `${date.toLocaleString('default', { month: 'short' })} 14, ${date.getFullYear()}`,
+                               dueDateStr: `${dueDate.toLocaleString('default', { month: 'short' })} 29, ${dueDate.getFullYear()}`,
+                               invoiceId: `INV-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(3, '0')}`,
+                               amount: 0,
+                               status: date.getMonth() === new Date().getMonth() ? 'Processing' : 'Paid'
+                            };
+                         }
+                         acc[key].amount += Number(b.supplier_payout || 0);
+                         return acc;
+                      }, {})).map((p: any, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                          <td style={{ padding: '16px', color: '#0f172a' }}>{p.dateStr}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{p.invoiceId}</td>
+                          <td style={{ padding: '16px', fontWeight: 800, color: '#0f172a' }}>${p.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                          <td style={{ padding: '16px', color: '#475569' }}>{p.dueDateStr}</td>
+                          <td style={{ padding: '16px' }}>
+                            {p.status === 'Paid' ? (
+                              <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 14px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Paid</span>
+                            ) : (
+                              <span style={{ background: '#fef3c7', color: '#92400e', padding: '4px 14px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700 }}>Pending</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '16px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                                <Eye size={14} /> View
+                              </button>
+                              <button style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                                <Download size={14} /> PDF
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {supplierBookings.length === 0 && (
+                        <tr>
+                          <td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>No invoices yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                  
+                  <div style={{ padding: '16px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', borderTop: '1px solid #e2e8f0', background: '#fff' }}>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}><ChevronLeft size={18} color="#64748b" /></button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <span style={{ background: '#1e3a8a', color: '#fff', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.85rem', fontWeight: 700 }}>1</span>
+                      <span style={{ color: '#475569', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.85rem', border: '1px solid #e2e8f0' }}>2</span>
+                      <span style={{ color: '#475569', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '0.85rem', border: '1px solid #e2e8f0' }}>3</span>
+                    </div>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}><ChevronRight size={18} color="#64748b" /></button>
+                  </div>
+                </div>
+              </>
+            )}
+
+
+            {financeTab === 'SETTINGS' && (
+              <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Payment Settings</h2>
+                    <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.9rem' }}>Manage your bank accounts for international payouts.</p>
+                  </div>
+                  {!showBankForm && (
+                    <button 
+                      onClick={() => setShowBankForm(true)}
+                      style={{ padding: '10px 16px', borderRadius: '8px', background: '#0f172a', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                      <Plus size={16} /> Add Another Payment Method
+                    </button>
+                  )}
+                </div>
+
+                {!showBankForm && bankAccounts.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {bankAccounts.map((account) => (
+                      <div key={account.id} style={{ background: '#fff', borderRadius: '16px', border: account.is_primary ? '2px solid #10b981' : '1px solid #e2e8f0', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: account.is_primary ? '0 4px 12px rgba(16, 185, 129, 0.1)' : 'none' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{account.bank_name}</h3>
+                            {account.is_primary && (
+                              <span style={{ background: '#ecfdf5', color: '#047857', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 800, border: '1px solid #a7f3d0' }}>PRIMARY</span>
+                            )}
+                          </div>
+                          <div style={{ color: '#475569', fontSize: '0.9rem', marginBottom: '4px' }}>{account.bank_account_holder} • {account.bank_account_number}</div>
+                          <div style={{ color: '#64748b', fontSize: '0.8rem' }}>{account.bank_country} • {account.bank_currency} • Routing: {account.bank_routing_number}</div>
+                        </div>
+                        {!account.is_primary && (
+                          <button 
+                            onClick={async () => {
+                              try {
+                                const res = await fetch('/api/supplier/bank-details/set-primary', {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ supplierId: user?.id, accountId: account.id })
+                                });
+                                if (res.ok) {
+                                  setBankAccounts(prev => prev.map(a => ({ ...a, is_primary: a.id === account.id })));
+                                  triggerToast('Primary Updated', 'Successfully changed your primary payout account.');
+                                }
+                              } catch (err) {}
+                            }}
+                            style={{ padding: '8px 16px', borderRadius: '8px', background: '#f8fafc', color: '#475569', fontWeight: 700, border: '1px solid #cbd5e1', cursor: 'pointer' }}
+                          >
+                            Set as Primary
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {showBankForm && (
+                  <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '32px' }}>
+                    <form onSubmit={async (e: any) => {
+                      e.preventDefault();
+                      const btn = document.getElementById('save_bank_btn');
+                      if (btn) btn.innerText = 'Saving...';
+                      
+                      try {
+                        const formData = new FormData(e.target);
+                        const bankDetails = {
+                          account_holder: formData.get('bank_account_name'),
+                          bank_name: formData.get('bank_name'),
+                          account_number: formData.get('bank_account_number'),
+                          routing_number: formData.get('bank_routing'),
+                          country: formData.get('bank_country'),
+                          currency: formData.get('bank_currency')
+                        };
+                        const isPrimary = formData.get('is_primary') === 'on';
+
+                        const res = await fetch('/api/supplier/bank-details/update', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ supplierId: user?.id, bankDetails, isPrimary })
+                        });
+                        if (res.ok) {
+                          // Fetch latest accounts
+                          const fetchRes = await fetch(`/api/supplier/bank-details?supplierId=${user?.id}`);
+                          const data = await fetchRes.json();
+                          setBankAccounts(data);
+                          setShowBankForm(false);
+                          triggerToast('Awesome!', 'Your new payment method has been added successfully.');
+                        } else {
+                          const data = await res.json();
+                          triggerToast('Error', data.error, 'error');
+                        }
+                      } catch (err) {
+                        triggerToast('Error', 'Network error saving bank details.', 'error');
+                      }
+                      if (btn) btn.innerText = 'Save Payment Settings';
+                    }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Account Holder Name</label>
+                          <input name="bank_account_name" id="bank_account_name" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="John Doe" required />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Bank Name</label>
+                          <input name="bank_name" id="bank_name" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="Chase Bank" required />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Account Number / IBAN</label>
+                          <input name="bank_account_number" id="bank_account_number" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="GB0000..." required />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Routing / SWIFT / BIC</label>
+                          <input name="bank_routing" id="bank_routing" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="CHASUS..." required />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Bank Country</label>
+                          <select name="bank_country" id="bank_country" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', background: '#fff' }} required>
+                            <option value="US">United States</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="EU">European Union</option>
+                            <option value="AE">United Arab Emirates</option>
+                            <option value="AU">Australia</option>
+                            <option value="SG">Singapore</option>
+                            <option value="JP">Japan</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Payout Currency</label>
+                          <select name="bank_currency" id="bank_currency" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', background: '#fff' }} required>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                            <option value="AED">AED (د.إ)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <input name="is_primary" type="checkbox" id="is_primary" defaultChecked={bankAccounts.length === 0} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                        <label htmlFor="is_primary" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>Make this my primary payout method</label>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
+                        {bankAccounts.length > 0 && (
+                          <button type="button" onClick={() => setShowBankForm(false)} style={{ padding: '12px 24px', borderRadius: '8px', background: '#fff', color: '#64748b', fontWeight: 700, border: '1px solid #cbd5e1', cursor: 'pointer' }}>
+                            Cancel
+                          </button>
+                        )}
+                        <button type="submit" id="save_bank_btn" style={{ padding: '12px 24px', borderRadius: '8px', background: '#0f172a', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+                          Save Payment Settings
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
 
         {activeTab === 'LISTINGS' && (
@@ -294,10 +815,9 @@ export default function SupplierDashboard() {
             </div>
           </>
         )}
-      </div>
 
         {activeTab === 'BOOKINGS' && (
-          <div style={{ flex: 1, padding: '40px', overflowY: 'auto', background: '#f8fafc' }}>
+          <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
               <div>
                 <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>Customer Bookings</h1>
@@ -330,7 +850,23 @@ export default function SupplierDashboard() {
                       <tr key={b.id} style={{ borderBottom: idx < supplierBookings.length - 1 ? '1px solid #e2e8f0' : 'none' }}>
                         <td style={{ padding: '16px 24px' }}>
                           <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{b.traveler_details?.lead_name || 'Guest'}</div>
-                          <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>{b.listing_title || b.option_name}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>{b.traveler_details?.lead_email}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px' }}>{b.traveler_details?.lead_phone}</div>
+                          {b.traveler_details?.special_requirements && (
+                            <div style={{ fontSize: '0.75rem', color: '#d97706', marginTop: '4px', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px', display: 'inline-block' }}>
+                              Note: {b.traveler_details.special_requirements}
+                            </div>
+                          )}
+                          {(b.traveler_details?.pickup_time || b.traveler_details?.pickup_location) && (
+                            <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '6px' }}>
+                              <div style={{ fontWeight: 600 }}>Pickup Details:</div>
+                              {b.traveler_details?.pickup_time && <div>Time: {b.traveler_details.pickup_time}</div>}
+                              {b.traveler_details?.pickup_location && <div>Location: {b.traveler_details.pickup_location}</div>}
+                              {b.traveler_details?.dropoff_location && b.traveler_details.dropoff_location !== b.traveler_details.pickup_location && <div>Drop-off: {b.traveler_details.dropoff_location}</div>}
+                            </div>
+                          )}
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '6px', fontWeight: 600 }}>Tour: {b.traveler_details?.tour_name || b.listing_title || 'N/A'}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '2px', fontWeight: 600 }}>Vehicle: {b.option_name}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', marginTop: '2px' }}>Ref: {b.booking_reference}</div>
                         </td>
                         <td style={{ padding: '16px 24px' }}>
@@ -368,15 +904,36 @@ export default function SupplierDashboard() {
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                               <button 
                                 onClick={async () => {
-                                  await fetch(`/api/bookings/${b.id}/status`, { method: 'PATCH', body: JSON.stringify({ action: 'approve' }) });
+                                  if (!confirm('Approve this booking?')) return;
+                                  const res = await fetch('/api/supplier/bookings/update', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' }, 
+                                    body: JSON.stringify({ bookingId: b.id, status: 'CONFIRMED', supplierId: user?.id }) 
+                                  });
+                                  if (res.ok) {
+                                    setSupplierBookings(prev => prev.map(book => book.id === b.id ? { ...book, status: 'CONFIRMED' } : book));
+                                  } else {
+                                    alert('Failed to approve booking.');
+                                  }
                                 }}
-                                style={{ padding: '6px 12px', borderRadius: '6px', background: '#dcfce7', color: '#166534', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                                className="btn-primary" 
+                                style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: '6px' }}
                               >
                                 Approve
                               </button>
                               <button 
                                 onClick={async () => {
-                                  await fetch(`/api/bookings/${b.id}/status`, { method: 'PATCH', body: JSON.stringify({ action: 'reject' }) });
+                                  if (!confirm('Reject this booking?')) return;
+                                  const res = await fetch('/api/supplier/bookings/update', { 
+                                    method: 'POST', 
+                                    headers: { 'Content-Type': 'application/json' }, 
+                                    body: JSON.stringify({ bookingId: b.id, status: 'REJECTED', supplierId: user?.id }) 
+                                  });
+                                  if (res.ok) {
+                                    setSupplierBookings(prev => prev.map(book => book.id === b.id ? { ...book, status: 'REJECTED' } : book));
+                                  } else {
+                                    alert('Failed to reject booking.');
+                                  }
                                 }}
                                 style={{ padding: '6px 12px', borderRadius: '6px', background: '#fee2e2', color: '#991b1b', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
                               >
@@ -391,8 +948,9 @@ export default function SupplierDashboard() {
                 </table>
               )}
             </div>
-          </div>
+          </>
         )}
+      </div>
 
       {/* Custom Delete Confirmation Modal */}
       {deleteConfirmId && (

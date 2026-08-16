@@ -27,7 +27,7 @@ interface Listing {
   merchandising_badges: string[];
   images: Array<{ url: string; alt: string }>;
   confirmation_type: string;
-  status: 'LIVE' | 'PENDING_APPROVAL' | 'DRAFT' | 'DEACTIVATED' | 'NEEDS_FIX' | 'PENDING_DELETION' | 'REJECTED';
+  status: 'PUBLISHED' | 'PENDING_APPROVAL' | 'DRAFT' | 'DEACTIVATED' | 'NEEDS_FIX' | 'PENDING_DELETION' | 'REJECTED';
   raw_data?: any;
 }
 
@@ -82,7 +82,7 @@ export default function ListingsManagementPage() {
         setListings(
           data.map((l: any, idx: number) => ({
             ...l,
-            status: l.status || (idx % 3 === 0 ? 'PENDING_APPROVAL' : 'LIVE'),
+            status: l.status || (idx % 3 === 0 ? 'PENDING_APPROVAL' : 'PUBLISHED'),
             duration_minutes: l.duration_minutes || 180,
           }))
         );
@@ -119,7 +119,7 @@ export default function ListingsManagementPage() {
       }
 
       setListings((prev) =>
-        prev.map((l) => (l.id === id ? { ...l, status: 'LIVE' } : l))
+        prev.map((l) => (l.id === id ? { ...l, status: 'PUBLISHED' } : l))
       );
       triggerAction(`Product Approved & Published: "${title}"!`);
     } catch (e: any) {
@@ -128,16 +128,34 @@ export default function ListingsManagementPage() {
     }
   };
 
-  const handleToggleStatus = (id: string, currentStatus: string, title: string) => {
-    const nextStatus = currentStatus === 'LIVE' ? 'DEACTIVATED' : 'LIVE';
+  const handleToggleStatus = async (id: string, currentStatus: string, title: string) => {
+    const nextStatus = currentStatus === 'PUBLISHED' ? 'DEACTIVATED' : 'PUBLISHED';
+    
+    // Optimistically update the UI
     setListings((prev) =>
       prev.map((l) => (l.id === id ? { ...l, status: nextStatus as any } : l))
     );
     triggerAction(
-      nextStatus === 'LIVE'
+      nextStatus === 'PUBLISHED'
         ? `Product ACTIVATED: "${title}"`
         : `Product DEACTIVATED: "${title}"`
     );
+
+    try {
+      const res = await fetch('/api/admin/listings/toggle-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: id, status: nextStatus })
+      });
+      if (!res.ok) throw new Error('Failed to update status on server');
+    } catch (e) {
+      console.error(e);
+      // Revert on failure
+      setListings((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status: currentStatus as any } : l))
+      );
+      triggerAction('Failed to update product status.');
+    }
   };
 
   const triggerAction = (msg: string) => {
@@ -147,7 +165,7 @@ export default function ListingsManagementPage() {
 
   // Unique categories list for tab filters
   const categories = ['All', ...Array.from(new Set(listings.map((l) => l.category_name)))];
-  const statuses = ['All', 'LIVE', 'PENDING_APPROVAL', 'DEACTIVATED'];
+  const statuses = ['All', 'PUBLISHED', 'PENDING_APPROVAL', 'DEACTIVATED'];
 
   const filteredListings = listings.filter((l) => {
     if (selectedCategory !== 'All' && l.category_name !== selectedCategory) return false;
@@ -159,7 +177,7 @@ export default function ListingsManagementPage() {
     return true;
   });
 
-  const totalLive = listings.filter((l) => l.status === 'LIVE').length;
+  const totalLive = listings.filter((l) => l.status === 'PUBLISHED').length;
   const totalPending = listings.filter((l) => l.status === 'PENDING_APPROVAL').length;
   const avgRating = (listings.reduce((acc, l) => acc + (l.cached_rating_avg || 4.5), 0) / (listings.length || 1)).toFixed(1);
 
@@ -421,7 +439,7 @@ export default function ListingsManagementPage() {
                 </div>
 
                 <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-                  <span className={`admin-badge ${l.status === 'PENDING_APPROVAL' ? 'admin-badge--pending' : l.status === 'LIVE' ? 'admin-badge--confirmed' : 'admin-badge--cancelled'}`}>
+                  <span className={`admin-badge admin-badge--${(l.status || '').toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-')}`}>
                     {l.status.replace(/_/g, ' ')}
                   </span>
                 </div>
@@ -517,8 +535,8 @@ export default function ListingsManagementPage() {
                         fontSize: '0.82rem',
                         fontWeight: 800,
                         borderRadius: '9999px',
-                        background: l.status === 'LIVE' ? '#fff1f2' : '#ecfdf5',
-                        color: l.status === 'LIVE' ? '#e11d48' : '#047857',
+                        background: l.status === 'PUBLISHED' ? '#fff1f2' : '#ecfdf5',
+                        color: l.status === 'PUBLISHED' ? '#e11d48' : '#047857',
                         border: 'none',
                         cursor: 'pointer',
                         display: 'inline-flex',
@@ -526,7 +544,7 @@ export default function ListingsManagementPage() {
                         gap: '4px'
                       }}
                       onClick={() => handleToggleStatus(l.id, l.status, l.title)}
-                      title={l.status === 'LIVE' ? 'Deactivate Product' : 'Activate Product'}
+                      title={l.status === 'PUBLISHED' ? 'Deactivate Product' : 'Activate Product'}
                     >
                       <PowerOff size={14} />
                     </button>
@@ -591,7 +609,7 @@ export default function ListingsManagementPage() {
                     </div>
                   </td>
                   <td>
-                    <span className={`admin-badge ${l.status === 'PENDING_APPROVAL' ? 'admin-badge--pending' : l.status === 'LIVE' ? 'admin-badge--confirmed' : 'admin-badge--cancelled'}`}>
+                    <span className={`admin-badge admin-badge--${(l.status || '').toLowerCase().replace(/_/g, '-').replace(/\s+/g, '-')}`}>
                       {l.status.replace(/_/g, ' ')}
                     </span>
                   </td>
@@ -747,8 +765,8 @@ export default function ListingsManagementPage() {
                           fontSize: '0.82rem',
                           fontWeight: 800,
                           borderRadius: '9999px',
-                          background: l.status === 'LIVE' ? '#fff1f2' : '#ecfdf5',
-                          color: l.status === 'LIVE' ? '#e11d48' : '#047857',
+                          background: l.status === 'PUBLISHED' ? '#fff1f2' : '#ecfdf5',
+                          color: l.status === 'PUBLISHED' ? '#e11d48' : '#047857',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'inline-flex',
@@ -1097,10 +1115,10 @@ export default function ListingsManagementPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'sticky', top: '94px' }}>
                 
                 {/* Status Box */}
-                <div style={{ background: previewListing.status === 'LIVE' ? '#ecfdf5' : previewListing.status === 'PENDING_APPROVAL' ? '#fffbeb' : '#ffffff', border: `1px solid ${previewListing.status === 'LIVE' ? '#a7f3d0' : previewListing.status === 'PENDING_APPROVAL' ? '#fde68a' : '#e2e8f0'}`, borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: previewListing.status === 'LIVE' ? '#059669' : previewListing.status === 'PENDING_APPROVAL' ? '#d97706' : '#64748b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {previewListing.status === 'LIVE' ? <CheckCircle2 size={20} /> : <Clock size={20} />} 
-                    {previewListing.status === 'LIVE' ? 'Product is Live' : previewListing.status === 'PENDING_APPROVAL' ? 'Pending Approval' : 'Deactivated'}
+                <div style={{ background: previewListing.status === 'PUBLISHED' ? '#ecfdf5' : previewListing.status === 'PENDING_APPROVAL' ? '#fffbeb' : '#ffffff', border: `1px solid ${previewListing.status === 'PUBLISHED' ? '#a7f3d0' : previewListing.status === 'PENDING_APPROVAL' ? '#fde68a' : '#e2e8f0'}`, borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: previewListing.status === 'PUBLISHED' ? '#059669' : previewListing.status === 'PENDING_APPROVAL' ? '#d97706' : '#64748b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {previewListing.status === 'PUBLISHED' ? <CheckCircle2 size={20} /> : <Clock size={20} />} 
+                    {previewListing.status === 'PUBLISHED' ? 'Product is Live' : previewListing.status === 'PENDING_APPROVAL' ? 'Pending Approval' : 'Deactivated'}
                   </h3>
                   <div style={{ fontSize: '0.9rem', color: '#475569', lineHeight: 1.6 }}>
                     {previewListing.status === 'PENDING_APPROVAL' 
@@ -1183,7 +1201,7 @@ export default function ListingsManagementPage() {
                 merchandising_badges: ['NEW', 'FEATURED'],
                 images: [{ url: newTourForm.imageUrl || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80', alt: newTourTitle }],
                 confirmation_type: newTourForm.confirmation_type,
-                status: 'LIVE'
+                status: 'PUBLISHED'
               };
 
               setListings([newTour, ...listings]);

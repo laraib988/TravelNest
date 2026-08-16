@@ -14,16 +14,33 @@ export async function GET() {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data, error } = await supabaseAdmin
+    const { data: kycData, error: kycError } = await supabaseAdmin
       .from('supplier_kyc_records')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (kycError) {
+      return NextResponse.json({ error: kycError.message }, { status: 400 });
     }
 
-    return NextResponse.json(data || [], { status: 200 });
+    const { data: bankData, error: bankError } = await supabaseAdmin
+      .from('supplier_bank_accounts')
+      .select('*');
+
+    if (bankError) {
+      // Just log it, don't fail the whole request
+      console.error('Failed to fetch bank accounts:', bankError);
+    }
+
+    const records = (kycData || []).map((record) => {
+      const bankAccounts = (bankData || []).filter(b => b.supplier_id === record.user_id);
+      return {
+        ...record,
+        bankAccounts
+      };
+    });
+
+    return NextResponse.json(records, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

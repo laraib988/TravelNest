@@ -133,6 +133,11 @@ export default function TourDetailPage() {
     : '';
 
   const handleAcquireHold = async () => {
+    if (capacityWarning) {
+      setErrorMsg(capacityWarning);
+      return;
+    }
+
     // Build robust defaults so checkout NEVER blocks
     const optionToUse = selectedOption || {
       id: tour?.options?.[0]?.id || 'opt-default',
@@ -720,11 +725,11 @@ export default function TourDetailPage() {
 
             <button
               onClick={handleAcquireHold}
-              disabled={holding || remainingSeats <= 0}
+              disabled={holding || remainingSeats <= 0 || !!capacityWarning}
               className="btn-primary"
-              style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.05rem' }}
+              style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.05rem', opacity: (holding || remainingSeats <= 0 || !!capacityWarning) ? 0.5 : 1 }}
             >
-              {holding ? 'Acquiring Lock...' : remainingSeats > 0 ? 'Checkout' : 'Sold Out'}
+              {holding ? 'Acquiring Lock...' : remainingSeats <= 0 ? 'Sold Out' : !!capacityWarning ? 'Exceeds Capacity' : 'Checkout'}
               <ArrowRight size={18} />
             </button>
 

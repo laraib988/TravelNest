@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
-import { Calendar, Users, QrCode, Compass, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { Calendar, Users, Compass, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function MyBookingsPage() {
@@ -20,37 +20,16 @@ export default function MyBookingsPage() {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const data = await fetchFromAPI('/users/me/bookings');
-      setBookings(Array.isArray(data) ? data : (data.data || []));
+      const res = await fetch('/api/customer/bookings');
+      if (res.ok) {
+        const data = await res.json();
+        setBookings(Array.isArray(data) ? data : (data.data || []));
+      } else {
+        setBookings([]);
+      }
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
-      // Mock data fallback if endpoint doesn't exist
-      setBookings([
-        {
-          id: 'bk_1',
-          tour_image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80',
-          title: 'Bali Highlights: Mount Batur Sunrise Trek',
-          date: '2026-10-15',
-          status: 'CONFIRMED',
-          travelers: 2,
-          gross_amount: 120.0,
-          currency: 'USD',
-          qr_voucher_code: 'TN-QR-BALI-99812',
-          lead_name: 'Ayesha Khan',
-        },
-        {
-          id: 'bk_2',
-          tour_image: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400&q=80',
-          title: 'Private Yacht Charter Dubai Marina',
-          date: '2026-07-10',
-          status: 'COMPLETED',
-          travelers: 4,
-          gross_amount: 850.0,
-          currency: 'USD',
-          qr_voucher_code: 'TN-QR-DXB-44321',
-          lead_name: 'Ayesha Khan',
-        }
-      ]);
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -115,7 +94,13 @@ export default function MyBookingsPage() {
               <div key={booking.id} className="card-panel" style={{ borderRadius: '24px', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                   <div style={{ padding: '24px', display: 'flex', gap: '24px', flex: 1, minWidth: '300px' }}>
-                    <img src={booking.tour_image} alt={booking.title} style={{ width: '120px', height: '120px', borderRadius: '16px', objectFit: 'cover' }} />
+                    <div style={{ width: '120px', height: '120px', borderRadius: '16px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden' }}>
+                      {booking.listing_image ? (
+                        <img src={booking.listing_image} alt="Tour" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <Compass size={40} />
+                      )}
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <span className={getStatusBadgeClass(booking.status)} style={{ display: 'inline-block', width: 'fit-content', marginBottom: '8px' }}>
@@ -125,10 +110,11 @@ export default function MyBookingsPage() {
                           💳 {booking.payment_status || 'PAID'}
                         </span>
                       </div>
-                      <h3 style={{ fontSize: '1.25rem', marginBottom: '10px', fontWeight: 700, color: '#0f172a' }}>{booking.title}</h3>
+                      <h3 style={{ fontSize: '1.25rem', marginBottom: '10px', fontWeight: 700, color: '#0f172a' }}>{booking.traveler_details?.tour_name || booking.listing_title || 'Activity Booking'}</h3>
+                      <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '12px', fontWeight: 600 }}>Vehicle / Option: {booking.option_name}</div>
                       <div style={{ display: 'flex', gap: '16px', color: '#64748b', fontSize: '0.85rem' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> {booking.date}</span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Users size={14} /> {booking.travelers} Guests</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> {new Date(booking.slot_start_time || booking.created_at).toLocaleDateString()}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Users size={14} /> {booking.total_travelers} Guests</span>
                       </div>
                     </div>
                   </div>
@@ -149,16 +135,26 @@ export default function MyBookingsPage() {
                   <div style={{ padding: '24px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
                     <div>
                       <h4 style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '6px' }}>Traveler Details</h4>
-                      <p style={{ fontWeight: 700, color: '#0f172a' }}>Lead Guest: {booking.lead_name}</p>
+                      <p style={{ fontWeight: 700, color: '#0f172a' }}>Lead Guest: {booking.traveler_details?.lead_name || booking.lead_name}</p>
+                      <p style={{ fontSize: '0.85rem', color: '#475569', margin: '4px 0' }}>Email: {booking.traveler_details?.lead_email}</p>
+                      <p style={{ fontSize: '0.85rem', color: '#475569', margin: '0' }}>Phone: {booking.traveler_details?.lead_phone}</p>
+                      {booking.traveler_details?.special_requirements && (
+                        <p style={{ fontSize: '0.85rem', color: '#d97706', margin: '4px 0', background: '#fef3c7', padding: '4px 8px', borderRadius: '4px', display: 'inline-block' }}>
+                          Note: {booking.traveler_details.special_requirements}
+                        </p>
+                      )}
+                      {(booking.traveler_details?.pickup_location || booking.traveler_details?.pickup_time) && (
+                        <div style={{ marginTop: '12px' }}>
+                          <h4 style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '6px' }}>Pickup Details</h4>
+                          {booking.traveler_details?.pickup_time && <p style={{ fontSize: '0.85rem', color: '#475569', margin: '2px 0' }}>Time: {booking.traveler_details.pickup_time}</p>}
+                          {booking.traveler_details?.pickup_location && <p style={{ fontSize: '0.85rem', color: '#475569', margin: '2px 0' }}>Location: {booking.traveler_details.pickup_location}</p>}
+                          {booking.traveler_details?.dropoff_location && booking.traveler_details.dropoff_location !== booking.traveler_details.pickup_location && <p style={{ fontSize: '0.85rem', color: '#475569', margin: '2px 0' }}>Drop-off: {booking.traveler_details.dropoff_location}</p>}
+                        </div>
+                      )}
                       <h4 style={{ color: '#64748b', fontSize: '0.85rem', margin: '16px 0 6px 0' }}>Booking Reference</h4>
                       <p style={{ fontWeight: 700, color: '#0f172a' }}>{booking.booking_reference || booking.id}</p>
                     </div>
-                    {booking.status === 'CONFIRMED' && (
-                      <div style={{ background: '#ffffff', padding: '16px', borderRadius: '16px', textAlign: 'center', border: '1px solid #cbd5e1', boxShadow: 'var(--shadow-sm)' }}>
-                        <QrCode size={48} color="#0f172a" style={{ margin: '0 auto 8px' }} />
-                        <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: 'var(--brand-primary)' }}>{booking.qr_voucher_code}</span>
-                      </div>
-                    )}
+                    
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                       {['CONFIRMED', 'PENDING_SUPPLIER_APPROVAL'].includes(booking.status) && (
                         <button 
