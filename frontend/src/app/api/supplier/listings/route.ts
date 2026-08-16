@@ -25,6 +25,26 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
+    // Auto-reactivate products whose temporary availability block has expired
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (const p of products) {
+      const block = p.logistics?.availability_block;
+      if (block && block.to) {
+        const blockTo = new Date(block.to);
+        blockTo.setHours(23, 59, 59, 999);
+        if (blockTo < today) {
+          const updatedLogistics = { ...p.logistics, availability_block: null };
+          const { error: reactivateError } = await supabaseAdmin
+            .from('products')
+            .update({ logistics: updatedLogistics, updated_at: new Date().toISOString() })
+            .eq('id', p.id);
+          if (reactivateError) console.error('Auto-reactivate failed:', reactivateError);
+          p.logistics = updatedLogistics;
+        }
+      }
+    }
+
     const clones = products.filter(p => p.logistics?.parent_id);
     const parents = products.filter(p => !p.logistics?.parent_id);
 
@@ -66,7 +86,8 @@ export async function GET(request: Request) {
         price: displayPrice,
         status: displayStatus,
         lastUpdated: new Date(p.updated_at).toLocaleDateString(),
-        admin_feedback: p.logistics?.admin_feedback || null
+        admin_feedback: p.logistics?.admin_feedback || null,
+        availability_block: p.logistics?.availability_block || null
       };
     });
 

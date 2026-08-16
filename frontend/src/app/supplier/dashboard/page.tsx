@@ -52,11 +52,15 @@ export default function SupplierDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS' | 'BOOKINGS' | 'FINANCE'>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS' | 'BOOKINGS' | 'FINANCE' | 'AVAILABILITY'>('DASHBOARD');
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>('PAYOUTS');
+  const [availabilityTab, setAvailabilityTab] = useState<'PRODUCTS' | 'SETTINGS'>('PRODUCTS');
+  const [search, setSearch] = useState('');
+  const [dateRanges, setDateRanges] = useState<Record<string, { from: string; to: string }>>({});
+  const [savingId, setSavingId] = useState<string | null>(null);
   const [selectedPayout, setSelectedPayout] = useState<any>(null);
   const [financeSearch, setFinanceSearch] = useState('');
   
@@ -81,9 +85,88 @@ export default function SupplierDashboard() {
     }
   }, [user]);
 
-  const triggerToast = (title: string, message: string, type: 'success' | 'error' = 'success') => {
+const triggerToast = (title: string, message: string, type: 'success' | 'error' = 'success') => {
     setToastMessage({ title, message, type });
     setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const toggleStatus = async (productId: string, status: string) => {
+    try {
+      const res = await fetch(`/api/supplier/availability`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierId: user?.id, productId, status })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to update status');
+      }
+      const data = await res.json();
+      // Update state immediately for real-time feedback
+      setListings(prev => prev.map(l => l.id === productId ? { ...l, status: data.status, availability_block: data.availability_block } : l));
+      triggerToast('Success', status === 'PUBLISHED' || status === 'APPROVED'
+        ? 'Product is now Active and visible to customers.'
+        : 'Product is now Inactive and hidden from customers.');
+    } catch (err: any) {
+      console.error('toggleStatus error:', err);
+      triggerToast('Error', err.message || 'Failed to update product status', 'error');
+    }
+  };
+
+  const saveAvailability = async (productId: string, fromDate: string, toDate: string) => {
+    if (!fromDate || !toDate) {
+      triggerToast('Error', 'Please select both From and To dates.', 'error');
+      return;
+    }
+    if (new Date(toDate) < new Date(fromDate)) {
+      triggerToast('Error', '"To" date cannot be before "From" date.', 'error');
+      return;
+    }
+    try {
+      setSavingId(productId);
+      const res = await fetch(`/api/supplier/availability`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          supplierId: user?.id,
+          productId,
+          availabilityDates: { from: fromDate, to: toDate }
+        })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save availability');
+      }
+      const data = await res.json();
+      // Update state immediately for real-time feedback
+      setListings(prev => prev.map(l => l.id === productId ? { ...l, status: data.status, availability_block: data.availability_block } : l));
+      triggerToast('Success', `Product will be blocked from ${fromDate} to ${toDate}, then auto-activate.`);
+    } catch (err: any) {
+      console.error('saveAvailability error:', err);
+      triggerToast('Error', err.message || 'Failed to save availability', 'error');
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const clearAvailability = async (productId: string) => {
+    try {
+      const res = await fetch(`/api/supplier/availability`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierId: user?.id, productId, action: 'ACTIVATE' })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to clear availability');
+      }
+      const data = await res.json();
+      setListings(prev => prev.map(l => l.id === productId ? { ...l, status: data.status, availability_block: null } : l));
+      setDateRanges(prev => ({ ...prev, [productId]: { from: '', to: '' } }));
+      triggerToast('Success', 'Product is now fully available to customers.');
+    } catch (err: any) {
+      triggerToast('Error', err.message || 'Failed to clear availability', 'error');
+    }
   };
 
   
@@ -198,11 +281,17 @@ export default function SupplierDashboard() {
             >
               <Users size={18} /> Bookings
             </div>
-            <div 
+<div 
               onClick={() => setActiveTab('FINANCE')}
               style={{ padding: '12px 16px', background: activeTab === 'FINANCE' ? '#f0f9ff' : 'transparent', color: activeTab === 'FINANCE' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'FINANCE' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
             >
               <DollarSign size={18} /> Finance & Payouts
+            </div>
+            <div 
+              onClick={() => setActiveTab('AVAILABILITY')}
+              style={{ padding: '12px 16px', background: activeTab === 'AVAILABILITY' ? '#f0f9ff' : 'transparent', color: activeTab === 'AVAILABILITY' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'AVAILABILITY' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+            >
+              <Calendar size={18} /> Availability
             </div>
             <div style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
               <Settings size={18} /> Account Settings
@@ -841,8 +930,180 @@ export default function SupplierDashboard() {
               </div>
             )}
           </div>
-        )}
+)}
+        
+        {activeTab === 'AVAILABILITY' && (
+          <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Product Availability</h1>
+            <p style={{ color: '#64748b', marginBottom: '24px' }}>Activate or deactivate your products and set temporary blocked dates. No admin approval needed.</p>
 
+            <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px' }}>
+              {loading ? (
+                <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                  Loading your products...
+                </div>
+              ) : listings.length === 0 ? (
+                <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                  No listings found. Create your first tour to get started!
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '280px' }}>
+                      <input
+                        type="text"
+                        placeholder="Search products by name or ID.."
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
+                        onChange={(e) => setSearch(e.target.value)}
+                        value={search}
+                      />
+                    </div>
+                    <button
+                      onClick={() => router.push('/supplier/listings/create')}
+                      style={{ padding: '10px 20px', borderRadius: '8px', background: 'var(--brand-gradient)', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                      <Plus size={18} /> Create New Listing
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+                    {listings
+                      .filter(item => !search || (item.title && item.title.toLowerCase().includes(search.toLowerCase())) || (item.id && item.id.toLowerCase().includes(search.toLowerCase())))
+                      .map((item) => {
+                        const block = item.availability_block || null;
+                        const blockFrom = block?.from || '';
+                        const blockTo = block?.to || '';
+                        const isBlockedNow = (() => {
+                          if (!blockFrom || !blockTo) return false;
+                          const today = new Date(); today.setHours(0,0,0,0);
+                          const f = new Date(blockFrom); f.setHours(0,0,0,0);
+                          const t = new Date(blockTo); t.setHours(23,59,59,999);
+                          return f <= today && t >= today;
+                        })();
+                        const isActive = item.status === 'PUBLISHED' || item.status === 'APPROVED';
+
+                        return (
+                          <div
+                            key={item.id}
+                            style={{
+                              background: '#fff',
+                              borderRadius: '16px',
+                              border: isBlockedNow ? '2px solid #f43f5e' : isActive ? '1px solid #e2e8f0' : '1px solid #cbd5e1',
+                              padding: '24px',
+                              transition: 'all 0.2s',
+                              display: 'flex',
+                              flexDirection: 'column'
+                            }}
+                          >
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              style={{ width: '100%', height: '160px', borderRadius: '12px', objectFit: 'cover', marginBottom: '16px' }}
+                            />
+
+                            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px', lineHeight: 1.35 }}>{item.title}</div>
+                            <div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '12px' }}>ID: {item.id.startsWith('TN') ? item.id : 'TN' + item.id.replace(/-/g, '').substring(0, 8).toUpperCase()}</div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                              <span style={{
+                                padding: '4px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700,
+                                background: isBlockedNow ? '#fef2f2' : isActive ? '#dcfce7' : '#f1f5f9',
+                                color: isBlockedNow ? '#b91c1c' : isActive ? '#166534' : '#475569'
+                              }}>
+                                {isBlockedNow ? 'BLOCKED (dates active)' : isActive ? 'LIVE' : 'OFFLINE'}
+                              </span>
+                              {block && (
+                                <span style={{ padding: '4px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 700, background: '#fef3c7', color: '#92400e' }}>
+                                  Blocked {blockFrom} → {blockTo}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Status Toggle */}
+                            <div style={{ marginBottom: '16px' }}>
+                              <label style={{ color: '#334155', fontSize: '0.85rem', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Status</label>
+                              <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                  onClick={() => toggleStatus(item.id, 'PUBLISHED')}
+                                  style={{
+                                    flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700,
+                                    border: isActive ? '2px solid #10b981' : '1px solid #cbd5e1',
+                                    background: isActive ? '#dcfce7' : '#fff',
+                                    color: isActive ? '#166534' : '#475569'
+                                  }}
+                                >
+                                  Active
+                                </button>
+                                <button
+                                  onClick={() => toggleStatus(item.id, 'DRAFT')}
+                                  style={{
+                                    flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700,
+                                    border: !isActive ? '2px solid #ef4444' : '1px solid #cbd5e1',
+                                    background: !isActive ? '#fee2e2' : '#fff',
+                                    color: !isActive ? '#b91c1c' : '#475569'
+                                  }}
+                                >
+                                  Inactive
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Date Range picker */}
+                            <div style={{ marginBottom: '16px', flex: 1 }}>
+                              <label style={{ color: '#334155', fontSize: '0.85rem', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Temporary Block Dates</label>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+                                <input
+                                  type="date"
+                                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                                  min={new Date().toISOString().split('T')[0]}
+                                  onChange={(e) => setDateRanges(prev => ({ ...prev, [item.id]: { from: e.target.value, to: dateRanges[item.id]?.to || blockTo } }))}
+                                  value={(dateRanges[item.id]?.from ?? blockFrom) || ''}
+                                />
+                                <span style={{ color: '#64748b', fontSize: '1rem' }}>→</span>
+                                <input
+                                  type="date"
+                                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                                  min={(dateRanges[item.id]?.from || blockFrom) || new Date().toISOString().split('T')[0]}
+                                  onChange={(e) => setDateRanges(prev => ({ ...prev, [item.id]: { from: (dateRanges[item.id]?.from ?? blockFrom) || '', to: e.target.value } }))}
+                                  value={(dateRanges[item.id]?.to ?? blockTo) || ''}
+                                />
+                              </div>
+                              <small style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginTop: '6px' }}>
+                                Product will be hidden from customers during these dates and auto-activate after the end date.
+                              </small>
+                            </div>
+
+                            {/* Actions */}
+                            <div style={{ display: 'flex', gap: '10px', borderTop: '1px solid #eef2f7', paddingTop: '16px' }}>
+                              <button
+                                onClick={() => saveAvailability(item.id, (dateRanges[item.id]?.from ?? blockFrom) || '', (dateRanges[item.id]?.to ?? blockTo) || '')}
+                                disabled={savingId === item.id}
+                                style={{
+                                  flex: 1, padding: '10px 16px', borderRadius: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.85rem',
+                                  background: 'var(--brand-gradient)', color: '#fff', opacity: savingId === item.id ? 0.6 : 1
+                                }}
+                              >
+                                {savingId === item.id ? 'Saving...' : 'Save Dates'}
+                              </button>
+                              {(block || dateRanges[item.id]?.from) && (
+                                <button
+                                  onClick={() => clearAvailability(item.id)}
+                                  style={{ padding: '10px 16px', borderRadius: '10px', fontWeight: 700, border: '1px solid #cbd5e1', cursor: 'pointer', fontSize: '0.85rem', background: '#fff', color: '#475569' }}
+                                >
+                                  Clear
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        
         {activeTab === 'LISTINGS' && (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>

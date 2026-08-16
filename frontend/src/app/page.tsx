@@ -713,7 +713,7 @@ export default function HomePage() {
               msOverflowStyle: 'none'
             }}
           >
-            {filteredListings.filter(item => item.id !== 'list-bali-sunset').map((item) => (
+            {filteredListings.filter(item => item.id !== 'list-bali-sunset').slice(0, 4).map((item) => (
               <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none' }}>
                 <div 
                   className="card-panel card-interactive" 

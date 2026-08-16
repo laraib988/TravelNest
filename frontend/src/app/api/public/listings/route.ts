@@ -29,7 +29,41 @@ export async function GET(req: Request) {
       return NextResponse.json([], { status: 200 });
     }
 
-    let filteredProducts = products;
+    // Handle temporary availability blocks: auto-reactivate expired blocks and
+    // exclude products that are currently inside a blocked date range.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const activeProducts: any[] = [];
+    for (const p of products) {
+      const block = p.logistics?.availability_block;
+      if (block && block.from && block.to) {
+        const blockTo = new Date(block.to);
+        blockTo.setHours(23, 59, 59, 999);
+        if (blockTo < today) {
+          // Block expired -> auto-reactivate (clear the block so it shows again)
+          const { error: reactivateError } = await supabaseAdmin
+            .from('products')
+            .update({
+              logistics: { ...p.logistics, availability_block: null },
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', p.id);
+          if (reactivateError) console.error('Auto-reactivate failed:', reactivateError);
+          activeProducts.push(p);
+          continue;
+        }
+        const blockFrom = new Date(block.from);
+        blockFrom.setHours(0, 0, 0, 0);
+        if (blockFrom <= today && blockTo >= today) {
+          // Currently inside the blocked window -> hide from customers
+          continue;
+        }
+      }
+      activeProducts.push(p);
+    }
+
+    let filteredProducts = activeProducts;
     if (search) {
       const lowerSearch = search.toLowerCase();
       filteredProducts = products.filter(p => {
