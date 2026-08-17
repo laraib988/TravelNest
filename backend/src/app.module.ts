@@ -19,6 +19,8 @@ import { PayoutsController } from './payouts/payouts.controller';
 import { PayoutEngineService } from './payouts/payout-engine.service';
 import { AIPlannerController } from './ai-planner/ai-planner.controller';
 import { AIPlannerService } from './ai-planner/ai-planner.service';
+import { TravelAgentService } from './ai-planner/travel-agent.service';
+import { SupabaseDataService } from './ai-planner/supabase-data.service';
 import { AffiliateController } from './affiliate/affiliate.controller';
 import { AffiliateService } from './affiliate/affiliate.service';
 import { AdminController } from './admin/admin.controller';
@@ -51,6 +53,8 @@ import { AdminService } from './admin/admin.service';
     KYCService,
     PayoutEngineService,
     AIPlannerService,
+    TravelAgentService,
+    SupabaseDataService,
     AffiliateService,
     AdminService,
   ],

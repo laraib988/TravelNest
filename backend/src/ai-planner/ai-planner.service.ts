@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { dbStore, Listing } from '../mock-db/db.store';
 import { VectorSearchService } from '../listings/vector-search.service';
+import { TravelAgentService } from './travel-agent.service';
 
 export interface AIItineraryResponse {
   trip_name: string;
@@ -22,15 +23,17 @@ export interface AIItineraryResponse {
 
 @Injectable()
 export class AIPlannerService {
-  constructor(private readonly vectorSearchService: VectorSearchService) {}
+  constructor(
+    private readonly vectorSearchService: VectorSearchService,
+    private readonly travelAgentService: TravelAgentService,
+  ) {}
 
-  // 1. SRS 9.1: AI Trip Planner (Conversational Itinerary Builder)
-  public generateItinerary(promptText: string, targetDestination = 'bali', maxBudget = 250): AIItineraryResponse {
+  // 1. SRS 9.1: AI Trip Planner (Conversational Itinerary Builder) — powered by the Karvaan AI agent
+  public async generateItinerary(promptText: string, targetDestination = 'bali', maxBudget = 250): Promise<AIItineraryResponse> {
     const query = promptText.toLowerCase();
     const dest = dbStore.destinations.find((d) => d.slug === targetDestination || query.includes(d.slug)) || dbStore.destinations[0];
 
     const matchedListings = this.vectorSearchService.hybridSearch(promptText, dest.slug);
-
     const primaryMatch = matchedListings[0] || dbStore.listings[0];
     const secondaryMatch = matchedListings[1] || dbStore.listings[1];
 
@@ -234,83 +237,12 @@ export class AIPlannerService {
     return { answer: `Based on verified traveler reviews and supplier guidelines: ${listing?.summary}` };
   }
 
-  // --- NEW: AI Booking Agent (SRS §9) ---
-  private agentSessions = new Map<string, any>();
-
+  // --- AI Travel Agent (Karvaan) — delegated to TravelAgentService ---
   public createAgentSession() {
-    const sessionId = 'agt_' + Math.random().toString(36).substring(2, 10);
-    this.agentSessions.set(sessionId, { history: [], heldInventory: [], status: 'ACTIVE' });
-    return { sessionId };
+    return this.travelAgentService.createSession();
   }
 
   public async processAgentMessage(sessionId: string, message: string) {
-    const session = this.agentSessions.get(sessionId);
-    if (!session) throw new Error('Session not found');
-
-    const steps = [];
-    let responseText = '';
-    let bundle = null;
-
-    const lowerMsg = message.toLowerCase();
-
-    if (lowerMsg.includes('book') && lowerMsg.includes('yes')) {
-       // Confirming a booking
-       steps.push({ tool: 'create_booking', status: 'done', detail: 'Confirmed bookings for held items.' });
-       responseText = 'Done! Your bookings are confirmed. Vouchers are in My Bookings.';
-       session.status = 'COMPLETED';
-    } else {
-       // Planning a trip (Mocking Think -> Act -> Check loop)
-       steps.push({ tool: 'think', status: 'done', detail: 'Analyzing request constraints (budget, dates, preferences).' });
-       
-       await new Promise(r => setTimeout(r, 600));
-       steps.push({ tool: 'search_listings', status: 'done', detail: 'Searching for relevant food/history tours.' });
-       
-       await new Promise(r => setTimeout(r, 600));
-       steps.push({ tool: 'check_availability', status: 'done', detail: 'Checking capacity across candidate dates.' });
-
-       await new Promise(r => setTimeout(r, 600));
-       steps.push({ tool: 'hold_inventory', status: 'done', detail: 'Holding slots for top 3 matching options.' });
-
-       responseText = `I found 3 great options fitting your request. I've held these slots for 10 minutes. Should I confirm and book all three?`;
-       
-       let items = [];
-       let totalPrice = 0;
-
-       if (lowerMsg.includes('tokyo')) {
-         items = [
-           { id: '1', title: 'Shinjuku Ramen Walk', price: 85.0, date: 'Saturday Evening', img: 'https://images.unsplash.com/photo-1542051812871-757500850028?w=400' },
-           { id: '2', title: 'Asakusa Temple Tour', price: 40.0, date: 'Sunday Morning', img: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400' },
-           { id: '3', title: 'Akihabara Anime Experience', price: 60.0, date: 'Sunday Afternoon', img: 'https://images.unsplash.com/photo-1583061266014-a3fde062b144?w=400' }
-         ];
-         totalPrice = 185.0;
-       } else if (lowerMsg.includes('bali')) {
-         items = [
-           { id: '1', title: 'Catamaran Sunset Cruise', price: 120.0, date: 'Saturday Evening', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400' },
-           { id: '2', title: 'Ubud Rice Terrace Walk', price: 35.0, date: 'Sunday Morning', img: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=400' },
-           { id: '3', title: 'Seafood Buffet Dinner', price: 50.0, date: 'Sunday Evening', img: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400' }
-         ];
-         totalPrice = 205.0;
-       } else {
-         items = [
-           { id: '1', title: 'Old Lahore Food Walk', price: 45.0, date: 'Saturday Evening', img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400' },
-           { id: '2', title: 'Lahore Fort Guided Tour', price: 69.0, date: 'Sunday Morning', img: 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400' },
-           { id: '3', title: 'Heritage Street Food Tasting', price: 50.0, date: 'Sunday Evening', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400' }
-         ];
-         totalPrice = 164.0;
-       }
-
-       bundle = {
-          items: items,
-          totalPrice: totalPrice,
-          currency: 'USD',
-          expiresAt: Date.now() + 10 * 60 * 1000 // 10 mins
-       };
-       session.heldInventory = bundle.items;
-    }
-
-    session.history.push({ role: 'user', content: message });
-    session.history.push({ role: 'agent', content: responseText, steps, bundle });
-
-    return { responseText, steps, bundle };
+    return this.travelAgentService.processMessage(sessionId, message);
   }
 }
