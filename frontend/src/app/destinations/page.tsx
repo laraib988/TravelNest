@@ -14,8 +14,19 @@ export default function DestinationsIndexPage() {
   useEffect(() => {
     async function loadDestinations() {
       try {
-        const res = await fetchFromAPI('/listings/destinations');
-        setDestinations(Array.isArray(res) ? res : []);
+        // Try new Supabase-backed API first
+        const res = await fetch('/api/public/destinations', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setDestinations(data);
+            setLoading(false);
+            return;
+          }
+        }
+        // Fallback to old backend API
+        const fallback = await fetchFromAPI('/listings/destinations');
+        setDestinations(Array.isArray(fallback) ? fallback : []);
       } catch (err) {
         console.error('Error loading destinations:', err);
       } finally {

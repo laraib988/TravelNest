@@ -22,7 +22,8 @@ import {
   Package,
   Clock,
   FileText,
-  Settings
+  Settings,
+  MapPin
 } from 'lucide-react';
 
 const PAGE_TITLES: Record<string, string> = {
@@ -33,6 +34,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/listings': 'Products Catalog',
   '/admin/listings?filter=PENDING': 'Pending Product Reviews',
   '/admin/bookings': 'Bookings & Orders',
+  '/admin/destinations': 'Destinations Management',
   '/admin/reviews': 'Reviews & Feedback',
   '/admin/cms': 'Content Management System (CMS)',
   '/admin/promotions': 'Promotions & Coupons',
@@ -66,6 +68,7 @@ const NAV_SECTIONS = [
   {
     label: 'MARKETING & CONTENT',
     items: [
+      { href: '/admin/destinations', icon: MapPin, label: 'Destinations' },
       { href: '/admin/reviews', icon: Star, label: 'Review and Feedback' },
       { href: '/admin/cms', icon: FileText, label: 'CMS' },
       { href: '/admin/promotions', icon: Tag, label: 'Promotions' },

@@ -94,8 +94,8 @@ export default function HomePage() {
     async function loadData() {
       try {
         const [destsRes, supabaseListingsRes] = await Promise.all([
-          fetchFromAPI('/listings/destinations'),
-          fetch('/api/public/listings').then(res => res.json()).catch(() => [])
+          fetch('/api/public/destinations', { cache: 'no-store' }).then(res => res.json()).catch(() => []),
+          fetch('/api/public/listings', { cache: 'no-store' }).then(res => res.json()).catch(() => [])
         ]);
         
         setListings(supabaseListingsRes || []);
@@ -379,10 +379,14 @@ export default function HomePage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
           {(() => {
-            const defaults = ['bali', 'tokyo', 'paris', 'lahore'];
             const filteredDests = activeSearchTerm.trim()
               ? destinations.filter((d) => d.name.toLowerCase().includes(activeSearchTerm.toLowerCase()) || d.country.toLowerCase().includes(activeSearchTerm.toLowerCase()))
-              : destinations.filter((d) => defaults.includes(d.slug));
+              : destinations.slice(0, 8); // Show up to 8 trending destinations dynamically
+            
+            if (filteredDests.length === 0) {
+              return <p style={{ color: '#64748b', padding: '20px 0' }}>No trending destinations available at the moment.</p>;
+            }
+
             return filteredDests.map((dest) => (
               <Link key={dest.id} href={`/destinations/${dest.slug}`}>
                 <div className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', height: '220px', position: 'relative' }}>

@@ -59,3 +59,27 @@ CREATE TABLE IF NOT EXISTS public.bookings (
 
 CREATE INDEX IF NOT EXISTS bookings_supplier_id_idx ON public.bookings(supplier_id);
 CREATE INDEX IF NOT EXISTS bookings_customer_id_idx ON public.bookings(customer_id);
+
+-- 4. Create Destinations Table
+CREATE TABLE IF NOT EXISTS public.destinations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    country TEXT NOT NULL,
+    country_code TEXT DEFAULT 'PK',
+    hero_image TEXT,
+    description TEXT,
+    best_points JSONB DEFAULT '[]'::jsonb,
+    trending_places JSONB DEFAULT '[]'::jsonb,
+    faqs JSONB DEFAULT '[]'::jsonb,
+    gallery JSONB DEFAULT '[]'::jsonb,
+    itinerary JSONB DEFAULT '[]'::jsonb,
+    popular_activities_count INTEGER DEFAULT 0,
+    is_published BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS Policy for destinations
+ALTER TABLE public.destinations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all access to destinations" ON public.destinations FOR ALL USING (true) WITH CHECK (true);
