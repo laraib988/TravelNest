@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder';
+const getSupabaseAdmin = () => createClient(supabaseUrl, supabaseServiceKey);
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -15,7 +15,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       return NextResponse.json({ error: 'Action is required' }, { status: 400 });
     }
 
-    // Fetch current booking
+    const supabaseAdmin = getSupabaseAdmin();
     const { data: booking, error: fetchError } = await supabaseAdmin
       .from('bookings')
       .select('*')

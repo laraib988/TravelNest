@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     // Also fetch product details (title, image) for these bookings
     // For simplicity in this demo, we'll fetch them separately and merge
     if (bookings && bookings.length > 0) {
-      const listingIds = [...new Set(bookings.map((b: any) => b.listing_id))];
+      const listingIds = Array.from(new Set(bookings.map((b: any) => b.listing_id)));
       
       const { data: listings } = await supabaseAdmin
         .from('products')

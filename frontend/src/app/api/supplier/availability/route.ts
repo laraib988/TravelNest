@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+const getSupabaseAdmin = () => createClient(supabaseUrl, supabaseServiceKey);
 
 export async function PATCH(request: Request) {
   try {
@@ -20,6 +20,7 @@ export async function PATCH(request: Request) {
     }
 
     // Fetch existing product to preserve logistics data and verify ownership
+    const supabaseAdmin = getSupabaseAdmin();
     const { data: existingProduct, error: fetchError } = await supabaseAdmin
       .from('products')
       .select('logistics, status')
@@ -61,7 +62,7 @@ export async function PATCH(request: Request) {
       newStatus = status === 'PUBLISHED' || status === 'APPROVED' ? 'PUBLISHED' : 'DRAFT';
     }
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from('products')
       .update({
         status: newStatus,

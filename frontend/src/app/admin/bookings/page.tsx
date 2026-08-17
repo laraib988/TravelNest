@@ -9,8 +9,8 @@ import {
   FileText, ShieldCheck, Clock, Check, AlertCircle, ArrowUpRight
 } from 'lucide-react';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface BookingRecord {
@@ -31,12 +31,17 @@ interface BookingRecord {
   payment_status?: string;
   confirmation_type: string;
   qr_voucher_code: string;
+  listing_title?: string;
   traveler_details: {
     lead_name: string;
     lead_email: string;
     lead_phone: string;
+    tour_name?: string;
     special_requirements?: string;
     guest_names?: string[];
+    pickup_time?: string;
+    pickup_location?: string;
+    dropoff_location?: string;
   };
   payment_intent_id?: string;
   created_at: string;

@@ -7,7 +7,10 @@ import {
   User, 
   Search, 
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Calendar,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 export default function SupplierBookingsPage() {

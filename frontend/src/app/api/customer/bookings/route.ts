@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET() {
@@ -21,7 +21,7 @@ export async function GET() {
     }
 
     if (bookings && bookings.length > 0) {
-      const listingIds = [...new Set(bookings.map((b: any) => b.listing_id))];
+      const listingIds = Array.from(new Set(bookings.map((b: any) => b.listing_id)));
       const { data: listings } = await supabase
         .from('products')
         .select('id, basic_info')
