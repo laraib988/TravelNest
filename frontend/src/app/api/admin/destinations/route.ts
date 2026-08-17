@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS public.destinations (
     faqs JSONB DEFAULT '[]'::jsonb,
     gallery JSONB DEFAULT '[]'::jsonb,
     itinerary JSONB DEFAULT '[]'::jsonb,
+    best_time_to_visit JSONB DEFAULT '{}'::jsonb,
     popular_activities_count INTEGER DEFAULT 0,
     is_published BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -33,7 +34,11 @@ async function ensureTable() {
     const { error } = await supabase.from('destinations').select('id').limit(1);
     if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
       await supabase.rpc('exec_sql', { sql: CREATE_TABLE_SQL }).catch(() => null);
-      // If RPC doesn't exist, try direct insert to trigger table creation awareness
+    } else {
+      // Add column if table exists but column doesn't
+      await supabase.rpc('exec_sql', { 
+        sql: "ALTER TABLE public.destinations ADD COLUMN IF NOT EXISTS best_time_to_visit JSONB DEFAULT '{}'::jsonb;" 
+      }).catch(() => null);
     }
   } catch (e) {
     // Table might already exist
@@ -80,6 +85,7 @@ export async function POST(request: Request) {
       faqs: body.faqs || [],
       gallery: body.gallery || [],
       itinerary: body.itinerary || [],
+      best_time_to_visit: body.best_time_to_visit || { months: [], description: '' },
       popular_activities_count: body.popular_activities_count || 0,
       is_published: body.is_published ?? false,
     };

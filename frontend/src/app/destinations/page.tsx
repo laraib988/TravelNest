@@ -18,15 +18,10 @@ export default function DestinationsIndexPage() {
         const res = await fetch('/api/public/destinations', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setDestinations(data);
-            setLoading(false);
-            return;
-          }
+          setDestinations(Array.isArray(data) ? data : []);
+        } else {
+          setDestinations([]);
         }
-        // Fallback to old backend API
-        const fallback = await fetchFromAPI('/listings/destinations');
-        setDestinations(Array.isArray(fallback) ? fallback : []);
       } catch (err) {
         console.error('Error loading destinations:', err);
       } finally {

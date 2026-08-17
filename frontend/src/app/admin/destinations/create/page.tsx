@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ArrowLeft, Save, Send, Plus, Trash2, 
-  MapPin, Image as ImageIcon, HelpCircle, Map, Camera, Route 
+  MapPin, Image as ImageIcon, HelpCircle, Map, Camera, Route, Calendar
 } from 'lucide-react';
 
 function DestinationFormContent() {
@@ -14,6 +14,7 @@ function DestinationFormContent() {
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(!!id);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
   // Form State
@@ -29,6 +30,7 @@ function DestinationFormContent() {
     faqs: [{ question: '', answer: '' }],
     gallery: [{ image: '', caption: '' }],
     itinerary: [{ title: '', description: '', image: '' }],
+    best_time_to_visit: { months: [] as string[], description: '' },
     is_published: false
   });
 
@@ -59,6 +61,7 @@ function DestinationFormContent() {
               faqs: dest.faqs?.length ? dest.faqs : [{ question: '', answer: '' }],
               gallery: dest.gallery?.length ? dest.gallery : [{ image: '', caption: '' }],
               itinerary: dest.itinerary?.length ? dest.itinerary : [{ title: '', description: '', image: '' }],
+              best_time_to_visit: dest.best_time_to_visit || { months: [], description: '' },
               is_published: dest.is_published || false
             });
           }
@@ -91,19 +94,37 @@ function DestinationFormContent() {
     });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: string, index?: number) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string, index?: number) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        if (index !== undefined) {
-          handleArrayChange(field as any, index, 'image', base64String);
-        } else {
-          setFormData(prev => ({ ...prev, [field]: base64String }));
+      setUploadingImage(true);
+      try {
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+        
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: uploadData
+        });
+        
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Failed to upload');
         }
-      };
-      reader.readAsDataURL(file);
+        
+        const { url } = await res.json();
+        
+        if (index !== undefined) {
+          const fieldKey = field === 'gallery' ? 'image_url' : 'image';
+          handleArrayChange(field as any, index, fieldKey, url);
+        } else {
+          setFormData(prev => ({ ...prev, [field]: url }));
+        }
+      } catch (err: any) {
+        alert('Image upload failed: ' + err.message);
+      } finally {
+        setUploadingImage(false);
+      }
     }
   };
 
@@ -639,6 +660,58 @@ function DestinationFormContent() {
         </button>
       </div>
 
+      {/* G) BEST TIME TO VISIT */}
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>
+          <Calendar size={22} color="#0284c7" />
+          Best Time to Visit
+        </h2>
+        <div style={formGroupStyle}>
+          <label style={labelStyle}>Select Best Months</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => {
+              const isSelected = formData.best_time_to_visit.months.includes(m);
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      best_time_to_visit: {
+                        ...prev.best_time_to_visit,
+                        months: isSelected 
+                          ? prev.best_time_to_visit.months.filter(x => x !== m)
+                          : [...prev.best_time_to_visit.months, m]
+                      }
+                    }));
+                  }}
+                  style={{
+                    padding: '8px 16px', borderRadius: '999px', border: `1px solid ${isSelected ? '#0284c7' : '#cbd5e1'}`,
+                    background: isSelected ? '#e0f2fe' : '#ffffff', color: isSelected ? '#0369a1' : '#475569',
+                    fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div style={formGroupStyle}>
+          <label style={labelStyle}>Description / Timing Details</label>
+          <textarea 
+            style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} 
+            value={formData.best_time_to_visit.description} 
+            onChange={(e) => setFormData(prev => ({
+              ...prev, 
+              best_time_to_visit: { ...prev.best_time_to_visit, description: e.target.value }
+            }))} 
+            placeholder="e.g. The best time to visit Lahore is between October and March when the weather is cool and pleasant..."
+          />
+        </div>
+      </div>
+
       {/* D) FAQs (Moved to Bottom) */}
       <div style={sectionStyle}>
         <h2 style={sectionTitleStyle}>
@@ -706,7 +779,7 @@ function DestinationFormContent() {
             type="button"
             style={btnDraftStyle}
             onClick={() => handleSubmit(false)}
-            disabled={loading}
+            disabled={loading || uploadingImage}
           >
             <Save size={18} />
             Save as Draft
@@ -715,10 +788,10 @@ function DestinationFormContent() {
             type="button"
             style={btnPrimaryStyle}
             onClick={() => handleSubmit(true)}
-            disabled={loading}
+            disabled={loading || uploadingImage}
           >
             <Send size={18} />
-            {loading ? 'Saving...' : 'Save & Publish'}
+            {uploadingImage ? 'Uploading Image...' : (loading ? 'Saving...' : 'Save & Publish')}
           </button>
         </div>
       </div>

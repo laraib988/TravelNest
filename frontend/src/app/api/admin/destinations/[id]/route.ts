@@ -16,7 +16,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const allowedFields = [
       'name', 'slug', 'country', 'country_code', 'hero_image', 'description',
       'best_points', 'trending_places', 'faqs', 'gallery', 'itinerary',
-      'popular_activities_count', 'is_published'
+      'best_time_to_visit', 'popular_activities_count', 'is_published'
     ];
 
     allowedFields.forEach((field) => {

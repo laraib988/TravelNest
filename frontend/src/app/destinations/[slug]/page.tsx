@@ -18,6 +18,7 @@ interface Destination {
   faqs: { question: string; answer: string }[];
   gallery: { image_url: string; caption: string }[];
   itinerary: { title: string; description: string; image: string }[];
+  best_time_to_visit?: { months: string[]; description: string };
   popular_activities_count: number;
 }
 
@@ -243,6 +244,46 @@ export default function DestinationTemplatePage() {
         )}
 
         {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* SECTION 3.5: BEST TIME TO VISIT */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {destination.best_time_to_visit && destination.best_time_to_visit.months.length > 0 && (
+          <section style={{ padding: '64px 0', borderTop: '1px solid #f1f5f9' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <Calendar size={22} color="#0284c7" />
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+                Best Time to Visit
+              </h2>
+            </div>
+            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '32px' }}>
+              Plan your trip for the perfect experience.
+            </p>
+
+            <div style={{ background: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', padding: '32px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
+                {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(m => {
+                  const isBest = destination.best_time_to_visit!.months.includes(m);
+                  return (
+                    <div key={m} style={{
+                      padding: '8px 16px', borderRadius: '999px',
+                      background: isBest ? '#0284c7' : '#f1f5f9',
+                      color: isBest ? '#ffffff' : '#64748b',
+                      fontWeight: 700, fontSize: '0.85rem'
+                    }}>
+                      {m}
+                    </div>
+                  )
+                })}
+              </div>
+              {destination.best_time_to_visit.description && (
+                <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.7 }}>
+                  {destination.best_time_to_visit.description}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════ */}
         {/* SECTION 4: TOP TRENDING PLACES */}
         {/* ═══════════════════════════════════════════════════════════════ */}
         {trendingPlaces.length > 0 && (
@@ -308,7 +349,7 @@ export default function DestinationTemplatePage() {
               {gallery.map((item, idx) => (
                 <div key={idx} style={{
                   borderRadius: '16px', overflow: 'hidden', position: 'relative',
-                  height: idx % 3 === 0 ? '320px' : '240px',
+                  height: '260px',
                   border: '1px solid #e2e8f0'
                 }}>
                   <img
