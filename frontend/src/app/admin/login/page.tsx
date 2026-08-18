@@ -128,9 +128,9 @@ export default function AdminLoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !turnstileToken}
+              disabled={loading}
               className="btn-primary"
-              style={{ width: '100%', padding: '14px', fontSize: '1rem', fontWeight: 700, borderRadius: '9999px', justifyContent: 'center', marginTop: '8px', opacity: (!turnstileToken) ? 0.6 : 1, cursor: (!turnstileToken) ? 'not-allowed' : 'pointer' }}
+              style={{ width: '100%', padding: '14px', fontSize: '1rem', fontWeight: 700, borderRadius: '9999px', justifyContent: 'center', marginTop: '8px', opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer' }}
             >
               {loading ? 'Authenticating...' : 'Secure Login'} <ArrowRight size={18} />
             </button>

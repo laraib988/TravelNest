@@ -73,7 +73,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading || !turnstileToken}
+            disabled={loading}
             className="btn-primary"
             style={{
               padding: '14px',
@@ -82,8 +82,8 @@ export default function LoginPage() {
               borderRadius: 'var(--radius-pill)',
               justifyContent: 'center',
               marginTop: '8px',
-              opacity: (!turnstileToken) ? 0.6 : 1,
-              cursor: (!turnstileToken) ? 'not-allowed' : 'pointer'
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? 'wait' : 'pointer'
             }}
           >
             {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={18} />
