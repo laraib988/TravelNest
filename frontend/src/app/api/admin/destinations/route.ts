@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.destinations (
     gallery JSONB DEFAULT '[]'::jsonb,
     itinerary JSONB DEFAULT '[]'::jsonb,
     best_time_to_visit JSONB DEFAULT '{}'::jsonb,
+    meta_data JSONB DEFAULT '{}'::jsonb,
     popular_activities_count INTEGER DEFAULT 0,
     is_published BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -53,7 +54,23 @@ export async function GET() {
       }
       throw error;
     }
-    return NextResponse.json({ data: data || [] });
+
+    const processedData = (data || []).map((dest: any) => {
+      let meta_data = dest.meta_data || null;
+      if (dest.faqs && Array.isArray(dest.faqs)) {
+        const metaFaqIndex = dest.faqs.findIndex((f: any) => f.question === '__META_DATA__');
+        if (metaFaqIndex !== -1) {
+          try {
+            meta_data = JSON.parse(dest.faqs[metaFaqIndex].answer);
+          } catch(e) {}
+          // Remove it from faqs so it doesn't show in UI
+          dest.faqs = dest.faqs.filter((_: any, i: number) => i !== metaFaqIndex);
+        }
+      }
+      return { ...dest, meta_data };
+    });
+
+    return NextResponse.json({ data: processedData });
   } catch (error: any) {
     console.error('Error fetching destinations:', error);
     return NextResponse.json({ error: error.message, data: [] }, { status: 500 });
@@ -82,9 +99,14 @@ export async function POST(request: Request) {
       is_published: body.is_published ?? false,
     };
 
-    // Only include best_time_to_visit if provided
-    if (body.best_time_to_visit) {
-      destination.best_time_to_visit = body.best_time_to_visit;
+    // Only include JSONB fields if provided
+    if (body.best_time_to_visit) destination.best_time_to_visit = body.best_time_to_visit;
+    // If meta_data exists, inject it as a hidden FAQ
+    if (body.meta_data) {
+      destination.faqs.push({
+        question: '__META_DATA__',
+        answer: JSON.stringify(body.meta_data)
+      });
     }
 
     const sanitized = stripBase64(destination);
@@ -95,13 +117,13 @@ export async function POST(request: Request) {
       .select()
       .maybeSingle();
 
-    // If best_time_to_visit column doesn't exist in DB, retry without it
+    // Smart Retry for best_time_to_visit
     if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
       console.warn('best_time_to_visit column not found, retrying without it...');
-      const { best_time_to_visit, ...withoutBttv } = sanitized;
+      const { best_time_to_visit, ...fallbackData } = sanitized;
       const retry = await supabase
         .from('destinations')
-        .insert(withoutBttv)
+        .insert(fallbackData)
         .select()
         .maybeSingle();
       data = retry.data;

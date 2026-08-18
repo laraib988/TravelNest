@@ -27,7 +27,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const allowedFields = [
       'name', 'slug', 'country', 'country_code', 'hero_image', 'description',
       'best_points', 'trending_places', 'faqs', 'gallery', 'itinerary',
-      'best_time_to_visit', 'popular_activities_count', 'is_published'
+      'best_time_to_visit', 'meta_data', 'popular_activities_count', 'is_published'
     ];
 
     allowedFields.forEach((field) => {
@@ -39,6 +39,19 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       updates.slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     }
 
+    // If meta_data exists, inject it as a hidden FAQ
+    if (body.meta_data) {
+      const currentFaqs = body.faqs || [];
+      // Remove any existing hidden FAQ first
+      const cleanFaqs = currentFaqs.filter((f: any) => f.question !== '__META_DATA__');
+      cleanFaqs.push({
+        question: '__META_DATA__',
+        answer: JSON.stringify(body.meta_data)
+      });
+      updates.faqs = cleanFaqs;
+      delete updates.meta_data;
+    }
+
     const sanitized = stripBase64(updates);
 
     let { data, error } = await supabase
@@ -48,13 +61,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .select()
       .maybeSingle();
 
-    // If best_time_to_visit column doesn't exist in DB, retry without it
+    // Smart Retry for best_time_to_visit
     if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
       console.warn('best_time_to_visit column not found, retrying without it...');
-      const { best_time_to_visit, ...withoutBttv } = sanitized;
+      const { best_time_to_visit, ...fallbackData } = sanitized;
       const retry = await supabase
         .from('destinations')
-        .update(withoutBttv)
+        .update(fallbackData)
         .eq('id', id)
         .select()
         .maybeSingle();

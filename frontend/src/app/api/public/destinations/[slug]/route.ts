@@ -25,6 +25,17 @@ export async function GET(request: Request, { params }: { params: { slug: string
       return NextResponse.json({ error: 'Destination is still a draft and not published yet' }, { status: 403 });
     }
 
+    // Extract hidden meta_data from faqs
+    if (destination.faqs && Array.isArray(destination.faqs)) {
+      const metaFaqIndex = destination.faqs.findIndex((f: any) => f.question === '__META_DATA__');
+      if (metaFaqIndex !== -1) {
+        try {
+          destination.meta_data = JSON.parse(destination.faqs[metaFaqIndex].answer);
+        } catch (e) {}
+        destination.faqs = destination.faqs.filter((_: any, i: number) => i !== metaFaqIndex);
+      }
+    }
+
     // Also fetch related products/tours for this destination
     let relatedProducts: any[] = [];
     try {

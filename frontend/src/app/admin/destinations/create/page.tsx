@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ArrowLeft, Save, Send, Plus, Trash2, 
-  MapPin, Image as ImageIcon, HelpCircle, Map, Camera, Route, Calendar
+  MapPin, Image as ImageIcon, HelpCircle, Map, Camera, Route, Calendar, ShieldCheck
 } from 'lucide-react';
 
 function DestinationFormContent() {
@@ -31,6 +31,14 @@ function DestinationFormContent() {
     gallery: [{ image_url: '', caption: '' }],
     itinerary: [{ title: '', description: '', image: '' }],
     best_time_to_visit: { months: [] as string[], description: '' },
+    meta_data: {
+      safety: {
+        is_safe_for_women: false,
+        safety_score: 0,
+        trusted_transport: '',
+        emergency_contacts: { police: '', ambulance: '', women_helpline: '' }
+      }
+    },
     is_published: false
   });
 
@@ -62,6 +70,14 @@ function DestinationFormContent() {
               gallery: dest.gallery?.length ? dest.gallery : [{ image_url: '', caption: '' }],
               itinerary: dest.itinerary?.length ? dest.itinerary : [{ title: '', description: '', image: '' }],
               best_time_to_visit: dest.best_time_to_visit || { months: [], description: '' },
+              meta_data: dest.meta_data || {
+                safety: {
+                  is_safe_for_women: false,
+                  safety_score: 0,
+                  trusted_transport: '',
+                  emergency_contacts: { police: '', ambulance: '', women_helpline: '' }
+                }
+              },
               is_published: dest.is_published || false
             });
           }
@@ -746,6 +762,98 @@ function DestinationFormContent() {
         <button style={addBtnStyle} onClick={() => addArrayItem('faqs', { question: '', answer: '' })}>
           <Plus size={20} /> Add Item
         </button>
+      </div>
+
+      {/* I) WOMEN SAFETY & SOLO TRAVEL */}
+      <div style={sectionStyle}>
+        <h2 style={{ ...sectionTitleStyle, color: '#9d174d' }}>
+          <ShieldCheck size={22} color="#ec4899" />
+          Women Safety & Solo Travel
+        </h2>
+        <div style={{ ...formGroupStyle, flexDirection: 'row', alignItems: 'center', gap: '12px' }}>
+          <input 
+            type="checkbox" 
+            id="is_safe"
+            checked={formData.meta_data.safety.is_safe_for_women}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              meta_data: {
+                ...prev.meta_data,
+                safety: { ...prev.meta_data.safety, is_safe_for_women: e.target.checked }
+              }
+            }))}
+            style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#ec4899' }}
+          />
+          <label htmlFor="is_safe" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer', color: '#9d174d' }}>
+            Verified Safe for Solo Female Travelers (Shows a special badge)
+          </label>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '16px' }}>
+          <div style={formGroupStyle}>
+            <label style={labelStyle}>Safety Score (1-10)</label>
+            <input 
+              type="number" 
+              min="1" max="10"
+              style={inputStyle} 
+              value={formData.meta_data.safety.safety_score || ''}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                meta_data: {
+                  ...prev.meta_data,
+                  safety: { ...prev.meta_data.safety, safety_score: parseInt(e.target.value) || 0 }
+                }
+              }))}
+              placeholder="e.g. 9"
+            />
+          </div>
+          <div style={formGroupStyle}>
+            <label style={labelStyle}>Trusted Transport Options</label>
+            <input 
+              type="text"
+              style={inputStyle} 
+              value={formData.meta_data.safety.trusted_transport}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                meta_data: {
+                  ...prev.meta_data,
+                  safety: { ...prev.meta_data.safety, trusted_transport: e.target.value }
+                }
+              }))}
+              placeholder="e.g. Uber, Careem, Metro"
+            />
+          </div>
+        </div>
+
+        <div style={{ marginTop: '16px', padding: '16px', backgroundColor: '#fdf2f8', borderRadius: '10px', border: '1px solid #fbcfe8' }}>
+          <h4 style={{ fontSize: '0.9rem', color: '#be185d', marginBottom: '12px', fontWeight: 700 }}>Emergency Contacts</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div style={formGroupStyle}>
+              <label style={{ ...labelStyle, fontSize: '0.8rem' }}>Police</label>
+              <input 
+                type="text" style={inputStyle} placeholder="e.g. 15"
+                value={formData.meta_data.safety.emergency_contacts.police}
+                onChange={(e) => setFormData(prev => ({ ...prev, meta_data: { ...prev.meta_data, safety: { ...prev.meta_data.safety, emergency_contacts: { ...prev.meta_data.safety.emergency_contacts, police: e.target.value } } } }))}
+              />
+            </div>
+            <div style={formGroupStyle}>
+              <label style={{ ...labelStyle, fontSize: '0.8rem' }}>Ambulance</label>
+              <input 
+                type="text" style={inputStyle} placeholder="e.g. 115"
+                value={formData.meta_data.safety.emergency_contacts.ambulance}
+                onChange={(e) => setFormData(prev => ({ ...prev, meta_data: { ...prev.meta_data, safety: { ...prev.meta_data.safety, emergency_contacts: { ...prev.meta_data.safety.emergency_contacts, ambulance: e.target.value } } } }))}
+              />
+            </div>
+            <div style={formGroupStyle}>
+              <label style={{ ...labelStyle, fontSize: '0.8rem' }}>Women's Helpline</label>
+              <input 
+                type="text" style={inputStyle} placeholder="e.g. 1099"
+                value={formData.meta_data.safety.emergency_contacts.women_helpline}
+                onChange={(e) => setFormData(prev => ({ ...prev, meta_data: { ...prev.meta_data, safety: { ...prev.meta_data.safety, emergency_contacts: { ...prev.meta_data.safety.emergency_contacts, women_helpline: e.target.value } } } }))}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Bottom Action Bar */}

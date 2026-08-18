@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { MapPin, Star, Clock, ChevronRight, ChevronDown, ChevronUp, Camera, Route, Sparkles, HelpCircle, ArrowRight, Calendar, Users } from 'lucide-react';
+import { MapPin, Star, Clock, ChevronRight, ChevronDown, ChevronUp, Camera, Route, Sparkles, HelpCircle, ArrowRight, Calendar, Users, Shield, PhoneCall, ShieldCheck, Car } from 'lucide-react';
 
 interface Destination {
   id: string;
@@ -19,6 +19,14 @@ interface Destination {
   gallery: { image_url: string; caption: string }[];
   itinerary: { title: string; description: string; image: string }[];
   best_time_to_visit?: { months: string[]; description: string };
+  meta_data?: {
+    safety?: {
+      is_safe_for_women?: boolean;
+      safety_score?: number;
+      trusted_transport?: string;
+      emergency_contacts?: { police?: string; ambulance?: string; women_helpline?: string };
+    }
+  };
   popular_activities_count: number;
 }
 
@@ -116,13 +124,27 @@ export default function DestinationTemplatePage() {
           }}>
             <MapPin size={14} /> {destination.country}
           </div>
-          <h1 style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 800, color: '#ffffff',
-            lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            {destination.name}
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <h1 style={{
+              fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 800, color: '#ffffff',
+              lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
+              fontFamily: 'var(--font-heading)'
+            }}>
+              {destination.name}
+            </h1>
+            {destination.meta_data?.safety?.is_safe_for_women && (
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                background: 'rgba(236, 72, 153, 0.25)', backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(236, 72, 153, 0.5)',
+                padding: '8px 16px', borderRadius: '9999px', marginBottom: '12px',
+                fontSize: '0.9rem', color: '#fbcfe8', fontWeight: 700,
+                boxShadow: '0 4px 12px rgba(236, 72, 153, 0.15)'
+              }}>
+                <ShieldCheck size={16} /> Verified Safe for Solo Female Travelers
+              </div>
+            )}
+          </div>
           <p style={{
             color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', maxWidth: '680px',
             lineHeight: 1.6
@@ -438,6 +460,84 @@ export default function DestinationTemplatePage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* SECTION 8: SAFETY & SECURITY */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {destination.meta_data?.safety && (
+          <section style={{ padding: '64px 0', borderTop: '1px solid #f1f5f9' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <ShieldCheck size={24} color="#ec4899" />
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+                Traveler Safety & Security
+              </h2>
+            </div>
+            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '40px', maxWidth: '600px' }}>
+              Essential safety information and trusted transport options for solo travelers in {destination.name}.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+              
+              {/* Safety Score Card */}
+              {destination.meta_data.safety.safety_score > 0 && (
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: destination.meta_data.safety.safety_score >= 7 ? '#f0fdf4' : '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: destination.meta_data.safety.safety_score >= 7 ? '#16a34a' : '#ea580c', fontSize: '1.5rem', fontWeight: 800 }}>
+                    {destination.meta_data.safety.safety_score}<span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>/10</span>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>Overall Safety Score</h3>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Based on recent traveler experiences.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Trusted Transport Card */}
+              {destination.meta_data.safety.trusted_transport && (
+                <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Car size={28} color="#0284c7" />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>Trusted Transport</h3>
+                    <p style={{ fontSize: '0.95rem', color: '#334155', fontWeight: 600 }}>{destination.meta_data.safety.trusted_transport}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Emergency Contacts Card */}
+              {(destination.meta_data.safety.emergency_contacts?.police || destination.meta_data.safety.emergency_contacts?.ambulance) && (
+                <div style={{ backgroundColor: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'flex-start', gap: '20px', boxShadow: '0 4px 12px rgba(225, 29, 72, 0.05)' }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#ffe4e6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <PhoneCall size={24} color="#e11d48" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#9f1239', marginBottom: '12px' }}>Emergency Contacts</h3>
+                    <div style={{ display: 'grid', gap: '8px' }}>
+                      {destination.meta_data.safety.emergency_contacts.police && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
+                          <span style={{ color: '#be185d' }}>Police:</span>
+                          <span style={{ fontWeight: 700, color: '#9f1239' }}>{destination.meta_data.safety.emergency_contacts.police}</span>
+                        </div>
+                      )}
+                      {destination.meta_data.safety.emergency_contacts.ambulance && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
+                          <span style={{ color: '#be185d' }}>Ambulance:</span>
+                          <span style={{ fontWeight: 700, color: '#9f1239' }}>{destination.meta_data.safety.emergency_contacts.ambulance}</span>
+                        </div>
+                      )}
+                      {destination.meta_data.safety.emergency_contacts.women_helpline && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', marginTop: '4px', paddingTop: '4px', borderTop: '1px solid #fecdd3' }}>
+                          <span style={{ color: '#be185d', fontWeight: 600 }}>Women's Helpline:</span>
+                          <span style={{ fontWeight: 800, color: '#e11d48' }}>{destination.meta_data.safety.emergency_contacts.women_helpline}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         )}
