@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
+import { useCurrency } from '@/context/CurrencyContext';
 import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, Heart, XCircle } from 'lucide-react';
 
 export default function TourDetailPage() {
+  const { formatPrice } = useCurrency();
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
@@ -606,7 +608,7 @@ export default function TourDetailPage() {
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div>
                 <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                  ${currentPrice} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{tour.currency} / {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
+                  {formatPrice(currentPrice)} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/ {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
                 </div>
               </div>
               <div className="badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -656,7 +658,7 @@ export default function TourDetailPage() {
                             {(unitsNeeded > available && available > 0 && quantity <= maxCap) && ` (Not enough availability)`}
                           </div>
                         </div>
-                        <strong style={{ color: 'var(--brand-primary)', fontSize: '0.95rem' }}>${opt.price_modifier || opt.price}</strong>
+                        <strong style={{ color: 'var(--brand-primary)', fontSize: '0.95rem' }}>{formatPrice(opt.price_modifier || opt.price)}</strong>
                       </div>
                     );
                   })}
@@ -762,7 +764,7 @@ export default function TourDetailPage() {
                     <Star size={14} color="#d97706" fill="#d97706" /> {p.cached_rating_avg || 5.0} ({p.cached_review_count || 0})
                   </div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                    From ${p.price || p.base_price || 150}
+                    From {formatPrice(p.price || p.base_price || 150)}
                   </div>
                 </div>
               </a>

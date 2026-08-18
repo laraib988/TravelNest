@@ -91,8 +91,18 @@ export async function GET(req: Request) {
         minPrice = p.base_price;
       }
 
+      let durationStr = '2 hours';
+      if (p.transport_pricing && p.transport_pricing.length > 0) {
+        const sorted = p.transport_pricing.slice().sort((a: any, b: any) => (Number(a.amount)||999999) - (Number(b.amount)||999999));
+        durationStr = sorted[0].duration || '2 hours';
+      } else if (p.pricing && p.pricing.length > 0) {
+        const sorted = p.pricing.slice().sort((a: any, b: any) => (Number(a.price) || Number(a.amount)||999999) - (Number(b.price) || Number(b.amount)||999999));
+        durationStr = sorted[0].duration || '2 hours';
+      }
+
       return {
         id: p.id,
+        duration: durationStr,
         title,
         images: [
           { url: p.basic_info?.photos?.heroImage || 'https://placehold.co/600x400?text=No+Image', alt: title }
@@ -109,6 +119,7 @@ export async function GET(req: Request) {
         destination_id: p.destination_id || 'dest-global',
         category_name: p.category_name || p.basic_info?.category || 'Adventures',
         selling_point: p.basic_info?.sellingPoints || p.basic_info?.category || 'Best Seller',
+        pickup_location: p.logistics?.pickupLocation || p.basic_info?.city || 'Tokyo',
         confirmation_type: p.logistics?.bookingType || 'Instant Confirmation',
         payment_option: p.logistics?.paymentOption || 'Pay Now'
       };

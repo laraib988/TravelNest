@@ -101,6 +101,22 @@ function CheckoutContent() {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponMsg, setCouponMsg] = useState('');
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [availablePickupLocations, setAvailablePickupLocations] = useState<any[]>([]);
+
+  const listingId = searchParams.get('listing_id') || 'mock-listing';
+  
+  useEffect(() => {
+    if (listingId !== 'mock-listing') {
+      fetch(`/api/public/listings/${listingId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.logistics && Array.isArray(data.logistics.pickup_locations)) {
+            setAvailablePickupLocations(data.logistics.pickup_locations);
+          }
+        })
+        .catch(err => console.error('Error fetching listing logistics:', err));
+    }
+  }, [listingId]);
 
   const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +167,6 @@ function CheckoutContent() {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      const listingId = searchParams.get('listing_id') || 'mock-listing';
       const supplierId = searchParams.get('supplier_id') || 'mock-supplier';
       const optionId = searchParams.get('option_id') || 'mock-opt';
 
@@ -329,13 +344,26 @@ function CheckoutContent() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Pickup Location</label>
-              <input
-                type="text"
-                placeholder="e.g., Hotel Name or Address"
-                value={formData.pickup_location}
-                onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value, dropoff_location: formData.same_as_pickup ? e.target.value : formData.dropoff_location })}
-                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
-              />
+              {availablePickupLocations.length > 0 ? (
+                <select
+                  value={formData.pickup_location}
+                  onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value, dropoff_location: formData.same_as_pickup ? e.target.value : formData.dropoff_location })}
+                  style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
+                >
+                  <option value="" disabled>Select a pickup location</option>
+                  {availablePickupLocations.map((loc, idx) => (
+                    <option key={idx} value={loc.name}>{loc.name} {loc.address ? `(${loc.address})` : ''}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="e.g., Hotel Name or Address"
+                  value={formData.pickup_location}
+                  onChange={(e) => setFormData({ ...formData, pickup_location: e.target.value, dropoff_location: formData.same_as_pickup ? e.target.value : formData.dropoff_location })}
+                  style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
+                />
+              )}
             </div>
             
             <div>

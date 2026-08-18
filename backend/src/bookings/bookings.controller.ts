@@ -20,6 +20,11 @@ export class BookingsController {
     return this.bookingsService.createBooking(body);
   }
 
+  @Get()
+  getAllBookings() {
+    return this.bookingsService.getSupplierBookings();
+  }
+
   @Get(':ref')
   getBooking(@Param('ref') ref: string) {
     return this.bookingsService.getBookingByReference(ref);

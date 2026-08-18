@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -51,12 +52,14 @@ const DUMMY_LISTINGS = [
 export default function SupplierDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const params = useParams();
+const section = (params?.section as string) || 'dashboard';
   
-  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'LISTINGS' | 'BOOKINGS' | 'FINANCE' | 'AVAILABILITY'>('DASHBOARD');
+  const activeTab = section === 'listings' ? 'LISTINGS' : section === 'bookings' ? 'BOOKINGS' : (section === 'finance' || section === 'account-settings') ? 'FINANCE' : section === 'availability' ? 'AVAILABILITY' : 'DASHBOARD';
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>('PAYOUTS');
+  const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>(section === 'account-settings' ? 'SETTINGS' : 'PAYOUTS');
   const [availabilityTab, setAvailabilityTab] = useState<'PRODUCTS' | 'SETTINGS'>('PRODUCTS');
   const [search, setSearch] = useState('');
   const [dateRanges, setDateRanges] = useState<Record<string, { from: string; to: string }>>({});
@@ -262,40 +265,25 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
         </div>
         
         <div style={{ flex: 1, padding: '20px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div 
-              onClick={() => setActiveTab('DASHBOARD')}
-              style={{ padding: '12px 16px', background: activeTab === 'DASHBOARD' ? '#f0f9ff' : 'transparent', color: activeTab === 'DASHBOARD' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'DASHBOARD' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-            >
+<div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <Link href="/supplier/dashboard" style={{ padding: '12px 16px', background: activeTab === 'DASHBOARD' ? '#f0f9ff' : 'transparent', color: activeTab === 'DASHBOARD' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'DASHBOARD' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <LayoutDashboard size={18} /> Dashboard
-            </div>
-            <div 
-              onClick={() => setActiveTab('LISTINGS')}
-              style={{ padding: '12px 16px', background: activeTab === 'LISTINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'LISTINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'LISTINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-            >
+            </Link>
+            <Link href="/supplier/listings" style={{ padding: '12px 16px', background: activeTab === 'LISTINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'LISTINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'LISTINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Calendar size={18} /> My Listings
-            </div>
-            <div 
-              onClick={() => setActiveTab('BOOKINGS')}
-              style={{ padding: '12px 16px', background: activeTab === 'BOOKINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'BOOKINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'BOOKINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-            >
+            </Link>
+            <Link href="/supplier/bookings" style={{ padding: '12px 16px', background: activeTab === 'BOOKINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'BOOKINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'BOOKINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Users size={18} /> Bookings
-            </div>
-<div 
-              onClick={() => setActiveTab('FINANCE')}
-              style={{ padding: '12px 16px', background: activeTab === 'FINANCE' ? '#f0f9ff' : 'transparent', color: activeTab === 'FINANCE' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'FINANCE' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-            >
+            </Link>
+            <Link href="/supplier/finance" style={{ padding: '12px 16px', background: activeTab === 'FINANCE' ? '#f0f9ff' : 'transparent', color: activeTab === 'FINANCE' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'FINANCE' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <DollarSign size={18} /> Finance & Payouts
-            </div>
-            <div 
-              onClick={() => setActiveTab('AVAILABILITY')}
-              style={{ padding: '12px 16px', background: activeTab === 'AVAILABILITY' ? '#f0f9ff' : 'transparent', color: activeTab === 'AVAILABILITY' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'AVAILABILITY' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-            >
+            </Link>
+            <Link href="/supplier/availability" style={{ padding: '12px 16px', background: activeTab === 'AVAILABILITY' ? '#f0f9ff' : 'transparent', color: activeTab === 'AVAILABILITY' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'AVAILABILITY' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Calendar size={18} /> Availability
-            </div>
-            <div style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+            </Link>
+            <Link href="/supplier/account-settings" style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Settings size={18} /> Account Settings
-            </div>
+            </Link>
           </div>
         </div>
 

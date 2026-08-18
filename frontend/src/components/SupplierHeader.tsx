@@ -313,7 +313,7 @@ export default function SupplierHeader() {
                     <Calendar size={15} color="#0284c7" /> Dashboard
                   </Link>
                   <Link
-                    href="/supplier/dashboard"
+                    href="/supplier/account-settings"
                     onClick={() => setIsUserMenuOpen(false)}
                     style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.88rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
                   >

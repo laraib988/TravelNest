@@ -209,12 +209,44 @@ export default function SupplierStatusPage() {
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#0f172a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
               <Ban size={36} />
             </div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Account Suspended</h1>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Account Banned</h1>
             <p style={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '24px' }}>
-              Your account has been permanently suspended due to a violation of our Terms of Service or fraudulent activity detected.
+              Your account has been permanently banned due to a violation of our Terms of Service or fraudulent activity detected.
             </p>
-            <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', padding: '16px', borderRadius: '12px', fontSize: '0.9rem', color: '#b91c1c', fontWeight: 600 }}>
+            <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', padding: '16px', borderRadius: '12px', fontSize: '0.9rem', color: '#b91c1c', fontWeight: 600, marginBottom: '16px' }}>
               This email address is permanently banned from creating new accounts on TravelNest.
+            </div>
+            {kycRecord?.audit_reasons && kycRecord.audit_reasons.length > 0 && (
+              <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', padding: '16px', borderRadius: '12px', textAlign: 'left', marginBottom: '24px' }}>
+                <div style={{ fontWeight: 800, color: '#be123c', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle size={18} /> Ban Reason:
+                </div>
+                <ul style={{ margin: 0, paddingLeft: '20px', color: '#881337', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                  {kycRecord.audit_reasons.map((reason: string, i: number) => (
+                    <li key={i}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '20px', borderRadius: '16px', textAlign: 'left', marginBottom: '8px' }}>
+              <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem', marginBottom: '8px' }}>
+                Want to appeal this ban?
+              </div>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', lineHeight: 1.6 }}>
+                You can submit an appeal to our compliance team. They will review your case and respond via email.
+              </p>
+              <button
+                type="button"
+                style={{
+                  marginTop: '14px', padding: '12px 20px', borderRadius: '12px', background: '#0f172a', color: '#ffffff',
+                  fontWeight: 700, fontSize: '0.9rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%'
+                }}
+              >
+                <LogOut size={16} style={{ transform: 'rotate(180deg)' }} /> Appeal Ban via Email
+              </button>
+              <p style={{ margin: '10px 0 0', fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center' }}>
+                You will be contacted at <strong>{user?.email}</strong>
+              </p>
             </div>
           </>
         );

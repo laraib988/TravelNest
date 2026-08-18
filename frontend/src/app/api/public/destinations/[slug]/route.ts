@@ -39,9 +39,11 @@ export async function GET(request: Request, { params }: { params: { slug: string
     // Also fetch related products/tours for this destination
     let relatedProducts: any[] = [];
     try {
+      // Root cause fix for slow loading: only select small, necessary columns.
+      // Avoids downloading massive base64 product image blobs from Supabase.
       const { data: products } = await supabase
         .from('products')
-        .select('*')
+        .select('id, title, slug, images, base_price, currency, status, basic_info, logistics, cached_rating_avg')
         .eq('status', 'PUBLISHED')
         .order('created_at', { ascending: false })
         .limit(8);
@@ -55,7 +57,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
         });
       }
     } catch (e) {
-      // Products table might not exist
+      // Products table might not exist or failed
     }
 
     return NextResponse.json({ destination, relatedProducts });

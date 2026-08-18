@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { v2 as cloudinary } from 'cloudinary';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request: Request) {
   try {
@@ -17,31 +19,21 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `images/${fileName}`;
+    const result = await new Promise<any>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: 'travelnest' },
+        (error, uploadResult) => {
+          if (error) {
+            console.error('Cloudinary stream upload error:', error);
+            reject(error);
+          } else {
+            resolve(uploadResult);
+          }
+        }
+      ).end(buffer);
+    });
 
-    // Attempt to create bucket if it doesn't exist
-    await supabase.storage.createBucket('destinations', { public: true }).catch(() => null);
-    await supabase.storage.updateBucket('destinations', { public: true }).catch(() => null);
-
-    const { data, error } = await supabase.storage
-      .from('destinations')
-      .upload(filePath, buffer, {
-        contentType: file.type,
-        upsert: false
-      });
-
-    if (error) {
-      console.error('Supabase upload error:', error);
-      throw error;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('destinations')
-      .getPublicUrl(filePath);
-
-    return NextResponse.json({ url: publicUrlData.publicUrl });
+    return NextResponse.json({ url: result.secure_url });
   } catch (error: any) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: error.message || 'Failed to upload image' }, { status: 500 });

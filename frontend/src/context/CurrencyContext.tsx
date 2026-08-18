@@ -49,6 +49,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrency] = useState<Currency>(SUPPORTED_CURRENCIES.USD);
   const [language, setLanguage] = useState<Language>(SUPPORTED_LANGUAGES.en);
+  const [liveRates, setLiveRates] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const savedCurr = localStorage.getItem('travelnest_currency');
@@ -61,9 +62,33 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Fetch live exchange rates from Frankfurter (ECB) so prices are accurate
+  useEffect(() => {
+    const codes = Object.keys(SUPPORTED_CURRENCIES).join(',');
+    fetch(`https://api.frankfurter.app/latest?from=USD&to=${codes}`, { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.rates) {
+          setLiveRates({ ...data.rates, USD: 1 });
+        }
+      })
+      .catch(() => {
+        // Fall back to the built-in rates if the network call fails
+      });
+  }, []);
+
+  // Apply a live rate when available (fall back to the built-in static rate)
+  const resolvedRate = (code: string): number => {
+    if (liveRates[code] && liveRates[code] > 0) return liveRates[code];
+    return SUPPORTED_CURRENCIES[code]?.rate ?? 1;
+  };
+
   const setCurrencyCode = (code: string) => {
     if (SUPPORTED_CURRENCIES[code]) {
-      setCurrency(SUPPORTED_CURRENCIES[code]);
+      setCurrency({
+        ...SUPPORTED_CURRENCIES[code],
+        rate: resolvedRate(code),
+      });
       localStorage.setItem('travelnest_currency', code);
     }
   };
@@ -82,7 +107,8 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   };
 
   const formatPrice = (amountInUSD: number) => {
-    const converted = amountInUSD * currency.rate;
+    const rate = resolvedRate(currency.code);
+    const converted = amountInUSD * rate;
     if (currency.code === 'JPY' || currency.code === 'PKR' || currency.code === 'INR') {
       return `${currency.symbol} ${Math.round(converted).toLocaleString()}`;
     }

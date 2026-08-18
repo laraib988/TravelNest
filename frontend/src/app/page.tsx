@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 import {
   Search,
   Sparkles,
@@ -77,6 +78,7 @@ export default function HomePage() {
 
   // AI TRIP PLANNER FORM STATE
   const [aiDest, setAiDest] = useState('bali');
+  const [publishedDestinations, setPublishedDestinations] = useState<any[]>([]);
   const [aiDays, setAiDays] = useState('3');
   const [aiBudget, setAiBudget] = useState('budget');
   const [aiInterests, setAiInterests] = useState<string[]>(['nature']);
@@ -425,11 +427,13 @@ export default function HomePage() {
               <div>
                 <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Destination</label>
                 <select value={aiDest} onChange={(e) => setAiDest(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
-                  <option value="bali">Bali, Indonesia</option>
-                  <option value="tokyo">Tokyo, Japan</option>
-                  <option value="paris">Paris, France</option>
-                  <option value="lahore">Lahore, Pakistan</option>
-                  <option value="dubai">Dubai, UAE</option>
+                  {publishedDestinations.length > 0 ? (
+                    publishedDestinations.map(d => (
+                      <option key={d.slug} value={d.slug}>{d.name}, {d.country}</option>
+                    ))
+                  ) : (
+                    <option value="loading">Loading...</option>
+                  )}
                 </select>
               </div>
 
@@ -514,10 +518,20 @@ export default function HomePage() {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Most booked verified experiences globally</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-          {listings.slice(0, 4).map((item) => (
-            <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none' }}>
-              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+        <div 
+          style={{ 
+            display: 'flex', 
+            gap: '24px', 
+            overflowX: 'auto', 
+            scrollBehavior: 'smooth',
+            paddingBottom: '16px',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
+          {listings.slice(0, 8).map((item) => (
+            <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', height: '100%' }}>
+              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   {item.selling_point && (
@@ -526,22 +540,35 @@ export default function HomePage() {
                     </div>
                   )}
                 </div>
-                <div style={{ padding: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
-                    <Star size={14} color="#d97706" fill="#d97706" />
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>{item.cached_rating_avg}</span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
-                  </div>
-                  <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
-                  
-                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                    <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.confirmation_type || 'Instant Confirmation'}</span>
-                    <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.payment_option || 'Pay Now'}</span>
+                <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    {/* Pickup Location & Duration Row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>
+                        <MapPin size={12} color="#64748b" /> {item.pickup_location || 'Hotel Pickup'}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
+                        <Clock size={12} color="#64748b" /> {item.duration || '2 hours'}
+                      </span>
+                    </div>
+
+                    {/* Rating Row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                      <Star size={14} color="#d97706" fill="#d97706" />
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>{item.cached_rating_avg}</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
+                    </div>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
+                    
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.confirmation_type || 'Instant Confirmation'}</span>
+                      <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.payment_option || 'Pay Now'}</span>
+                    </div>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '14px' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From <strong style={{ fontSize: '1rem', color: '#0f172a' }}>${item.base_price} {item.currency || 'USD'}</strong> <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>/ {item.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span></span>
-                    <div className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>From <strong style={{ fontSize: '1rem', color: '#0f172a' }}>{formatPrice(item.base_price)}</strong> <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>/ {item.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span></span>
+                    <div className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
                       Book Slots
                     </div>
                   </div>
@@ -717,81 +744,52 @@ export default function HomePage() {
               msOverflowStyle: 'none'
             }}
           >
-            {filteredListings.filter(item => item.id !== 'list-bali-sunset').slice(0, 4).map((item) => (
-              <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none' }}>
-                <div 
-                  className="card-panel card-interactive" 
-                  style={{ 
-                    flex: '0 0 calc(25% - 18px)', 
-                    minWidth: '270px', 
-                    overflow: 'hidden', 
-                    display: 'flex', 
-                    flexDirection: 'column' 
-                  }}
-                >
-                  
-                  {/* IMAGE & BADGES */}
-                  <div style={{ height: '200px', position: 'relative' }}>
-                    <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    
-                    <button
-                      onClick={(e) => { e.preventDefault(); toggleWishlist(item.id, e); }}
-                      style={{
-                        position: 'absolute',
-                        top: '12px',
-                        right: '12px',
-                        background: '#ffffff',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '34px',
-                        height: '34px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        boxShadow: 'var(--shadow-sm)',
-                      }}
-                    >
-                      <Heart size={16} color={wishlist[item.id] ? '#f43f5e' : '#64748b'} fill={wishlist[item.id] ? '#f43f5e' : 'none'} />
-                    </button>
-
-                    <div style={{ position: 'absolute', bottom: '12px', left: '12px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', padding: '3px 8px', borderRadius: 'var(--radius-pill)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#0f172a', fontWeight: 700, boxShadow: 'var(--shadow-sm)' }}>
-                      <Star size={13} color="#d97706" fill="#d97706" /> {item.cached_rating_avg} ({item.cached_review_count})
+            {filteredListings.filter(item => item.id !== 'list-bali-sunset').map((item) => (
+              <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', height: '100%' }}>
+              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+                <div style={{ height: '200px', position: 'relative' }}>
+                  <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {item.selling_point && (
+                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
+                      {item.selling_point}
+                    </div>
+                  )}
+                </div>
+                <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    {/* Pickup Location & Duration Row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>
+                        <MapPin size={12} color="#64748b" /> {item.pickup_location || 'Hotel Pickup'}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
+                        <Clock size={12} color="#64748b" /> {item.duration || '2 hours'}
+                      </span>
                     </div>
 
-                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-primary)', color: '#fff', padding: '3px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem', fontWeight: 700 }}>
-                      {item.category_name || item.category}
+                    {/* Rating Row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                      <Star size={14} color="#d97706" fill="#d97706" />
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>{item.cached_rating_avg}</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(Booked 450+ times)</span>
+                    </div>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{item.title}</h3>
+                    
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.confirmation_type || 'Instant Confirmation'}</span>
+                      <span style={{ background: '#f1f5f9', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>{item.payment_option || 'Pay Now'}</span>
                     </div>
                   </div>
 
-                  {/* CONTENT */}
-                  <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <h3 style={{ fontSize: '1.05rem', marginBottom: '6px', lineHeight: 1.35, color: '#0f172a', fontWeight: 700 }}>{item.title}</h3>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {item.summary}
-                      </p>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={12} /> {item.duration_minutes / 60} {t('hours')}</span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} color="#059669" /> {t('kyc_verified')}</span>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-light)' }}>
-                      <div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('from')}</span>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                          {formatPrice(item.base_price)}
-                        </div>
-                      </div>
-                      <div className="btn-secondary" style={{ padding: '7px 14px', fontSize: '0.82rem' }}>
-                        {t('view_slots')}
-                      </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '14px' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>From <strong style={{ fontSize: '1rem', color: '#0f172a' }}>{formatPrice(item.base_price)}</strong> <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>/ {item.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span></span>
+                    <div className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+                      Book Slots
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
+            </Link>
             ))}
           </div>
         )}

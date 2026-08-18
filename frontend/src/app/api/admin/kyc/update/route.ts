@@ -52,8 +52,8 @@ export async function PATCH(request: Request) {
       notifTitle = 'Account Application Rejected';
       notifMsg = 'Unfortunately, your supplier account application has been rejected.';
     } else if (status === 'SUSPENDED') {
-      notifTitle = 'Account Suspended';
-      notifMsg = 'Your supplier account has been temporarily suspended. Please contact support.';
+      notifTitle = 'Account Banned';
+      notifMsg = `Your account has been banned. Reason: "${newReason || 'Violation of our Terms of Service or fraudulent activity detected.'}" Please contact support to appeal.`;
     }
 
     // Insert notification using service role

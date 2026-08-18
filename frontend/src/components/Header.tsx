@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 import {
   Compass,
   Sparkles,
@@ -61,16 +62,22 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const featuredCities = [
-    { name: 'Lahore', country: 'Pakistan', slug: 'lahore' },
-    { name: 'Karachi', country: 'Pakistan', slug: 'karachi' },
-    { name: 'Bali', country: 'Indonesia', slug: 'bali' },
-    { name: 'Tokyo', country: 'Japan', slug: 'tokyo' },
-    { name: 'Paris', country: 'France', slug: 'paris' },
-    { name: 'Dubai', country: 'UAE', slug: 'dubai' },
-    { name: 'Rome', country: 'Italy', slug: 'rome' },
-    { name: 'Skardu', country: 'Pakistan', slug: 'skardu' },
-  ];
+  const [featuredCities, setFeaturedCities] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      const { data, error } = await supabase
+        .from('destinations')
+        .select('name, country, slug')
+        .eq('is_published', true)
+        .limit(8);
+        
+      if (!error && data) {
+        setFeaturedCities(data);
+      }
+    };
+    fetchDestinations();
+  }, []);
 
   return (
     <>

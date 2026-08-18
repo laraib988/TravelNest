@@ -42,18 +42,20 @@ export default function AdminDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<'7D' | '30D' | '90D'>('7D');
 
   useEffect(() => {
-    async function loadDashboardData() {
+    async function loadDashboardData(showLoading = true) {
       try {
-        setLoading(true);
+        if (showLoading) {
+          setLoading(true);
+        }
         
         let statsData;
         try {
           const raw = await fetchFromAPI('/admin/dashboard');
           statsData = {
-            revenue: raw.revenue ?? raw.totalRevenue ?? 124500,
-            activeBookings: raw.activeBookings ?? 842,
-            registeredUsers: raw.registeredUsers ?? raw.totalUsers ?? 14592,
-            pendingVerifications: raw.pendingVerifications ?? raw.pendingKYC ?? 28,
+            revenue: raw.totalRevenue ?? raw.revenue ?? 124500,
+            activeBookings: raw.activeBookings ?? raw.totalBookings ?? 842,
+            registeredUsers: raw.totalUsers ?? raw.registeredUsers ?? 14592,
+            pendingVerifications: raw.pendingKYC ?? raw.pendingVerifications ?? 28,
             revenueChange: raw.revenueChange ?? 12.5,
             bookingsChange: raw.bookingsChange ?? 8.2,
             usersChange: raw.usersChange ?? 15.3,
@@ -90,11 +92,18 @@ export default function AdminDashboard() {
       } catch (err) {
         console.error('Error loading dashboard:', err);
       } finally {
-        setLoading(false);
+        if (showLoading) {
+          setLoading(false);
+        }
       }
     }
 
-    loadDashboardData();
+    loadDashboardData(true);
+    const interval = setInterval(() => {
+      loadDashboardData(false);
+    }, 5000); // Fetch real-time data every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {

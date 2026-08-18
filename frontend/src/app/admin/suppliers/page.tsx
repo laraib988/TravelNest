@@ -6,7 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { 
   Check, X, AlertTriangle, FileText, PauseCircle, ShieldAlert, CheckCircle2, 
-  RefreshCw, Search, Building2, UserCheck, ShieldCheck, ExternalLink, ChevronDown, ChevronUp
+  RefreshCw, Search, Building2, UserCheck, ShieldCheck, ExternalLink, ChevronDown, ChevronUp,
+  Ban as BanIcon
 } from 'lucide-react';
 
 interface KYCDocument {
@@ -17,6 +18,19 @@ interface KYCDocument {
   status: 'PENDING' | 'PASSED' | 'FLAGGED' | 'EXPIRED';
   expiry_date?: string;
   ocr_result?: string;
+}
+
+interface BankAccount {
+  id: string;
+  supplier_id: string;
+  bank_name: string;
+  bank_account_holder: string;
+  bank_account_number: string;
+  bank_routing_number?: string;
+  bank_country?: string;
+  bank_currency?: string;
+  is_primary?: boolean;
+  created_at?: string;
 }
 
 interface KYCRecord {
@@ -31,6 +45,7 @@ interface KYCRecord {
   ai_fraud_score: number;
   audit_reasons: string[];
   updated_at: string;
+  bankAccounts?: BankAccount[];
 }
 
 export default function SupplierVerificationPage() {
@@ -48,6 +63,12 @@ export default function SupplierVerificationPage() {
   const [fixSupplierId, setFixSupplierId] = useState('');
   const [fixCompanyName, setFixCompanyName] = useState('');
   const [fixReason, setFixReason] = useState('');
+
+  // Ban Modal State
+  const [banModalOpen, setBanModalOpen] = useState(false);
+  const [banSupplierId, setBanSupplierId] = useState('');
+  const [banCompanyName, setBanCompanyName] = useState('');
+  const [banReason, setBanReason] = useState('');
 
   useEffect(() => {
     loadRecords();
@@ -74,7 +95,8 @@ export default function SupplierVerificationPage() {
           ocr_confidence: 90, // We could pull this from db if it existed
           ai_fraud_score: 5,
           audit_reasons: row.audit_reasons || [],
-          updated_at: row.updated_at
+          updated_at: row.updated_at,
+          bankAccounts: row.bankAccounts || []
         }));
       }
 
@@ -435,10 +457,87 @@ export default function SupplierVerificationPage() {
                               </div>
 
                               <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
+                                Bank Details for Payouts
+                              </h4>
+
+                              {r.bankAccounts && r.bankAccounts.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+                                  {r.bankAccounts.map((ba) => (
+                                    <div key={ba.id} style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: ba.is_primary ? '1px solid #a7f3d0' : '1px solid #e2e8f0' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                        <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a' }}>{ba.bank_name}</div>
+                                        {ba.is_primary && (
+                                          <span style={{ background: '#ecfdf5', color: '#047857', padding: '2px 10px', borderRadius: '100px', fontSize: '0.72rem', fontWeight: 800, border: '1px solid #a7f3d0' }}>PRIMARY</span>
+                                        )}
+                                      </div>
+                                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.82rem' }}>
+                                        <div>
+                                          <div style={{ color: '#64748b', fontWeight: 700 }}>Account Holder</div>
+                                          <div className="code-ref">{ba.bank_account_holder}</div>
+                                        </div>
+                                        <div>
+                                          <div style={{ color: '#64748b', fontWeight: 700 }}>Account / IBAN</div>
+                                          <div className="code-ref">{ba.bank_account_number}</div>
+                                        </div>
+                                        {ba.bank_routing_number && (
+                                          <div>
+                                            <div style={{ color: '#64748b', fontWeight: 700 }}>Routing / SWIFT</div>
+                                            <div className="code-ref">{ba.bank_routing_number}</div>
+                                          </div>
+                                        )}
+                                        {(ba.bank_country || ba.bank_currency) && (
+                                          <div>
+                                            <div style={{ color: '#64748b', fontWeight: 700 }}>Country / Currency</div>
+                                            <div className="code-ref">{ba.bank_country} {ba.bank_currency}</div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div style={{ fontSize: '0.84rem', color: '#64748b', fontStyle: 'italic', marginBottom: '24px' }}>
+                                  No bank account linked yet.
+                                </div>
+                              )}
+
+                              <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
                                 Management Actions
                               </h4>
 
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {r.kyc_state === 'APPROVED_VERIFIED' ? (
+                                  <>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                      <button
+                                        style={{
+                                          padding: '14px', fontSize: '0.95rem', fontWeight: 900, borderRadius: '12px',
+                                          background: '#ecfdf5', color: '#047857',
+                                          border: '1px solid #a7f3d0', cursor: 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                        }}
+                                      >
+                                        <CheckCircle2 size={18} color="#10b981" /> Approved
+                                      </button>
+                                      <button
+                                        style={{
+                                          padding: '14px', fontSize: '0.95rem', fontWeight: 900, borderRadius: '12px',
+                                          background: 'linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)', color: '#ffffff',
+                                          border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                          boxShadow: '0 4px 16px rgba(225, 29, 72, 0.25)'
+                                        }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setBanSupplierId(r.supplier_id);
+                                          setBanCompanyName(r.company_name);
+                                          setBanReason('');
+                                          setBanModalOpen(true);
+                                        }}
+                                      >
+                                        <BanIcon size={18} color="#ffffff" /> Ban Account
+                                      </button>
+                                    </div>
+                                  </>
+                                ) : (
                                 <button
                                   style={{
                                     width: '100%', padding: '14px', fontSize: '0.95rem', fontWeight: 900, borderRadius: '12px',
@@ -450,7 +549,9 @@ export default function SupplierVerificationPage() {
                                 >
                                   <Check size={18} color="#ffffff" /> Approve Account & Verify
                                 </button>
+                                )}
 
+                                {r.kyc_state !== 'APPROVED_VERIFIED' && (
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                                   <button
                                     style={{ padding: '10px', fontSize: '0.8rem', fontWeight: 800, borderRadius: '10px', background: '#fffbe6', color: '#d97706', border: '1px solid #fde68a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
@@ -477,6 +578,7 @@ export default function SupplierVerificationPage() {
                                     <PauseCircle size={14} /> Suspend
                                   </button>
                                 </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -534,6 +636,55 @@ export default function SupplierVerificationPage() {
                 style={{ padding: '12px 24px', background: '#d97706', color: '#ffffff', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: fixReason.trim() ? 'pointer' : 'not-allowed', opacity: fixReason.trim() ? 1 : 0.5 }}
               >
                 Send Fix Request
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ban Supplier Modal */}
+      {banModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1001 }}>
+          <div style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '500px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff1f2', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BanIcon size={24} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Ban Supplier Account</h3>
+                <div style={{ fontSize: '0.85rem', color: '#64748b' }}>For {banCompanyName}</div>
+              </div>
+            </div>
+            
+            <p style={{ fontSize: '0.9rem', color: '#475569', marginBottom: '16px', lineHeight: 1.5 }}>
+              This will immediately revoke the supplier's dashboard access. They will see the reason below and will be blocked from logging into their account. This action cannot be undone easily.
+            </p>
+            
+            <textarea
+              value={banReason}
+              onChange={(e) => setBanReason(e.target.value)}
+              placeholder="e.g. Fraudulent activity detected. This account is banned for violating our Terms of Service."
+              style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none', minHeight: '120px', resize: 'vertical', marginBottom: '24px' }}
+            />
+            
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => setBanModalOpen(false)}
+                style={{ padding: '12px 20px', background: 'transparent', border: 'none', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  if (banReason.trim()) {
+                    handleUpdateKycState(banSupplierId, 'SUSPENDED', banCompanyName, `Supplier Account BANNED: "${banCompanyName}"`, banReason.trim());
+                    setBanModalOpen(false);
+                  }
+                }}
+                disabled={!banReason.trim()}
+                style={{ padding: '12px 24px', background: '#e11d48', color: '#ffffff', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: banReason.trim() ? 'pointer' : 'not-allowed', opacity: banReason.trim() ? 1 : 0.5 }}
+              >
+                Confirm Ban
               </button>
             </div>
           </div>
