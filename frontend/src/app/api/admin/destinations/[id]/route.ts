@@ -7,6 +7,17 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export const dynamic = 'force-dynamic';
 
+const stripBase64 = (obj: any): any => {
+  if (typeof obj === 'string' && obj.startsWith('data:image/')) return '';
+  if (Array.isArray(obj)) return obj.map(stripBase64);
+  if (obj !== null && typeof obj === 'object') {
+    const newObj: any = {};
+    for (const key in obj) newObj[key] = stripBase64(obj[key]);
+    return newObj;
+  }
+  return obj;
+};
+
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
@@ -28,12 +39,28 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       updates.slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     }
 
-    const { data, error } = await supabase
+    const sanitized = stripBase64(updates);
+
+    let { data, error } = await supabase
       .from('destinations')
-      .update(updates)
+      .update(sanitized)
       .eq('id', id)
       .select()
       .single();
+
+    // If best_time_to_visit column doesn't exist in DB, retry without it
+    if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
+      console.warn('best_time_to_visit column not found, retrying without it...');
+      const { best_time_to_visit, ...withoutBttv } = sanitized;
+      const retry = await supabase
+        .from('destinations')
+        .update(withoutBttv)
+        .eq('id', id)
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) throw error;
 

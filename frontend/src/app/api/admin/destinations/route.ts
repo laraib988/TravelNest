@@ -29,25 +29,19 @@ CREATE TABLE IF NOT EXISTS public.destinations (
 );
 `;
 
-async function ensureTable() {
-  try {
-    const { error } = await supabase.from('destinations').select('id').limit(1);
-    if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
-      await supabase.rpc('exec_sql', { sql: CREATE_TABLE_SQL }).catch(() => null);
-    } else {
-      // Add column if table exists but column doesn't
-      await supabase.rpc('exec_sql', { 
-        sql: "ALTER TABLE public.destinations ADD COLUMN IF NOT EXISTS best_time_to_visit JSONB DEFAULT '{}'::jsonb;" 
-      }).catch(() => null);
-    }
-  } catch (e) {
-    // Table might already exist
+const stripBase64 = (obj: any): any => {
+  if (typeof obj === 'string' && obj.startsWith('data:image/')) return '';
+  if (Array.isArray(obj)) return obj.map(stripBase64);
+  if (obj !== null && typeof obj === 'object') {
+    const newObj: any = {};
+    for (const key in obj) newObj[key] = stripBase64(obj[key]);
+    return newObj;
   }
-}
+  return obj;
+};
 
 export async function GET() {
   try {
-    await ensureTable();
     const { data, error } = await supabase
       .from('destinations')
       .select('*')
@@ -68,12 +62,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await ensureTable();
     const body = await request.json();
 
     const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    const destination = {
+    const destination: any = {
       name: body.name,
       slug,
       country: body.country,
@@ -85,20 +78,39 @@ export async function POST(request: Request) {
       faqs: body.faqs || [],
       gallery: body.gallery || [],
       itinerary: body.itinerary || [],
-      best_time_to_visit: body.best_time_to_visit || { months: [], description: '' },
       popular_activities_count: body.popular_activities_count || 0,
       is_published: body.is_published ?? false,
     };
 
-    const { data, error } = await supabase
+    // Only include best_time_to_visit if provided
+    if (body.best_time_to_visit) {
+      destination.best_time_to_visit = body.best_time_to_visit;
+    }
+
+    const sanitized = stripBase64(destination);
+
+    let { data, error } = await supabase
       .from('destinations')
-      .insert(destination)
+      .insert(sanitized)
       .select()
       .single();
 
+    // If best_time_to_visit column doesn't exist in DB, retry without it
+    if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
+      console.warn('best_time_to_visit column not found, retrying without it...');
+      const { best_time_to_visit, ...withoutBttv } = sanitized;
+      const retry = await supabase
+        .from('destinations')
+        .insert(withoutBttv)
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
+
     if (error) {
-      if (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('schema cache') || error.message?.includes('Could not find the table')) {
-        return NextResponse.json({ error: 'Database table not found. Please click the "Setup Destinations Table" button on the main destinations page first.', sql: CREATE_TABLE_SQL }, { status: 400 });
+      if (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('Could not find the table')) {
+        return NextResponse.json({ error: 'Database table not found. Please run the setup SQL first.', sql: CREATE_TABLE_SQL }, { status: 400 });
       }
       throw error;
     }

@@ -28,7 +28,7 @@ function DestinationFormContent() {
     best_points: [{ title: '', description: '' }],
     trending_places: [{ name: '', image: '', description: '' }],
     faqs: [{ question: '', answer: '' }],
-    gallery: [{ image: '', caption: '' }],
+    gallery: [{ image_url: '', caption: '' }],
     itinerary: [{ title: '', description: '', image: '' }],
     best_time_to_visit: { months: [] as string[], description: '' },
     is_published: false
@@ -59,7 +59,7 @@ function DestinationFormContent() {
               best_points: dest.best_points?.length ? dest.best_points : [{ title: '', description: '' }],
               trending_places: dest.trending_places?.length ? dest.trending_places : [{ name: '', image: '', description: '' }],
               faqs: dest.faqs?.length ? dest.faqs : [{ question: '', answer: '' }],
-              gallery: dest.gallery?.length ? dest.gallery : [{ image: '', caption: '' }],
+              gallery: dest.gallery?.length ? dest.gallery : [{ image_url: '', caption: '' }],
               itinerary: dest.itinerary?.length ? dest.itinerary : [{ title: '', description: '', image: '' }],
               best_time_to_visit: dest.best_time_to_visit || { months: [], description: '' },
               is_published: dest.is_published || false
@@ -551,8 +551,8 @@ function DestinationFormContent() {
             )}
             <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '20px', alignItems: 'start' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {item.image ? (
-                  <img src={item.image} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {(item as any).image_url ? (
+                  <img src={(item as any).image_url} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <ImageIcon size={24} color="#94a3b8" />
                 )}
@@ -563,8 +563,8 @@ function DestinationFormContent() {
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input 
                       style={{ ...inputStyle, flex: 1 }} 
-                      value={item.image} 
-                      onChange={(e) => handleArrayChange('gallery', index, 'image', e.target.value)} 
+                      value={(item as any).image_url} 
+                      onChange={(e) => handleArrayChange('gallery', index, 'image_url', e.target.value)} 
                     />
                     <label style={{
                       display: 'flex', alignItems: 'center', gap: '4px', padding: '10px 14px',
@@ -593,7 +593,7 @@ function DestinationFormContent() {
             </div>
           </div>
         ))}
-        <button style={addBtnStyle} onClick={() => addArrayItem('gallery', { image: '', caption: '' })}>
+        <button style={addBtnStyle} onClick={() => addArrayItem('gallery', { image_url: '', caption: '' })}>
           <Plus size={20} /> Add Item
         </button>
       </div>
