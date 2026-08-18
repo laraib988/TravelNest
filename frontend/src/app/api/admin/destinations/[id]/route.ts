@@ -81,7 +81,24 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ error: 'Destination not found with this ID.' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data });
+    // --- STEP 6: ACTION AUDIT LOGGING ---
+    try {
+      const { logAuditAction } = await import('@/lib/audit');
+      await logAuditAction({
+        actorId: 'ADMIN_PORTAL',
+        actorRole: 'ADMIN',
+        action: 'UPDATE_DESTINATION',
+        entityId: id,
+        entityType: 'DESTINATION',
+        details: { fieldsUpdated: Object.keys(updates) },
+        ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1'
+      });
+    } catch (auditErr) {
+      console.error('Failed to log audit action:', auditErr);
+    }
+    // ------------------------------------
+
+    return NextResponse.json({ data });
   } catch (error: any) {
     console.error('Error updating destination:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

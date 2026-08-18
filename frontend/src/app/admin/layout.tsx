@@ -39,6 +39,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/cms': 'Content Management System (CMS)',
   '/admin/promotions': 'Promotions & Coupons',
   '/admin/payouts': 'Payouts Ledger',
+  '/admin/security': 'Security & Audit Center',
   '/admin/settings': 'System Settings',
 };
 
@@ -75,6 +76,13 @@ const NAV_SECTIONS = [
       { href: '/admin/payouts', icon: Wallet, label: 'Payouts' },
     ],
   },
+  {
+    label: 'SYSTEM & SECURITY',
+    items: [
+      { href: '/admin/security', icon: ShieldAlert, label: 'Security & Audit' },
+      { href: '/admin/settings', icon: Settings, label: 'Platform Settings' },
+    ],
+  }
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

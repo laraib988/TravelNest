@@ -1,9 +1,33 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+
+// Define a strict schema for incoming data to prevent XSS and malformed payloads
+const signupSchema = z.object({
+  email: z.string().email("Invalid email format").max(255, "Email is too long"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(100, "Password is too long"),
+  // Only allow letters, spaces, hyphens, and apostrophes to prevent script injection (XSS)
+  name: z.string().min(2, "Name must be at least 2 characters").max(100).regex(/^[a-zA-Z\s\-\']+$/, "Name contains invalid characters. No HTML or scripts allowed."),
+  role: z.enum(['CUSTOMER', 'SUPPLIER', 'ADMIN']).default('CUSTOMER'),
+  kycData: z.record(z.any()).optional(), // Ensure it's an object if provided
+});
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name, role, kycData } = await request.json();
+    const rawData = await request.json();
+    
+    // Validate and sanitize input
+    const validationResult = signupSchema.safeParse(rawData);
+    
+    if (!validationResult.success) {
+      // Return 400 Bad Request with specific validation errors
+      return NextResponse.json({ 
+        error: 'Strict Validation Failed', 
+        details: validationResult.error.format() 
+      }, { status: 400 });
+    }
+
+    const { email, password, name, role, kycData } = validationResult.data;
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -57,7 +81,22 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ user: data.user }, { status: 200 });
+    // --- STEP 6: ACTION AUDIT LOGGING ---
+    try {
+      const { logAuditAction } = await import('@/lib/audit');
+      await logAuditAction({
+        actorId: data.user?.id || 'SYSTEM',
+        actorRole: role,
+        action: 'USER_SIGNUP',
+        entityId: data.user?.id,
+        entityType: 'USER',
+        details: { email, role, hasKyc: !!kycData },
+        ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1'
+      });
+    } catch (auditErr) {}
+    // ------------------------------------
+
+    return NextResponse.json({ message: 'User created successfully', user: data.user });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Script from 'next/script';
 
 interface TurnstileWidgetProps {
   onVerify: (token: string) => void;
@@ -13,46 +14,52 @@ export default function TurnstileWidget({
   siteKey = '1x00000000000000000000AA' 
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
   const widgetIdRef = useRef<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (!document.getElementById('turnstile-script')) {
-      const script = document.createElement('script');
-      script.id = 'turnstile-script';
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => setIsLoaded(true);
-      document.head.appendChild(script);
-    } else if (window.turnstile) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoaded && containerRef.current && window.turnstile && !widgetIdRef.current) {
-      widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: siteKey,
-        callback: function(token: string) {
-          onVerify(token);
-        },
-        theme: 'light',
-      });
+    // If it's already available globally
+    if (typeof window !== 'undefined' && window.turnstile) {
+      setIsReady(true);
     }
     
+    // Cloudflare will call this globally when the script is fully parsed and ready
+    window.onloadTurnstileCallback = () => {
+      setIsReady(true);
+    };
+
     return () => {
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.remove(widgetIdRef.current);
         widgetIdRef.current = null;
       }
     };
-  }, [isLoaded, siteKey, onVerify]);
+  }, []);
+
+  useEffect(() => {
+    if (isReady && containerRef.current && window.turnstile && !widgetIdRef.current) {
+      try {
+        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+          sitekey: siteKey,
+          callback: (token: string) => {
+            onVerify(token);
+          },
+          theme: 'light',
+        });
+      } catch (error) {
+        console.error("Turnstile rendering error:", error);
+      }
+    }
+  }, [isReady, siteKey, onVerify]);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0', minHeight: '65px' }}>
+      <Script 
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback&render=explicit" 
+        strategy="afterInteractive"
+      />
       <div ref={containerRef}>
-        {!isLoaded && <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Loading Security Check...</div>}
+        {!isReady && <div style={{ fontSize: '0.85rem', color: '#94a3b8', padding: '10px' }}>Loading Security Check...</div>}
       </div>
     </div>
   );
@@ -65,5 +72,6 @@ declare global {
       remove: (widgetId: string) => void;
       reset: (widgetId: string) => void;
     };
+    onloadTurnstileCallback?: () => void;
   }
 }
