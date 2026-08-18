@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       .from('destinations')
       .insert(sanitized)
       .select()
-      .single();
+      .maybeSingle();
 
     // If best_time_to_visit column doesn't exist in DB, retry without it
     if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         .from('destinations')
         .insert(withoutBttv)
         .select()
-        .single();
+        .maybeSingle();
       data = retry.data;
       error = retry.error;
     }

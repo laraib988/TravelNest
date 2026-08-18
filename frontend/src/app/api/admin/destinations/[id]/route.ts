@@ -46,7 +46,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .update(sanitized)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     // If best_time_to_visit column doesn't exist in DB, retry without it
     if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
@@ -57,12 +57,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         .update(withoutBttv)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
       data = retry.data;
       error = retry.error;
     }
 
     if (error) throw error;
+
+    if (!data) {
+      return NextResponse.json({ error: 'Destination not found with this ID.' }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true, data });
   } catch (error: any) {

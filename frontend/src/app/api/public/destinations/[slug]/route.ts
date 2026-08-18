@@ -15,7 +15,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
       .from('destinations')
       .select('*')
       .ilike('slug', slug)
-      .single();
+      .maybeSingle();
 
     if (error || !destination) {
       return NextResponse.json({ error: 'Destination not found' }, { status: 404 });
