@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, ArrowRight, ShieldCheck, CheckCircle } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import TurnstileWidget from '@/components/TurnstileWidget';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,9 +69,11 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <TurnstileWidget onVerify={(token) => setTurnstileToken(token)} />
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !turnstileToken}
             className="btn-primary"
             style={{
               padding: '14px',
@@ -78,6 +82,8 @@ export default function LoginPage() {
               borderRadius: 'var(--radius-pill)',
               justifyContent: 'center',
               marginTop: '8px',
+              opacity: (!turnstileToken) ? 0.6 : 1,
+              cursor: (!turnstileToken) ? 'not-allowed' : 'pointer'
             }}
           >
             {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={18} />

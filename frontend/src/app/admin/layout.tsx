@@ -83,16 +83,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const { user, login, logout, signup } = useAuth();
 
+  const [mfaPending, setMfaPending] = useState(true);
+  const router = require('next/navigation').useRouter();
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Strict MFA Bypass Protection
+  useEffect(() => {
+    const checkSecurity = async () => {
+      if (!user || user.role !== 'ADMIN') {
+        setMfaPending(false);
+        return;
+      }
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (!error && data?.nextLevel === 'aal2' && data?.currentLevel === 'aal1') {
+          // MFA is enrolled but not verified yet. Kick them back to login.
+          router.replace('/admin/login');
+        } else {
+          setMfaPending(false);
+        }
+      } catch (e) {
+        setMfaPending(false);
+      }
+    };
+    
+    if (isMounted && pathname !== '/admin/login' && pathname !== '/admin/signup') {
+      checkSecurity();
+    } else {
+      setMfaPending(false);
+    }
+  }, [user, isMounted, pathname, router]);
 
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  if (!isMounted) return null;
+  if (!isMounted || mfaPending) return null;
 
   // Allow access to login and signup pages without layout restrictions
   if (pathname === '/admin/login' || pathname === '/admin/signup') {

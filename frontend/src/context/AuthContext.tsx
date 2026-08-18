@@ -119,9 +119,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (error) throw error;
     
+    // Check if MFA is required
+    const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (!aalError && aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
+      // User has enrolled in MFA but hasn't verified this session
+      return { needsMFA: true, user: data.user };
+    }
+    
     // Wait for the profile to be fetched so the caller gets the full user object
     await fetchProfile(data.user.id, data.user.email || '');
-    return user; // Return the user object (it might be slightly delayed, but we fetch it above)
+    return { needsMFA: false, user: user }; 
   };
 
   const checkUserExists = async (email: string) => {
