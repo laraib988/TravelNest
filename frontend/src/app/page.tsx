@@ -94,6 +94,9 @@ export default function HomePage() {
   const [emailSub, setEmailSub] = useState('');
   const [subSuccess, setSubSuccess] = useState(false);
 
+  // Weather state for trending destinations
+  const [destWeather, setDestWeather] = useState<Record<string, { temp: number; icon: string; condition: string }>>({});
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -104,7 +107,19 @@ export default function HomePage() {
         
         setListings(supabaseListingsRes || []);
         
-        setDestinations(destsRes || []);
+        const dests = destsRes || [];
+        setDestinations(dests);
+        if (dests.length > 0) {
+          const slugs = dests.map((d: any) => d.slug).join(',');
+          fetch(`/api/public/destinations/weather-batch?slugs=${slugs}`)
+            .then(res => res.json())
+            .then(wData => {
+              if (wData.destinations) {
+                setDestWeather(wData.destinations);
+              }
+            })
+            .catch(() => {});
+        }
       } catch (err) {
         console.error('Error fetching storefront data:', err);
       } finally {
@@ -371,7 +386,7 @@ export default function HomePage() {
                   <div style={{ position: 'absolute', bottom: '18px', left: '18px' }}>
                     <h3 style={{ fontSize: '1.4rem', color: '#ffffff', marginBottom: '4px', fontWeight: 800 }}>{dest.name}</h3>
                     <span style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <MapPin size={13} /> {dest.popular_activities_count}+ {t('verified_slots')}
+                      <MapPin size={13} /> {destWeather[dest.slug] ? `${destWeather[dest.slug].icon} ${destWeather[dest.slug].temp}°C · ${destWeather[dest.slug].condition}` : `${dest.popular_activities_count}+ ${t('verified_slots')}`}
                     </span>
                   </div>
                 </div>
