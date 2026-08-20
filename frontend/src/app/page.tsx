@@ -594,10 +594,10 @@ export default function HomePage() {
           </div>
 
           <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Zap size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Instant QR E-Vouchers</h3>
+            <Award size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Earn Loyalty Rewards</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              No manual waiting times. Receive your booking vouchers and check-in QR codes instantly to skip queue lines.
+              Earn exclusive loyalty points with every experience you book. Redeem points for discount vouchers and premium travel benefits.
             </p>
           </div>
 
