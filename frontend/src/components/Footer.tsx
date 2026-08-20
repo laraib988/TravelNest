@@ -56,8 +56,10 @@ export default function Footer() {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.95rem' }}>
                 <li><Link href="/community" style={{ color: '#d1d5db', textDecoration: 'none' }}>Community Forum</Link></li>
                 <li><Link href="/loyalty" style={{ color: '#d1d5db', textDecoration: 'none' }}>Loyalty & Rewards</Link></li>
+                <li><Link href="/blog" style={{ color: '#d1d5db', textDecoration: 'none' }}>Travel Journal</Link></li>
+                <li><Link href="/ai-planner" style={{ color: '#d1d5db', textDecoration: 'none' }}>AI Trip Studio</Link></li>
+                <li><Link href="/supplier" style={{ color: '#d1d5db', textDecoration: 'none' }}>Supplier Portal</Link></li>
                 <li><Link href="/about" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('about_us')}</Link></li>
-                {/* <li><Link href="/contact" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('contact')}</Link></li> */}
                 <li><Link href="/support" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('help_support')}</Link></li>
               </ul>
             </div>
