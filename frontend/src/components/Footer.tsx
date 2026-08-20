@@ -48,57 +48,6 @@ export default function Footer() {
               paddingBottom: '50px',
             }}
           >
-            {/* COLUMN 1: BRAND LOGO, DESCRIPTION & SOCIAL LINKS */}
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    border: '2px solid #38bdf8', // Cohesive sky blue accent color
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#38bdf8',
-                  }}
-                >
-                  <MapPin size={20} />
-                </div>
-                <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  TravelNest Tours
-                </h3>
-              </div>
-
-              <p style={{ color: '#d1d5db', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '24px', maxWidth: '300px' }}>
-                Discover amazing destinations and create unforgettable memories with our curated travel experiences.
-              </p>
-
-              {/* SOCIAL MEDIA ICONS */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <a href="https://facebook.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="Facebook">
-                  <Facebook size={20} />
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="Twitter">
-                  <Twitter size={20} />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="Instagram">
-                  <Instagram size={20} />
-                </a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="YouTube">
-                  <Youtube size={20} />
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="LinkedIn">
-                  <Linkedin size={20} />
-                </a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s', display: 'flex', alignItems: 'center' }} aria-label="TikTok">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-
             {/* COLUMN 2: QUICK LINKS */}
             <div>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
@@ -153,6 +102,56 @@ export default function Footer() {
               </div>
             </div>
 
+          </div>
+
+          
+          {/* PAYMENT CHANNELS */}
+          <div style={{ borderTop: '1px solid #1e293b', paddingTop: '30px', paddingBottom: '30px' }}>
+            <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Payment channels
+            </h4>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Visa */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', letterSpacing: '1px' }}>
+                <span style={{ color: '#38bdf8', marginRight: '4px' }}>💳</span> VISA
+              </div>
+              {/* Mastercard */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', gap: '6px' }}>
+                <span style={{ color: '#f59e0b' }}>●</span><span style={{ color: '#ef4444' }}>●</span> mastercard
+              </div>
+              {/* Amex */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
+                AMEX
+              </div>
+              {/* JCB */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
+                JCB
+              </div>
+              {/* UnionPay */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
+                UnionPay
+              </div>
+              {/* Discover */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
+                DISCOVER
+              </div>
+              {/* Diners Club */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
+                Diners Club
+              </div>
+              {/* Apple Pay */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
+                 Pay
+              </div>
+              {/* Google Pay */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', gap: '4px' }}>
+                <span style={{ color: '#38bdf8' }}>G</span> Pay
+              </div>
+              {/* PayPal */}
+              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', fontStyle: 'italic' }}>
+                PayPal
+              </div>
+            </div>
           </div>
 
           {/* BOTTOM COPYRIGHT BAR */}
