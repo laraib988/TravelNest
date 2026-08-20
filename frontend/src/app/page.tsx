@@ -788,56 +788,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 12. DYNAMIC FAQ ACCORDION */}
-      <section style={{ maxWidth: '800px', margin: '0 auto 60px', padding: '0 24px' }}>
-        <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-          {t('faq_title')}
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
-          Everything you need to know about TravelNest bookings & verification
-        </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {[
-            { q: 'How do I access my booking QR voucher?', a: 'Once payment is confirmed securely, an email confirmation is sent. You can also view your active check-in QR codes under the "My Bookings" tab in your header menu.' },
-            { q: 'Can I cancel my experience for a full refund?', a: 'Yes! Most of our activities offer free cancellation up to 24 hours before the scheduled experience start time. Check individual cards for validation.' },
-            { q: 'How are local tour operators verified?', a: 'We perform strict KYC document checks including trade license review, corporate tax registration check, and public liability insurance checks before supplier approval.' },
-            { q: 'How does the AI Trip Planner build my itinerary?', a: 'Our AI engine aggregates actual real-time availability slots, budget options, and interest parameters to generate a custom bookable trip board instantly.' }
-          ].map((faq, index) => {
-            const isOpen = faqOpen[index];
-            return (
-              <div key={index} style={{ border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', background: '#ffffff', overflow: 'hidden' }}>
-                <button
-                  onClick={() => toggleFaq(index)}
-                  style={{
-                    width: '100%',
-                    padding: '18px 24px',
-                    textAlign: 'left',
-                    background: 'none',
-                    border: 'none',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    color: '#0f172a',
-                  }}
-                >
-                  <span>{faq.q}</span>
-                  {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                </button>
-                {isOpen && (
-                  <div style={{ padding: '0 24px 20px', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       {/* 13. NEWSLETTER */}
       <section style={{ maxWidth: '1100px', margin: '0 auto 60px', padding: '0 24px' }}>
         <div style={{ background: 'var(--brand-gradient)', padding: '50px 30px', borderRadius: 'var(--radius-lg)', color: '#ffffff', textAlign: 'center', boxShadow: '0 12px 36px rgba(2, 132, 199, 0.25)' }}>
