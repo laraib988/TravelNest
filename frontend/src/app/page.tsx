@@ -11,7 +11,6 @@ import {
   Clock,
   ShieldCheck,
   ArrowRight,
-  Heart,
   SlidersHorizontal,
   Check,
   Shield,
@@ -28,14 +27,17 @@ import {
   Users,
   Award,
   Lock,
-  Mail
+  Mail,
+  Ticket,
+  Train,
+  Car
 } from 'lucide-react';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
 import SortFilterDropdown, { SortOption } from '@/components/SortFilterDropdown';
 
 export default function HomePage() {
-  const { formatPrice, currency, t, wishlist, toggleWishlist } = useCurrency();
+  const { formatPrice, currency, t } = useCurrency();
 
   const toursSliderRef = useRef<HTMLDivElement>(null);
   const reviewsSliderRef = useRef<HTMLDivElement>(null);
@@ -311,32 +313,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. CATEGORIES HORIZONTAL BAR */}
-      <section style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '16px 0', marginBottom: '40px' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginRight: '8px', flexShrink: 0 }}>
-            Categories:
-          </span>
-          {quickFilterChips.map((chip) => (
-            <button
-              key={chip.id}
-              onClick={() => setSelectedCategory(chip.id)}
-              className={`chip-filter ${selectedCategory === chip.id ? 'active' : ''}`}
-              style={{
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                padding: '10px 22px',
-                borderRadius: 'var(--radius-pill)',
-                whiteSpace: 'nowrap',
-                border: selectedCategory === chip.id ? 'none' : '1px solid #cbd5e1',
-                background: selectedCategory === chip.id ? 'var(--brand-gradient)' : '#ffffff',
-                color: selectedCategory === chip.id ? '#ffffff' : '#0f172a',
-                cursor: 'pointer',
-              }}
-            >
-              {chip.label}
-            </button>
-          ))}
+      {/* 2. STATIC QUICK CATEGORIES BAR */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 40px', padding: '24px 24px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+          
+          {/* Card 1 - Tours & experiences */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <Compass size={32} color="#f97316" />
+            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'center' }}>Tours & experiences</span>
+          </div>
+
+          {/* Card 2 - Attraction tickets */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <Ticket size={32} color="#8b5cf6" />
+            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'center' }}>Attraction tickets</span>
+          </div>
+
+          {/* Card 3 - Transport */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <Train size={32} color="#3b82f6" />
+            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'center' }}>Transport</span>
+          </div>
+
+          {/* Card 4 - Car rentals */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <Car size={32} color="#10b981" />
+            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'center' }}>Car rentals</span>
+          </div>
+
         </div>
       </section>
 
@@ -504,32 +508,6 @@ export default function HomePage() {
               <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', flex: 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleWishlist(item.id);
-                    }} 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '12px', 
-                      right: '12px', 
-                      background: 'rgba(255,255,255,0.9)', 
-                      backdropFilter: 'blur(4px)', 
-                      border: 'none', 
-                      borderRadius: '50%', 
-                      width: '32px', 
-                      height: '32px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      cursor: 'pointer', 
-                      zIndex: 10, 
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                  >
-                    <Heart size={15} color={wishlist.includes(item.id) ? '#e11d48' : '#64748b'} fill={wishlist.includes(item.id) ? '#e11d48' : 'none'} />
-                  </button>
                   {item.selling_point && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                       {item.selling_point}
@@ -745,32 +723,6 @@ export default function HomePage() {
               <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', flex: 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleWishlist(item.id);
-                    }} 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '12px', 
-                      right: '12px', 
-                      background: 'rgba(255,255,255,0.9)', 
-                      backdropFilter: 'blur(4px)', 
-                      border: 'none', 
-                      borderRadius: '50%', 
-                      width: '32px', 
-                      height: '32px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      cursor: 'pointer', 
-                      zIndex: 10, 
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                  >
-                    <Heart size={15} color={wishlist.includes(item.id) ? '#e11d48' : '#64748b'} fill={wishlist.includes(item.id) ? '#e11d48' : 'none'} />
-                  </button>
                   {item.selling_point && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                       {item.selling_point}
