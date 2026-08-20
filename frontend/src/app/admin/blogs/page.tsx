@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Newspaper, Plus, Edit, Trash2, Eye, EyeOff, RefreshCw, AlertCircle, Sparkles, CheckCircle2, XCircle } from 'lucide-react';
+import { Newspaper, Plus, Edit, Trash2, Eye, EyeOff, RefreshCw, AlertCircle, Sparkles, CheckCircle2, XCircle, PenLine } from 'lucide-react';
 
 interface Blog {
   id: string;
@@ -175,7 +175,7 @@ export default function AdminBlogsPage() {
             className="btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '9999px', fontWeight: 700 }}
           >
-            <Plus size={18} /> New Blog
+            <PenLine size={18} /> Write Manually
           </button>
         </div>
       </div>

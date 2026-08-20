@@ -78,8 +78,13 @@ export default function TourDetailPage() {
         }
         // SRS 3.7: Fetch reviews for this listing
         try {
-          const reviewsRes = await fetchFromAPI(`/reviews?listing_id=${res.id}`);
-          setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
+          const reviewsNextRes = await fetch(`/api/public/reviews?listing_id=${res.id}`, { cache: 'no-store' });
+          if (reviewsNextRes.ok) {
+            const reviewsRes = await reviewsNextRes.json();
+            setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
+          } else {
+            setReviews([]);
+          }
         } catch { setReviews([]); }
         
         // Fetch relevant products
@@ -107,7 +112,7 @@ export default function TourDetailPage() {
     setUploadError(null);
     setReviewSuccessMsg(null);
     try {
-      const newReview = await fetchFromAPI('/reviews', {
+      const nextReviewRes = await fetch('/api/public/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -119,6 +124,11 @@ export default function TourDetailPage() {
           tour_types: reviewTourTypes,
         }),
       });
+      if (!nextReviewRes.ok) {
+        const errBody = await nextReviewRes.json().catch(() => ({}));
+        throw new Error(errBody.message || 'Failed to submit review via proxy');
+      }
+      const newReview = await nextReviewRes.json();
       setReviewSuccessMsg('Your review has been submitted for moderation! It will appear once approved by the administrator.');
       setReviewTitle('');
       setReviewComment('');

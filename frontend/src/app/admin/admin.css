@@ -648,3 +648,29 @@
     padding: 0 20px;
   }
 }
+
+/* ===== Rich Text Editor (Tiptap) ===== */
+.rte-prose { min-height: inherit; outline: none; }
+.rte-prose p { margin: 0 0 14px; line-height: 1.75; color: #334155; font-size: 0.98rem; }
+.rte-prose h2 { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 26px 0 12px; }
+.rte-prose h3 { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 22px 0 10px; }
+.rte-prose h4 { font-size: 1.08rem; font-weight: 700; color: #0f172a; margin: 18px 0 8px; }
+.rte-prose ul { padding-left: 24px; margin: 0 0 14px; list-style: disc; }
+.rte-prose ol { padding-left: 24px; margin: 0 0 14px; list-style: decimal; }
+.rte-prose li { margin-bottom: 4px; color: #334155; line-height: 1.7; }
+.rte-prose blockquote { border-left: 4px solid #7c3aed; background: #f8fafc; padding: 12px 18px; border-radius: 8px; margin: 0 0 14px; color: #475569; }
+.rte-prose code { background: #f1f5f9; padding: 2px 6px; border-radius: 5px; font-size: 0.85em; color: #be185d; font-family: Consolas, monospace; }
+.rte-prose pre { background: #0f172a; color: #e2e8f0; padding: 16px 20px; border-radius: 10px; overflow-x: auto; margin: 0 0 14px; }
+.rte-prose pre code { background: transparent; color: inherit; padding: 0; }
+.rte-prose a { color: #7c3aed; font-weight: 600; }
+.rte-prose img { max-width: 100%; border-radius: 10px; margin: 12px 0; }
+.rte-prose hr { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+.rte-prose mark { background: #fef08a; padding: 0 3px; border-radius: 3px; }
+.rte-prose .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.rte-wrap .ProseMirror-focused { outline: none; }

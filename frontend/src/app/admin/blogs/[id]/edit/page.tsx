@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Save, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 
 export default function AdminBlogEditPage() {
   const router = useRouter();
@@ -191,12 +192,16 @@ export default function AdminBlogEditPage() {
                 <input style={inputStyle} value={form.hero_image_alt} onChange={(e) => setForm({ ...form, hero_image_alt: e.target.value })} />
               </div>
               <div>
-                <label style={labelStyle}>Content (Markdown) *</label>
-                <textarea
-                  style={{ ...inputStyle, minHeight: '420px', fontFamily: 'monospace', fontSize: '0.85rem', resize: 'vertical' }}
-                  value={form.content_markdown}
-                  onChange={(e) => setForm({ ...form, content_markdown: e.target.value })}
+                <label style={labelStyle}>Content (Rich Text) *</label>
+                <RichTextEditor
+                  value={form.content_markdown || ''}
+                  onChange={(md) => setForm({ ...form, content_markdown: md })}
+                  placeholder="Start writing your travel guide… Use the toolbar for bold, italic, headings, lists, links, images and more."
+                  minHeight="500px"
                 />
+                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px' }}>
+                  Rich text is stored as Markdown and rendered on the public blog page.
+                </p>
               </div>
             </div>
           </div>
