@@ -553,88 +553,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
-      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-          {t('why_choose_title')}
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
-          We guarantee safety, speed, and premium support for travelers worldwide
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Shield size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>100% KYC Verified Suppliers</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Every operator undergoes mandatory government trade license, tourism permit, and marine liability insurance checks.
-            </p>
-          </div>
-
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Award size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Earn Loyalty Rewards</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Earn exclusive loyalty points with every experience you book. Redeem points for discount vouchers and premium travel benefits.
-            </p>
-          </div>
-
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <DollarSign size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Best Price Guarantee</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Found the same experience cheaper? We'll match the price or refund the difference instantly, 0 hidden fees.
-            </p>
-          </div>
-
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Headphones size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>24/7 AI Concierge</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Access our smart AI trip planner and multilingual customer support for instant modifications on the go.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. HOW IT WORKS */}
-      <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-            🧭 {t('how_works_title')}
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
-            Book premium local experiences in 4 simple steps
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>1</div>
-              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Choose Experience</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Explore 5,000+ verified sightseeing tours, food walks, and cruises.</p>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>2</div>
-              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Customize with AI</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Let our AI engine build your customized destination itinerary instantly.</p>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>3</div>
-              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Secure QR Booking</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Lock slots securely. Receive printable QR e-vouchers instantly.</p>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>4</div>
-              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Present & Enjoy</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Show voucher QR to verified local operators at arrival and explore.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* 8. TOP RATED MARKETPLACE EXPERIENCES SLIDER SECTION */}
       <section id="experiences-section" style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
         
@@ -770,6 +688,90 @@ export default function HomePage() {
       </section>
 
 
+
+      
+
+      {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+          {t('why_choose_title')}
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
+          We guarantee safety, speed, and premium support for travelers worldwide
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Shield size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>100% KYC Verified Suppliers</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Every operator undergoes mandatory government trade license, tourism permit, and marine liability insurance checks.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Award size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Earn Loyalty Rewards</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Earn exclusive loyalty points with every experience you book. Redeem points for discount vouchers and premium travel benefits.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <DollarSign size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Best Price Guarantee</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Found the same experience cheaper? We'll match the price or refund the difference instantly, 0 hidden fees.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Headphones size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>24/7 AI Concierge</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Access our smart AI trip planner and multilingual customer support for instant modifications on the go.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. HOW IT WORKS */}
+      <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+            🧭 {t('how_works_title')}
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
+            Book premium local experiences in 4 simple steps
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>1</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Choose Experience</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Explore 5,000+ verified sightseeing tours, food walks, and cruises.</p>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>2</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Customize with AI</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Let our AI engine build your customized destination itinerary instantly.</p>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>3</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Secure QR Booking</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Lock slots securely. Receive printable QR e-vouchers instantly.</p>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>4</div>
+              <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Present & Enjoy</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Show voucher QR to verified local operators at arrival and explore.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 12. DYNAMIC FAQ ACCORDION */}
       <section style={{ maxWidth: '800px', margin: '0 auto 60px', padding: '0 24px' }}>
