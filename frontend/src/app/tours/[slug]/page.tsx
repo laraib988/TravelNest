@@ -120,7 +120,7 @@ export default function TourDetailPage() {
           rating: reviewRating,
           title: reviewTitle,
           comment: reviewComment,
-          photos: reviewPhoto ? [reviewPhoto] : [],
+          photos: [],
           tour_types: reviewTourTypes,
         }),
       });
@@ -602,36 +602,7 @@ export default function TourDetailPage() {
                   </div>
                 </div>
 
-                {/* Single Image Upload (Max 2MB) */}
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>Upload a Photo (Max 2MB)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      if (file.size > 2 * 1024 * 1024) {
-                        setUploadError('Image size exceeds 2MB limit! Please upload a smaller image.');
-                        setReviewPhoto('');
-                        return;
-                      }
-                      setUploadError(null);
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setReviewPhoto(reader.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                    style={{ fontSize: '0.85rem', color: '#475569' }}
-                  />
-                  {uploadError && <div style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '4px', fontWeight: 600 }}>{uploadError}</div>}
-                  {reviewPhoto && (
-                    <div style={{ marginTop: '10px' }}>
-                      <img src={reviewPhoto} alt="Upload Preview" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-                    </div>
-                  )}
-                </div>
+
 
                 <input
                   type="text"
