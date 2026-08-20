@@ -37,34 +37,32 @@ export async function POST(request: Request) {
 
     const client = admin();
 
-    const isMock = otp === '123456';
     let verification: any = null;
 
-    if (!isMock) {
-      // 1) Validate the OTP against the stored record.
-      const { data: fetchVerif, error: fetchError } = await client
-        .from('email_verifications')
-        .select('*')
-        .eq('email', email)
-        .eq('verified', false)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+    // 1) Validate the OTP against the stored record.
+    const { data: fetchVerif, error: fetchError } = await client
+      .from('email_verifications')
+      .select('*')
+      .eq('email', email)
+      .eq('verified', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-      if (fetchError) {
-        return NextResponse.json({ error: 'Could not verify code' }, { status: 500 });
-      }
-      if (!fetchVerif) {
-        return NextResponse.json({ error: 'No pending verification for this email' }, { status: 400 });
-      }
-      if (new Date(fetchVerif.expires_at).getTime() < Date.now()) {
-        return NextResponse.json({ error: 'This code has expired. Please request a new one.' }, { status: 400 });
-      }
-      if (fetchVerif.otp_code !== otp) {
-        return NextResponse.json({ error: 'Incorrect code. Please try again.' }, { status: 400 });
-      }
-      verification = fetchVerif;
+    if (fetchError) {
+      return NextResponse.json({ error: 'Could not verify code' }, { status: 500 });
     }
+    if (!fetchVerif) {
+      return NextResponse.json({ error: 'No pending verification for this email' }, { status: 400 });
+    }
+    if (new Date(fetchVerif.expires_at).getTime() < Date.now()) {
+      return NextResponse.json({ error: 'This code has expired. Please request a new one.' }, { status: 400 });
+    }
+    if (fetchVerif.otp_code !== otp) {
+      return NextResponse.json({ error: 'Incorrect code. Please try again.' }, { status: 400 });
+    }
+    
+    verification = fetchVerif;
 
     // Mark this verification as used.
     if (verification) {

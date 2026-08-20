@@ -1,76 +1,49 @@
-'use client';
+import { Metadata } from 'next';
+import FaqAccordion from './FaqAccordion';
 
-import { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+// Using Next.js automatic Static Site Generation (SSG)
+// Since this page does not use cookies, headers, or searchParams dynamically,
+// Next.js will naturally pre-render it as a highly optimized static HTML page at build time.
 
-export default function FAQPage() {
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
+export const metadata: Metadata = {
+  title: 'Frequently Asked Questions | TravelNest',
+  description: 'Find answers to common questions about booking tours, managing payments, and becoming a supplier on TravelNest.',
+};
 
-  const faqs = [
-    {
-      question: 'How do I receive my booking voucher?',
-      answer: 'Instant confirmation products issue an electronic QR voucher immediately after payment under My Bookings and via email. Present this QR code on your mobile device at the venue.'
-    },
-    {
-      question: 'Can I cancel or reschedule my activity?',
-      answer: 'Yes! Most tours feature a FREE 24-hour cancellation policy. You can cancel or request a date reschedule directly from My Bookings up to 24 hours before your start time.'
-    },
-    {
-      question: 'Are local tour guides verified?',
-      answer: 'Absolutely. Every supplier on TravelNest undergoes strict document-based KYC verification, trade license validation, and public liability insurance pre-screening.'
-    },
-    {
-      question: 'What payment methods are supported?',
-      answer: 'We accept major international credit/debit cards (Visa, Mastercard, AMEX), Apple Pay, Google Pay, PayPal, as well as local payment rails including JazzCash and Easypaisa.'
-    },
-    {
-      question: 'How does the AI Trip Planner work?',
-      answer: 'Type your vacation duration, budget, and travel preferences in natural language. Our AI planner queries live database inventory to build a day-by-day itinerary with 1-click cart checkout.'
-    }
-  ];
-
+export default function FaqPage() {
   return (
-    <div style={{ maxWidth: '960px', margin: '0 auto', padding: '60px 24px 80px' }}>
-      
-      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <h1 style={{ fontSize: '2.5rem', color: '#0f172a', fontWeight: 800, marginBottom: '12px' }}>
-          Frequently Asked Questions (FAQ)
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto' }}>
-          Got questions? We have answers. Everything you need to know about booking, e-vouchers, and AI itinerary planning.
+    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+      {/* HERO SECTION */}
+      <div 
+        style={{ 
+          background: '#0f172a', 
+          padding: '80px 24px', 
+          textAlign: 'center', 
+          color: '#fff',
+          marginBottom: '60px'
+        }}
+      >
+        <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '16px' }}>How can we help you?</h1>
+        <p style={{ fontSize: '1.2rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
+          Browse through our frequently asked questions below to find quick answers about your TravelNest experience.
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {faqs.map((faq, idx) => (
-          <div key={idx} className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-            <button
-              onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-              style={{
-                width: '100%',
-                padding: '20px 24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>{faq.question}</span>
-              {openIdx === idx ? <ChevronUp size={20} color="var(--brand-primary)" /> : <ChevronDown size={20} color="var(--text-muted)" />}
-            </button>
-
-            {openIdx === idx && (
-              <div style={{ padding: '0 24px 20px', color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, borderTop: '1px solid #f1f5f9' }}>
-                {faq.answer}
-              </div>
-            )}
-          </div>
-        ))}
+      {/* ACCORDION CONTAINER */}
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
+        <FaqAccordion />
       </div>
 
+      {/* STILL NEED HELP? */}
+      <div style={{ maxWidth: '800px', margin: '60px auto 0', padding: '0 24px', textAlign: 'center' }}>
+        <div style={{ background: '#e0f2fe', borderRadius: '16px', padding: '40px' }}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0369a1', marginBottom: '12px' }}>Still have questions?</h3>
+          <p style={{ color: '#0ea5e9', marginBottom: '24px' }}>Our dedicated support team is available 24/7 to assist you.</p>
+          <a href="mailto:support@travelnest.com" className="btn-primary" style={{ display: 'inline-block', padding: '12px 28px' }}>
+            Contact Support
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

@@ -452,7 +452,7 @@ export default function Header() {
                     }}
                   >
                     <Link
-                      href="/#experiences-section"
+                      href="/tours"
                       onClick={() => setIsExploreOpen(false)}
                       style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
                     >

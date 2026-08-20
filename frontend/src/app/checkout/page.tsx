@@ -119,6 +119,7 @@ useEffect(() => {
   const [otpStatus, setOtpStatus] = useState('');
   const [otpResendIn, setOtpResendIn] = useState(0);
   const [verifiedEmail, setVerifiedEmail] = useState('');
+  const [otpSentToEmail, setOtpSentToEmail] = useState('');
   const [verifiedUserId, setVerifiedUserId] = useState('');
   const [accountCreated, setAccountCreated] = useState(false);
   const [accountCredentials, setAccountCredentials] = useState<{ email: string; temporary_password: string; login_url: string } | null>(null);
@@ -240,7 +241,7 @@ useEffect(() => {
       }
       setOtpSent(true);
       setOtpInput('');
-      setVerifiedEmail(email);
+      setOtpSentToEmail(email);
       setDevOtp(data.dev_otp || '');
       setOtpStatus('✓ Verification code sent to your email. It expires in 10 minutes.');
       setOtpResendIn(60);
@@ -253,7 +254,7 @@ useEffect(() => {
 
   const handleVerifyOtp = async () => {
     const currentEmail = formData.lead_email.trim().toLowerCase();
-    const sentEmail = verifiedEmail.trim().toLowerCase();
+    const sentEmail = otpSentToEmail.trim().toLowerCase();
     // Guard against the user changing the email after a code was sent.
     if (!sentEmail || (currentEmail && currentEmail !== sentEmail)) {
       setOtpStatus('❌ The email was changed. Please re-verify with the same email or send a new code.');
@@ -273,7 +274,7 @@ useEffect(() => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: verifiedEmail,
+          email: otpSentToEmail,
           otp: otpInput,
           full_name: formData.lead_name,
         }),
@@ -284,7 +285,7 @@ useEffect(() => {
         return;
       }
       setVerifiedUserId(data.user_id || '');
-      setVerifiedEmail(verifiedEmail || currentEmail);
+      setVerifiedEmail(otpSentToEmail || currentEmail);
       setAccountCreated(!!data.account_created);
       if (data.account_created && data.credentials) {
         setAccountCredentials(data.credentials);
@@ -568,14 +569,11 @@ useEffect(() => {
                 )}
               </div>
 
-              {!verifiedEmail && (
+              {!verifiedEmail && otpSent && (
                 <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--radius-sm)', background: '#eff6ff', border: '1px solid #bfdbfe' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                     <KeyRound size={16} color="#2563eb" />
-                    <span style={{ fontSize: '0.85rem', color: '#1e40af', fontWeight: 700 }}>Enter the 6-digit code (use dev code for instant bypass)</span>
-                  </div>
-                  <div style={{ marginBottom: '10px', padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: '#fefce8', border: '1px dashed #facc15', fontSize: '0.85rem', color: '#713f12' }}>
-                    <strong>Dev/testing code:</strong> <span style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '3px', color: '#a16207' }}>{devOtp || '123456'}</span>
+                    <span style={{ fontSize: '0.85rem', color: '#1e40af', fontWeight: 700 }}>Enter the 6-digit code sent to your email</span>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <input

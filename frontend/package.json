@@ -15,6 +15,8 @@
     "@supabase/supabase-js": "^2.112.3",
     "@turf/turf": "^7.4.0",
     "cloudinary": "^2.10.0",
+    "date-fns": "^4.4.0",
+    "groq-sdk": "^1.5.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.312.0",
     "mapbox-gl": "^3.28.1",

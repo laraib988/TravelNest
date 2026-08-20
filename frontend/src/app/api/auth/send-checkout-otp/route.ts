@@ -49,14 +49,17 @@ export async function POST(request: Request) {
     // Send the OTP email.
     const mailResult = await sendOtpEmail(email, otp);
     if (!mailResult.success) {
-      console.warn('OTP email failed (proceeding with dev_otp fallback):', mailResult.error);
+      console.warn('OTP email failed:', mailResult.error);
+      return NextResponse.json(
+        { error: `Email delivery failed: ${mailResult.error}. (Note: Free Resend accounts can only send to the verified owner email).` },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: mailResult.success ? 'Verification code sent' : 'Verification code generated (email failed, use dev_otp)',
+      message: 'Verification code sent',
       expires_at: data.expires_at,
-      dev_otp: otp,
     });
   } catch (error: any) {
     console.error('send-checkout-otp error:', error);

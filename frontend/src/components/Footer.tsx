@@ -91,8 +91,10 @@ export default function Footer() {
                 <a href="https://linkedin.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s' }} aria-label="LinkedIn">
                   <Linkedin size={20} />
                 </a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s', fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none' }} aria-label="TikTok">
-                  TikTok
+                <a href="https://tiktok.com" target="_blank" rel="noreferrer" style={{ color: '#38bdf8', transition: 'opacity 0.2s', display: 'flex', alignItems: 'center' }} aria-label="TikTok">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a3 3 0 0 1-3-3" />
+                  </svg>
                 </a>
               </div>
             </div>
@@ -107,7 +109,7 @@ export default function Footer() {
                 <li><Link href="/community" style={{ color: '#d1d5db', textDecoration: 'none' }}>Community Forum</Link></li>
                 <li><Link href="/loyalty" style={{ color: '#d1d5db', textDecoration: 'none' }}>Loyalty & Rewards</Link></li>
                 <li><Link href="/about" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('about_us')}</Link></li>
-                <li><Link href="/contact" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('contact')}</Link></li>
+                {/* <li><Link href="/contact" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('contact')}</Link></li> */}
                 <li><Link href="/support" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('help_support')}</Link></li>
               </ul>
             </div>
