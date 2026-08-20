@@ -817,27 +817,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* 11. STATISTICS */}
-      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px', textAlign: 'center' }}>
-          <div>
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>500+</div>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Global Cities</span>
-          </div>
-          <div>
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>20,000+</div>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Verified Experiences</span>
-          </div>
-          <div>
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>1 Million+</div>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Happy Travelers</span>
-          </div>
-          <div>
-            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '6px' }}>99.2%</div>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Satisified Customers</span>
-          </div>
-        </div>
-      </section>
+
 
       {/* 12. DYNAMIC FAQ ACCORDION */}
       <section style={{ maxWidth: '800px', margin: '0 auto 60px', padding: '0 24px' }}>
