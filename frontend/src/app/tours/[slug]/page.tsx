@@ -131,6 +131,7 @@ export default function TourDetailPage() {
       }, 5000);
     } catch (err) {
       console.error('Error submitting review:', err);
+      setUploadError('Failed to submit review. Please try again.');
     } finally {
       setSubmittingReview(false);
     }

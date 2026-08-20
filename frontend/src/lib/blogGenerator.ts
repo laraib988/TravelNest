@@ -268,17 +268,31 @@ function buildFaqSchema(faqs: { question: string; answer: string }[]) {
   };
 }
 
-// Extract "## FAQs" bullets from the generated markdown so the FAQPage schema
-// mirrors what actually appears in the article body.
+// Extract "## FAQs" content from the generated markdown so the FAQPage schema
+// mirrors what actually appears in the article body. Supports both bullet
+// ("- **Q?** Answer") and bold-paragraph ("**Q?**\nAnswer") formats.
 function extractFaqsFromMarkdown(markdown: string): { question: string; answer: string }[] {
   const faqSection = markdown.split(/^##\s+FAQs?/im)[1];
   if (!faqSection) return [];
 
   const faqs: { question: string; answer: string }[] = [];
-  const bulletRe = /^\s*[-*]\s+\*\*(.+?)\*\*\s*(.+)$/gm;
+  // Bullet format: `- **Question?** Answer on same line`.
+  const bulletRe = /^\s*[-*]\s+\*\*(.+?)\*\*\s*(.*)$/gm;
   let match: RegExpExecArray | null;
   while ((match = bulletRe.exec(faqSection))) {
     faqs.push({ question: match[1].trim(), answer: match[2].trim() });
+  }
+  // Bold-paragraph format: `**Question?**` immediately followed by an answer
+  // paragraph on the next line(s).
+  if (faqs.length === 0) {
+    const blockRe = /\*\*(.+?)\*\*[\r\n]+([^\n]+)/g;
+    while ((match = blockRe.exec(faqSection))) {
+      const question = match[1].trim();
+      const answer = match[2].trim();
+      if (question && answer) {
+        faqs.push({ question, answer });
+      }
+    }
   }
   return faqs;
 }
