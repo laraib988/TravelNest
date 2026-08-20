@@ -568,6 +568,52 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
+      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+          {t('why_choose_title')}
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
+          We guarantee safety, speed, and premium support for travelers worldwide
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Shield size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>100% KYC Verified Suppliers</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Every operator undergoes mandatory government trade license, tourism permit, and marine liability insurance checks.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Award size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Earn Loyalty Rewards</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Earn exclusive loyalty points with every experience you book. Redeem points for discount vouchers and premium travel benefits.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <DollarSign size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Best Price Guarantee</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Found the same experience cheaper? We'll match the price or refund the difference instantly, 0 hidden fees.
+            </p>
+          </div>
+
+          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Headphones size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>24/7 AI Concierge</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+              Access our smart AI trip planner and multilingual customer support for instant modifications on the go.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      
+
       {/* 8. TOP RATED MARKETPLACE EXPERIENCES SLIDER SECTION */}
       <section id="experiences-section" style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
         
@@ -706,49 +752,7 @@ export default function HomePage() {
 
       
 
-      {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
-      <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-          {t('why_choose_title')}
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
-          We guarantee safety, speed, and premium support for travelers worldwide
-        </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Shield size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>100% KYC Verified Suppliers</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Every operator undergoes mandatory government trade license, tourism permit, and marine liability insurance checks.
-            </p>
-          </div>
-
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Award size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Earn Loyalty Rewards</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Earn exclusive loyalty points with every experience you book. Redeem points for discount vouchers and premium travel benefits.
-            </p>
-          </div>
-
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <DollarSign size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Best Price Guarantee</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Found the same experience cheaper? We'll match the price or refund the difference instantly, 0 hidden fees.
-            </p>
-          </div>
-
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Headphones size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>24/7 AI Concierge</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
-              Access our smart AI trip planner and multilingual customer support for instant modifications on the go.
-            </p>
-          </div>
-        </div>
-      </section>
+      
 
       {/* 7. HOW IT WORKS */}
       <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
