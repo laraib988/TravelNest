@@ -25,7 +25,7 @@ export default function RefundPolicyPage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>Complete Refund Policy Guidelines</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Complete Refund Policy Guidelines</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6 }}>
           Your peace of mind is our priority. Explore our clear, detailed guidelines on refunds, cancellations, and coverage so you can book your next adventure with absolute confidence.
         </p>

@@ -21,7 +21,7 @@ export default async function CommunityDirectoryPage() {
   return (
     <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 24px' }}>
       <div style={{ background: 'var(--brand-primary)', borderRadius: '16px', padding: '40px', color: '#fff', marginBottom: '40px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '12px' }}>Travel Community Forum</h1>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#ffffff' }}>Travel Community Forum</h1>
         <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Ask questions, share tips, and get advice from verified local guides.</p>
         <div style={{ marginTop: '24px', display: 'flex', gap: '8px', maxWidth: '500px', margin: '24px auto 0' }}>
           <input type="text" placeholder="Search discussions..." style={{ flex: 1, padding: '14px', borderRadius: '8px', border: 'none', outline: 'none' }} />

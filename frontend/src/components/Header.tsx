@@ -20,7 +20,7 @@ import {
   Globe,
   Star,
   FileText,
-  ArrowRightLeft,
+ArrowRightLeft,
   UserPlus,
   LayoutDashboard
 } from 'lucide-react';
@@ -451,13 +451,6 @@ export default function Header() {
                       zIndex: 300
                     }}
                   >
-                    <Link
-                      href="/tours"
-                      onClick={() => setIsExploreOpen(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
-                    >
-                      <Star size={15} color="#d97706" /> Top Experiences
-                    </Link>
                     <Link
                       href="/community"
                       onClick={() => setIsExploreOpen(false)}

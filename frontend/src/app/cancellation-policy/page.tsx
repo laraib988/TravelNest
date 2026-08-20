@@ -25,7 +25,7 @@ export default function CancellationPolicyPage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>Complete Cancellation Guidelines</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Complete Cancellation Guidelines</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
           Life happens, and plans change. Review our comprehensive 18-point cancellation guidelines designed to offer you maximum flexibility while protecting the livelihoods of our local partners.
         </p>

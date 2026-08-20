@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>Comprehensive Privacy Policy</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Comprehensive Privacy Policy</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
           Your privacy is a fundamental human right. Review our comprehensive privacy guidelines to understand exactly how we collect, process, and fiercely protect your personal information within the TravelNest ecosystem.
         </p>

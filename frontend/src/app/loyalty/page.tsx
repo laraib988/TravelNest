@@ -24,7 +24,7 @@ export default function LoyaltyRewardsPage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>TravelNest Rewards Program</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>TravelNest Rewards Program</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
           Your loyalty deserves to be aggressively rewarded. Dive into our incredibly detailed, multi-tiered rewards ecosystem designed to give you unprecedented value, exclusive VIP upgrades, and free global travel.
         </p>

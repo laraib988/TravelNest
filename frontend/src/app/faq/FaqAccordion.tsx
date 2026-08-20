@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDown, ChevronUp, List } from 'lucide-react';
 
 interface FAQ {
   question: string;
@@ -99,69 +99,138 @@ const FAQ_DATA: FaqCategory[] = [
 
 export default function FaqAccordion() {
   const [openIndex, setOpenIndex] = useState<string | null>('0-0');
+  const [activeCat, setActiveCat] = useState(0);
+
+  // Scroll-spy: highlight the ToC item matching the category currently in view.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = Number(entry.target.getAttribute('data-faq-cat'));
+            if (!isNaN(idx)) setActiveCat(idx);
+          }
+        });
+      },
+      { rootMargin: '-15% 0px -70% 0px' }
+    );
+    const sections = document.querySelectorAll('[data-faq-cat]');
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToCategory = (idx: number) => {
+    const el = document.getElementById(`faq-cat-${idx}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const toggleFaq = (index: string) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
-      {FAQ_DATA.map((category, catIndex) => (
-        <div key={catIndex} style={{ marginBottom: '10px' }}>
-          <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px' }}>
-            {category.title}
-          </h3>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {category.faqs.map((faq, faqIndex) => {
-              const uniqueId = `${catIndex}-${faqIndex}`;
-              const isOpen = openIndex === uniqueId;
-              
-              return (
-                <div 
-                  key={faqIndex} 
-                  style={{ 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    background: isOpen ? '#f8fafc' : '#ffffff',
-                    transition: 'all 0.3s ease'
+    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '32px', alignItems: 'start' }}>
+      {/* STICKY TABLE OF CONTENTS */}
+      <aside style={{ position: 'sticky', top: '100px', background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(15,23,42,0.06)' }}>
+        <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <List size={15} color="#0284c7" /> On This Page
+        </div>
+        <nav>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {FAQ_DATA.map((category, catIndex) => (
+              <li key={catIndex}>
+                <button
+                  type="button"
+                  onClick={() => scrollToCategory(catIndex)}
+                  aria-current={activeCat === catIndex ? 'true' : undefined}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    background: activeCat === catIndex ? '#eff6ff' : 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    fontWeight: activeCat === catIndex ? 700 : 500,
+                    color: activeCat === catIndex ? '#0284c7' : '#475569',
+                    borderLeft: activeCat === catIndex ? '3px solid #0284c7' : '3px solid transparent',
+                    transition: 'all 0.2s ease',
+                    lineHeight: 1.35
                   }}
                 >
-                  <button 
-                    onClick={() => toggleFaq(uniqueId)}
+                  {category.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* ACCORDION COLUMN */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {FAQ_DATA.map((category, catIndex) => (
+          <div
+            key={catIndex}
+            id={`faq-cat-${catIndex}`}
+            data-faq-cat={catIndex}
+            style={{ scrollMarginTop: '110px', marginBottom: '10px' }}
+          >
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px' }}>
+              {category.title}
+            </h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {category.faqs.map((faq, faqIndex) => {
+                const uniqueId = `${catIndex}-${faqIndex}`;
+                const isOpen = openIndex === uniqueId;
+                
+                return (
+                  <div 
+                    key={faqIndex} 
                     style={{ 
-                      width: '100%', 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center', 
-                      padding: '20px', 
-                      background: 'transparent', 
-                      border: 'none', 
-                      cursor: 'pointer',
-                      textAlign: 'left'
+                      border: '1px solid #e2e8f0', 
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      background: isOpen ? '#f8fafc' : '#ffffff',
+                      transition: 'all 0.3s ease'
                     }}
                   >
-                    <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isOpen ? '#0284c7' : '#334155', paddingRight: '20px', lineHeight: 1.4 }}>
-                      {faq.question}
-                    </span>
-                    {isOpen ? 
-                      <ChevronUp size={20} color="#0284c7" style={{ flexShrink: 0 }} /> : 
-                      <ChevronDown size={20} color="#64748b" style={{ flexShrink: 0 }} />
-                    }
-                  </button>
-                  
-                  {isOpen && (
-                    <div style={{ padding: '0 20px 20px 20px', color: '#475569', lineHeight: 1.7, fontSize: '0.95rem' }}>
-                      {faq.answer}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                    <button 
+                      onClick={() => toggleFaq(uniqueId)}
+                      style={{ 
+                        width: '100%', 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        padding: '20px', 
+                        background: 'transparent', 
+                        border: 'none', 
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isOpen ? '#0284c7' : '#334155', paddingRight: '20px', lineHeight: 1.4 }}>
+                        {faq.question}
+                      </span>
+                      {isOpen ? 
+                        <ChevronUp size={20} color="#0284c7" style={{ flexShrink: 0 }} /> : 
+                        <ChevronDown size={20} color="#64748b" style={{ flexShrink: 0 }} />
+                      }
+                    </button>
+                    
+                    {isOpen && (
+                      <div style={{ padding: '0 20px 20px 20px', color: '#475569', lineHeight: 1.7, fontSize: '0.95rem' }}>
+                        {faq.answer}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

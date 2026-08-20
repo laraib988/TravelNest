@@ -24,7 +24,7 @@ export default function HelpSupportPage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>Global Support Center</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Global Support Center</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
           We are dedicated to ensuring your journeys are seamless and stress-free. Explore our massively detailed support directory below to find exhaustive answers, troubleshooting steps, and direct pathways to our customer success teams.
         </p>

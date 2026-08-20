@@ -23,7 +23,7 @@ export default function SitemapPage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>Platform Sitemap</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Platform Sitemap</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
           Explore the complete architectural layout of the TravelNest ecosystem. From hidden destinations to our exhaustive legal directories, find exactly what you are looking for in seconds.
         </p>

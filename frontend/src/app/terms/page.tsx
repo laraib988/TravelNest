@@ -25,7 +25,7 @@ export default function TermsOfServicePage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>TravelNest Terms of Service Agreement</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>TravelNest Terms of Service Agreement</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
           By accessing and using TravelNest, you agree to comply with our global standards. Review these 18 foundational rules that govern our marketplace, protect your rights, and ensure a secure ecosystem for all travelers and hosts.
         </p>

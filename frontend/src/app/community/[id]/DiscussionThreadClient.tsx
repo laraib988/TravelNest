@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { CheckCircle2, UserCircle2 } from 'lucide-react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 export default function DiscussionThreadClient({ discussion, initialReplies }: { discussion: any, initialReplies: any[] }) {
@@ -35,7 +36,7 @@ export default function DiscussionThreadClient({ discussion, initialReplies }: {
 
     try {
       const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single();
-      const authorName = profile?.name || user.user_metadata?.name || 'Traveler';
+      const authorName = profile?.name || user.name || 'Traveler';
 
       // Insert reply directly to DB
       const { error } = await supabase.from('forum_replies').insert({

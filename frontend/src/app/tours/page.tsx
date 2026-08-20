@@ -56,7 +56,7 @@ export default function AllExperiencesPage() {
           borderRadius: '0 0 24px 24px'
         }}>
           <Compass size={48} color="#38bdf8" style={{ margin: '0 auto 16px' }} />
-          <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px' }}>Global Experiences</h1>
+          <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Global Experiences</h1>
           <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
             Discover and book authentic, real-time tours hosted by passionate locals worldwide. From hidden alleyways to extreme adventures, your next journey starts here.
           </p>
