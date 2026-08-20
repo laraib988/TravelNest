@@ -268,6 +268,21 @@ function buildFaqSchema(faqs: { question: string; answer: string }[]) {
   };
 }
 
+// Extract "## FAQs" bullets from the generated markdown so the FAQPage schema
+// mirrors what actually appears in the article body.
+function extractFaqsFromMarkdown(markdown: string): { question: string; answer: string }[] {
+  const faqSection = markdown.split(/^##\s+FAQs?/im)[1];
+  if (!faqSection) return [];
+
+  const faqs: { question: string; answer: string }[] = [];
+  const bulletRe = /^\s*[-*]\s+\*\*(.+?)\*\*\s*(.+)$/gm;
+  let match: RegExpExecArray | null;
+  while ((match = bulletRe.exec(faqSection))) {
+    faqs.push({ question: match[1].trim(), answer: match[2].trim() });
+  }
+  return faqs;
+}
+
 // --- Prompt builder ---------------------------------------------------------
 function buildPrompt(topic: DestinationTopic, author: { name: string; role: string }) {
   const internalLinks = topic.internalLinks
@@ -350,7 +365,7 @@ export async function generateDailyBlog(): Promise<{ success: boolean; blog?: an
       ],
       model: MODEL,
       temperature: 0.8,
-      max_tokens: 3800, // Keep under free-tier TPM so the request isn't rejected.
+      max_tokens: 6000, // Total per-request ≈6.8k tokens — under the 8k free-tier TPM cap.
       response_format: { type: 'json_object' },
     });
 
@@ -373,9 +388,18 @@ export async function generateDailyBlog(): Promise<{ success: boolean; blog?: an
       .maybeSingle();
     const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
 
-    const faqs = Array.isArray(parsed.faqs) && parsed.faqs.length >= 4
-      ? parsed.faqs.slice(0, 6)
-      : [{ question: `What is the best time to visit ${topic.name}?`, answer: 'The best months are the shoulder seasons, offering mild weather and fewer crowds.' }];
+    const faqs =
+      extractFaqsFromMarkdown(contentMarkdown).length >= 4
+        ? extractFaqsFromMarkdown(contentMarkdown).slice(0, 6)
+        : Array.isArray(parsed.faqs) && parsed.faqs.length >= 4
+          ? parsed.faqs.slice(0, 6)
+          : [
+              {
+                question: `What is the best time to visit ${topic.name}?`,
+                answer:
+                  'The best months are the shoulder seasons, offering mild weather and fewer crowds.',
+              },
+            ];
 
     const article: BlogArticle = {
       title,

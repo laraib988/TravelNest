@@ -15,6 +15,12 @@ export class ReviewsController {
     return this.reviewsService.createReview(body);
   }
 
+  @Post(':id/status')
+  updateStatus(@Param('id') id: string, @Body() body: any) {
+    const { status } = body;
+    return this.reviewsService.updateStatus(id, status);
+  }
+
   @Post(':id/reply')
   replyToReview(@Param('id') id: string, @Body() body: any) {
     const { text } = body;

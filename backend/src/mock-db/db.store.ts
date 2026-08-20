@@ -187,6 +187,7 @@ export interface Review {
   supplier_reply?: { text: string; replied_at: string };
   ai_fraud_score: number;
   status: 'PUBLISHED' | 'PENDING' | 'FLAGGED' | 'REMOVED';
+  tour_types?: string[];
   created_at: string;
 }
 

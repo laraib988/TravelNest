@@ -24,6 +24,7 @@ interface Review {
   supplier_reply?: { text: string; replied_at: string };
   ai_fraud_score: number;
   status: 'PUBLISHED' | 'PENDING' | 'FLAGGED' | 'REMOVED';
+  tour_types?: string[];
   created_at: string;
 }
 
@@ -125,25 +126,37 @@ export default function AdminReviewsPage() {
     setExpandedReviewIds(newSet);
   };
 
-  const handleAction = (id: string, action: 'Approve' | 'Flag' | 'Remove', title: string) => {
-    setReviews((prev) =>
-      prev.map((r) => {
-        if (r.id === id) {
-          if (action === 'Approve') return { ...r, status: 'PUBLISHED' };
-          if (action === 'Flag') return { ...r, status: 'FLAGGED' };
-          if (action === 'Remove') return { ...r, status: 'REMOVED' };
-        }
-        return r;
-      })
-    );
+  const handleAction = async (id: string, action: 'Approve' | 'Flag' | 'Remove', title: string) => {
+    let targetStatus: 'PUBLISHED' | 'FLAGGED' | 'REMOVED' = 'PUBLISHED';
+    if (action === 'Flag') targetStatus = 'FLAGGED';
+    if (action === 'Remove') targetStatus = 'REMOVED';
 
-    triggerAction(
-      action === 'Approve'
-        ? `Review "${title}" Approved & Published!`
-        : action === 'Flag'
-        ? `Review "${title}" Flagged for Fraud Audit!`
-        : `Review "${title}" Removed from Marketplace!`
-    );
+    try {
+      await fetchFromAPI(`/reviews/${id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: targetStatus })
+      });
+
+      setReviews((prev) =>
+        prev.map((r) => {
+          if (r.id === id) {
+            return { ...r, status: targetStatus };
+          }
+          return r;
+        })
+      );
+
+      triggerAction(
+        action === 'Approve'
+          ? `Review "${title}" Approved & Published!`
+          : action === 'Flag'
+          ? `Review "${title}" Flagged for Fraud Audit!`
+          : `Review "${title}" Removed from Marketplace!`
+      );
+    } catch (err) {
+      console.error('Failed to update review status:', err);
+    }
   };
 
   const triggerAction = (msg: string) => {
@@ -378,6 +391,17 @@ export default function AdminReviewsPage() {
                   </span>
                 </div>
 
+                {/* Tour Types if any */}
+                {review.tour_types && review.tour_types.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                    {review.tour_types.map((type) => (
+                      <span key={type} style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '0.72rem', fontWeight: 800, padding: '2px 8px', borderRadius: '12px' }}>
+                        ðŸ·ï¸ {type}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {/* Review Content */}
                 <p style={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.6, marginBottom: '16px' }}>
                   {review.comment}
@@ -502,3 +526,4 @@ export default function AdminReviewsPage() {
     </div>
   );
 }
+

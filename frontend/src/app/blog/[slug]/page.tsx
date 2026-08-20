@@ -1,123 +1,277 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { fetchFromAPI } from '@/lib/api-client';
-import { FileText, Sparkles, RefreshCw, Star, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
+import type { Metadata } from 'next';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Calendar, User, ArrowLeft, CheckCircle2, MapPin } from 'lucide-react';
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const slug = params.slug as string;
+export const revalidate = 86400; // 24h ISR
+export const dynamicParams = true;
 
-  const [listing, setListing] = useState<any>(null);
-  const [revalidating, setRevalidating] = useState(false);
-  const [revalidatedMsg, setRevalidatedMsg] = useState('');
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-  useEffect(() => {
-    async function loadEmbeddedWidgetData() {
-      try {
-        const res = await fetchFromAPI('/listings/luxury-bali-sunset-catamaran-cruise');
-        setListing(res);
-      } catch (err) {
-        console.error('Error fetching widget listing:', err);
-      }
-    }
-    loadEmbeddedWidgetData();
-  }, []);
+async function getBlog(slug: string) {
+  const { data, error } = await supabase
+    .from('blogs')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .maybeSingle();
 
-  const handleTriggerISR = async () => {
-    setRevalidating(true);
-    setRevalidatedMsg('');
-    try {
-      const res = await fetch('/api/revalidate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-revalidate-secret': 'travelnest_secret_token_123',
-        },
-        body: JSON.stringify({ paths: [`/blog/${slug}`, '/tours/luxury-bali-sunset-catamaran-cruise'] }),
-      });
-      const data = await res.json();
-      setRevalidatedMsg(`Path revalidated successfully at ${new Date(data.now).toLocaleTimeString()} via Next.js revalidatePath()!`);
-    } catch (err: any) {
-      setRevalidatedMsg('ISR Revalidation Error: ' + err.message);
-    } finally {
-      setRevalidating(false);
-    }
+  if (error) {
+    console.error('Blog fetch error:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function generateStaticParams() {
+  const { data } = await supabase
+    .from('blogs')
+    .select('slug')
+    .eq('status', 'published')
+    .limit(50);
+  return (data || []).map((b) => ({ slug: b.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const blog = await getBlog(slug);
+  if (!blog) return { title: 'Blog not found' };
+
+  return {
+    title: blog.meta_title || blog.title,
+    description: blog.meta_description || blog.summary,
+    keywords: blog.focus_keywords || [],
+    alternates: { canonical: `${APP_URL}/blog/${blog.slug}` },
+    openGraph: {
+      title: blog.meta_title || blog.title,
+      description: blog.meta_description || blog.summary,
+      type: 'article',
+      url: `${APP_URL}/blog/${blog.slug}`,
+      images: blog.hero_image ? [{ url: blog.hero_image, alt: blog.hero_image_alt }] : [],
+      authors: [blog.author_name],
+      publishedTime: blog.published_at,
+    },
   };
+}
+
+// Build a Table of Contents from markdown H2/H3 headings.
+function buildToC(markdown: string) {
+  const toc: { id: string; text: string; level: number }[] = [];
+  const re = /^(#{2,3})\s+(.+)$/gm;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(markdown))) {
+    const level = match[1].length;
+    const text = match[2].trim().replace(/[*_`]/g, '');
+    toc.push({ id: `heading-${toc.length}`, text, level });
+  }
+  return toc;
+}
+
+// Extract FAQ questions from markdown for display.
+function extractFaqs(markdown: string) {
+  const faqs: { question: string; answer: string }[] = [];
+  const section = markdown.split(/^##\s+FAQs?/im)[1];
+  if (!section) return faqs;
+  const re = /^\s*[-*]\s+\*\*(.+?)\*\*\s*(.+)$/gm;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(section))) {
+    faqs.push({ question: match[1].trim(), answer: match[2].trim() });
+  }
+  return faqs;
+}
+
+async function getRelatedDestinations() {
+  const { data } = await supabase
+    .from('destinations')
+    .select('id,name,slug,hero_image,country,description')
+    .eq('is_published', true)
+    .limit(3);
+  return data || [];
+}
+
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const blog = await getBlog(slug);
+  if (!blog) notFound();
+
+  const toc = buildToC(blog.content_markdown || '');
+  const faqs = extractFaqs(blog.content_markdown || '');
+  const related = await getRelatedDestinations();
+
+  let articleSchema: any = null;
+  let faqSchema: any = null;
+  try {
+    articleSchema = blog.schema_json ? JSON.parse(blog.schema_json) : null;
+  } catch (e) {}
+  try {
+    faqSchema = blog.faq_schema_json ? JSON.parse(blog.faq_schema_json) : null;
+  } catch (e) {}
+
+  const jsonLd = [
+    articleSchema && { ...articleSchema, '@context': 'https://schema.org' },
+    faqSchema && { ...faqSchema, '@context': 'https://schema.org' },
+  ].filter(Boolean);
+
+  const shareUrl = `${APP_URL}/blog/${blog.slug}`;
+  const shareText = encodeURIComponent(blog.title);
 
   return (
-    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
-      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
-        <ArrowLeft size={16} /> Return to Storefront
-      </Link>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '40px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
-        <div className="badge-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
-          <FileText size={14} /> Feature #6: SEO Blog ↔ Live Marketplace Integration
-        </div>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px 80px' }}>
+        <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', marginBottom: '24px', textDecoration: 'none' }}>
+          <ArrowLeft size={16} /> Back to all guides
+        </Link>
 
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px', lineHeight: 1.2, color: '#0f172a' }}>
-          Ultimate 2026 Guide to Sunset Catamaran Cruises & Culinary Nights in Bali
-        </h1>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '20px', borderBottom: '1px solid #e2e8f0', marginBottom: '32px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-          <span>By TravelNest Editorial Team • Published August 2026</span>
-          <button onClick={handleTriggerISR} disabled={revalidating} className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
-            {revalidating ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />} Trigger On-Demand ISR
-          </button>
-        </div>
-
-        {revalidatedMsg && (
-          <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-sm)', background: '#d1fae5', color: '#047857', fontSize: '0.85rem', marginBottom: '24px' }}>
-            {revalidatedMsg}
-          </div>
-        )}
-
-        <div style={{ fontSize: '1.05rem', lineHeight: 1.8, color: '#334155', marginBottom: '40px' }}>
-          <p style={{ marginBottom: '20px' }}>
-            Bali remains one of the world's premier tropical destinations. When visiting the southern coast around Benoa Harbour and Nusa Dua, taking a luxury dual-hull catamaran sunset cruise is an absolute must-do experience.
-          </p>
-          <p style={{ marginBottom: '24px' }}>
-            Below is our top editorially verified marketplace experience. The widget below hydrates live prices, availability slots, and review scores directly from the NestJS PostgreSQL database:
-          </p>
-
-          {/* EMBEDDED LIVE MARKETPLACE WIDGET */}
-          {listing ? (
-            <div className="glass-panel" style={{ borderRadius: 'var(--radius-md)', padding: '24px', background: '#f0f9ff', border: '1px solid #7dd3fc', marginBottom: '32px' }}>
-              <div className="badge-emerald" style={{ display: 'inline-flex', marginBottom: '12px' }}>
-                Live Marketplace Data Card
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '20px', alignItems: 'center' }}>
-                <img src={listing.images[0]?.url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
-                <div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '6px', color: '#0f172a' }}>{listing.title}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Star size={14} color="#d97706" fill="#d97706" /> {listing.cached_rating_avg} ({listing.cached_review_count})</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14} color="#059669" /> Verified</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                      ${listing.base_price} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ person</span>
-                    </div>
-                    <Link href={`/tours/${listing.slug}`} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                      Reserve Ticket <ArrowRight size={14} />
-                    </Link>
-                  </div>
-                </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 260px', gap: '48px', alignItems: 'start' }}>
+          {/* Main column */}
+          <article style={{ background: '#ffffff', borderRadius: 'var(--radius-lg)', padding: '40px', border: '1px solid #e2e8f0' }}>
+            {/* Hero */}
+            <div style={{ marginBottom: '28px' }}>
+              {blog.hero_image && (
+                <img src={blog.hero_image} alt={blog.hero_image_alt || blog.title} style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '24px' }} />
+              )}
+              <h1 style={{ fontSize: '2.4rem', color: '#0f172a', lineHeight: 1.2, marginBottom: '16px', fontWeight: 800 }}>
+                {blog.title}
+              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '18px', paddingBottom: '20px', borderBottom: '1px solid #e2e8f0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {blog.author_avatar && (
+                    <img src={blog.author_avatar} alt={blog.author_name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+                  )}
+                  <strong>{blog.author_name}</strong>
+                  {blog.author_role && <span>· {blog.author_role}</span>}
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Calendar size={14} />
+                  {blog.published_at ? new Date(blog.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}
+                </span>
               </div>
             </div>
-          ) : (
-            <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading embedded marketplace widget...</div>
-          )}
 
-          <p>
-            Whether you choose to dance to live acoustic music or savor grilled local seafood under the stars, this experience provides an unbeatable highlight to any Bali itinerary.
-          </p>
+            {/* Quick Takeaways */}
+            {blog.quick_takeaways && blog.quick_takeaways.length > 0 && (
+              <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 'var(--radius-md)', padding: '20px 24px', marginBottom: '28px' }}>
+                <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0c4a6e', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CheckCircle2 size={18} /> Quick Takeaways
+                </h2>
+                <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {blog.quick_takeaways.slice(0, 5).map((item: string, i: number) => (
+                    <li key={i} style={{ fontSize: '0.92rem', color: '#334155', lineHeight: 1.6 }}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Markdown content */}
+            <div className="blog-content" style={{ fontSize: '1.02rem', lineHeight: 1.85, color: '#334155' }}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h2: (props) => {
+                    const idx = toc.findIndex((t) => t.level === 2 && t.text === String(props.children || '').trim());
+                    return <h2 id={`heading-${idx >= 0 ? idx : 0}`} style={{ fontSize: '1.5rem', color: '#0f172a', margin: '36px 0 14px', fontWeight: 800 }} {...props} />;
+                  },
+                  h3: (props) => <h3 style={{ fontSize: '1.2rem', color: '#0f172a', margin: '28px 0 12px', fontWeight: 700 }} {...props} />,
+                  p: (props) => <p style={{ margin: '0 0 16px' }} {...props} />,
+                  a: (props) => <a {...props} style={{ color: 'var(--brand-primary)', fontWeight: 600 }} target={props.href?.startsWith('http') ? '_blank' : undefined} rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined} />,
+                  ul: (props) => <ul style={{ paddingLeft: '24px', margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: '6px' }} {...props} />,
+                  ol: (props) => <ol style={{ paddingLeft: '24px', margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: '6px' }} {...props} />,
+                  li: (props) => <li style={{ marginBottom: '4px' }} {...props} />,
+                  blockquote: (props) => <blockquote style={{ borderLeft: '4px solid var(--brand-primary)', background: '#f8fafc', padding: '14px 20px', borderRadius: 'var(--radius-sm)', margin: '0 0 16px', color: '#475569' }} {...props} />,
+                  table: (props) => <div style={{ overflowX: 'auto', margin: '0 0 20px' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.92rem' }} {...props} /></div>,
+                  th: (props) => <th style={{ border: '1px solid #e2e8f0', padding: '10px 14px', background: '#f1f5f9', textAlign: 'left', fontWeight: 700, color: '#0f172a' }} {...props} />,
+                  td: (props) => <td style={{ border: '1px solid #e2e8f0', padding: '10px 14px' }} {...props} />,
+                }}
+              >
+                {blog.content_markdown || ''}
+              </ReactMarkdown>
+            </div>
+          </article>
+
+          {/* Sidebar */}
+          <aside style={{ position: 'sticky', top: '100px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* ToC */}
+            {toc.length > 0 && (
+              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '20px' }}>
+                <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
+                  On This Page
+                </h3>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {toc.filter((t) => t.level === 2).map((t) => (
+                    <a key={t.id} href={`#${t.id}`} style={{ fontSize: '0.85rem', color: '#475569', textDecoration: 'none', padding: '4px 0', borderBottom: '1px solid #f1f5f9', transition: 'color 0.15s' }}>
+                      {t.text}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+            )}
+
+            {/* Share */}
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '20px' }}>
+              <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
+                Share This Guide
+              </h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none', background: '#f8fafc' }}>X</a>
+                <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none', background: '#f8fafc' }}>FB</a>
+                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none', background: '#f8fafc' }}>In</a>
+              </div>
+            </div>
+
+            {/* Author bio */}
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                {blog.author_avatar && (
+                  <img src={blog.author_avatar} alt={blog.author_name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover' }} />
+                )}
+                <div>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>{blog.author_name}</h3>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{blog.author_role}</span>
+                </div>
+              </div>
+              {blog.author_bio && (
+                <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>{blog.author_bio}</p>
+              )}
+            </div>
+          </aside>
         </div>
+
+        {/* Related destinations */}
+        {related.length > 0 && (
+          <div style={{ marginTop: '56px' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>
+              Explore These Destinations
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+              {related.map((d: any) => (
+                <Link key={d.id} href={`/destinations/${d.slug}`} className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ height: '160px', position: 'relative' }}>
+                    {d.hero_image ? (
+                      <img src={d.hero_image} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0f172a, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <MapPin size={32} color="rgba(255,255,255,0.3)" />
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ padding: '18px' }}>
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>{d.name}</h3>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.country}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }

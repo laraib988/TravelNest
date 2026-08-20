@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
-import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, XCircle } from 'lucide-react';
+import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, ChevronLeft, ChevronRight, XCircle } from 'lucide-react';
 
 export default function TourDetailPage() {
   const { formatPrice, t } = useCurrency();
@@ -35,6 +35,11 @@ export default function TourDetailPage() {
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewPhoto, setReviewPhoto] = useState<string>('');
+  const [reviewTourTypes, setReviewTourTypes] = useState<string[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
+  const [reviewsSliderIndex, setReviewsSliderIndex] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -99,22 +104,31 @@ export default function TourDetailPage() {
     e.preventDefault();
     if (!reviewComment.trim()) return;
     setSubmittingReview(true);
+    setUploadError(null);
+    setReviewSuccessMsg(null);
     try {
       const newReview = await fetchFromAPI('/reviews', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           listing_id: tour.id,
           rating: reviewRating,
           title: reviewTitle,
           comment: reviewComment,
-          photos: [],
+          photos: reviewPhoto ? [reviewPhoto] : [],
+          tour_types: reviewTourTypes,
         }),
       });
-      setReviews((prev) => [newReview, ...prev]);
-      setShowReviewForm(false);
+      setReviewSuccessMsg('Your review has been submitted for moderation! It will appear once approved by the administrator.');
       setReviewTitle('');
       setReviewComment('');
       setReviewRating(5);
+      setReviewPhoto('');
+      setReviewTourTypes([]);
+      setTimeout(() => {
+        setShowReviewForm(false);
+        setReviewSuccessMsg(null);
+      }, 5000);
     } catch (err) {
       console.error('Error submitting review:', err);
     } finally {
@@ -516,12 +530,19 @@ export default function TourDetailPage() {
               </div>
             </div>
 
-            {/* REVIEW SUBMISSION FORM */}
+            {/* REVIEW SUBMISSION FORM (UPDATED WITH IMAGE & TOUR PILLS) */}
             {showReviewForm && (
-              <form onSubmit={handleSubmitReview} className="card-panel" style={{ padding: '24px', marginBottom: '24px', background: '#fefce8', border: '1px solid #fde68a' }}>
-                <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '16px' }}>Share Your Experience</h3>
+              <form onSubmit={handleSubmitReview} className="card-panel" style={{ padding: '24px', marginBottom: '24px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Share Your Experience</h3>
+                
+                {reviewSuccessMsg && (
+                  <div style={{ background: '#dcfce7', border: '1px solid #bbf7d0', color: '#166534', padding: '12px 16px', borderRadius: '8px', fontSize: '0.88rem', fontWeight: 600, marginBottom: '16px' }}>
+                    {reviewSuccessMsg}
+                  </div>
+                )}
+
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>Your Rating</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>Your Rating</label>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     {[1,2,3,4,5].map(s => (
                       <Star
@@ -535,6 +556,72 @@ export default function TourDetailPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Tour Type Multi-Select Pills */}
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Who did you travel with? (Multi-select)</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {['Family', 'Friends', 'Solo', 'Couple', 'Business'].map(type => {
+                      const isSelected = reviewTourTypes.includes(type);
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => {
+                            setReviewTourTypes(prev =>
+                              prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+                            );
+                          }}
+                          style={{
+                            padding: '6px 16px',
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            borderRadius: '20px',
+                            cursor: 'pointer',
+                            border: isSelected ? 'none' : '1px solid #cbd5e1',
+                            background: isSelected ? 'var(--brand-primary)' : '#ffffff',
+                            color: isSelected ? '#ffffff' : '#475569',
+                            transition: 'all 0.15s'
+                          }}
+                        >
+                          {type}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Single Image Upload (Max 2MB) */}
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>Upload a Photo (Max 2MB)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 2 * 1024 * 1024) {
+                        setUploadError('Image size exceeds 2MB limit! Please upload a smaller image.');
+                        setReviewPhoto('');
+                        return;
+                      }
+                      setUploadError(null);
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setReviewPhoto(reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    style={{ fontSize: '0.85rem', color: '#475569' }}
+                  />
+                  {uploadError && <div style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '4px', fontWeight: 600 }}>{uploadError}</div>}
+                  {reviewPhoto && (
+                    <div style={{ marginTop: '10px' }}>
+                      <img src={reviewPhoto} alt="Upload Preview" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                    </div>
+                  )}
+                </div>
+
                 <input
                   type="text"
                   placeholder="Review title (e.g. 'Amazing sunset cruise!')"
@@ -558,45 +645,80 @@ export default function TourDetailPage() {
               </form>
             )}
 
-            {/* INDIVIDUAL REVIEW CARDS */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {reviews.map((review: any) => (
-                <div key={review.id} className="card-panel" style={{ padding: '20px', background: '#ffffff', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <img src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0284c7&color=fff`} alt={review.user_name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
-                    <div>
-                      <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{review.user_name}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            {/* REVIEW SLIDER CONTAINER (SHOWS 4 REVIEWS PER ROW) */}
+            <div style={{ position: 'relative', overflow: 'hidden', padding: '0 4px' }}>
+              {reviews.length > 0 ? (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Showing {Math.min(reviews.length, reviewsSliderIndex + 1)} - {Math.min(reviews.length, reviewsSliderIndex + 4)} of {reviews.length} reviews</span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => setReviewsSliderIndex(prev => Math.max(0, prev - 4))}
+                        disabled={reviewsSliderIndex === 0}
+                        style={{ border: '1px solid #cbd5e1', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#ffffff', cursor: reviewsSliderIndex === 0 ? 'not-allowed' : 'pointer', opacity: reviewsSliderIndex === 0 ? 0.4 : 1 }}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        onClick={() => setReviewsSliderIndex(prev => Math.min(reviews.length - (reviews.length % 4 || 4), prev + 4))}
+                        disabled={reviewsSliderIndex + 4 >= reviews.length}
+                        style={{ border: '1px solid #cbd5e1', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#ffffff', cursor: reviewsSliderIndex + 4 >= reviews.length ? 'not-allowed' : 'pointer', opacity: reviewsSliderIndex + 4 >= reviews.length ? 0.4 : 1 }}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
                     </div>
-                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '2px' }}>
-                      {[1,2,3,4,5].map(s => <Star key={s} size={14} color="#d97706" fill={s <= review.rating ? '#d97706' : 'none'} />)}
-                    </div>
-                    <span className="badge-emerald" style={{ fontSize: '0.7rem' }}>✓ Verified Booking</span>
                   </div>
-                  {review.title && <div style={{ fontWeight: 700, fontSize: '1rem', color: '#0f172a', marginBottom: '6px' }}>{review.title}</div>}
-                  <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.7, marginBottom: '12px' }}>{review.comment}</p>
-                  {review.photos && review.photos.length > 0 && (
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                      {review.photos.map((p: string, i: number) => (
-                        <img key={i} src={p} alt="Traveler photo" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                      ))}
-                    </div>
-                  )}
-                  {/* Supplier Reply */}
-                  {review.supplier_reply && (
-                    <div style={{ marginTop: '10px', padding: '12px', background: '#f0f9ff', borderRadius: '10px', border: '1px solid #7dd3fc' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0369a1', marginBottom: '4px' }}>🛡️ Supplier Response</div>
-                      <p style={{ fontSize: '0.85rem', color: '#334155', margin: 0 }}>{review.supplier_reply.text}</p>
-                    </div>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px' }}>
-                    <button onClick={() => handleHelpful(review.id)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '20px', border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '0.8rem', color: '#64748b', transition: 'all 0.2s' }}>
-                      <ThumbsUp size={13} /> Helpful ({review.helpful_count || 0})
-                    </button>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+                    {reviews.slice(reviewsSliderIndex, reviewsSliderIndex + 4).map((review: any) => (
+                      <div key={review.id} className="card-panel" style={{ padding: '16px', background: '#ffffff', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', minHeight: '300px' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                            <img src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0284c7&color=fff`} alt={review.user_name} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{review.user_name}</div>
+                              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{new Date(review.created_at).toLocaleDateString()}</div>
+                            </div>
+                          </div>
+                          
+                          <div style={{ display: 'flex', gap: '2px', marginBottom: '6px' }}>
+                            {[1,2,3,4,5].map(s => <Star key={s} size={11} color="#d97706" fill={s <= review.rating ? '#d97706' : 'none'} />)}
+                          </div>
+
+                          {/* Tour Types / Trip Companion Tags */}
+                          {review.tour_types && review.tour_types.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                              {review.tour_types.map((type: string) => (
+                                <span key={type} style={{ background: '#f1f5f9', color: '#475569', fontSize: '0.62rem', fontWeight: 700, padding: '2px 6px', borderRadius: '10px' }}>
+                                  {type}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {review.title && <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0f172a', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{review.title}</div>}
+                          <p style={{ color: '#475569', fontSize: '0.78rem', lineHeight: 1.5, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}>{review.comment}</p>
+                          
+                          {review.photos && review.photos.length > 0 && (
+                            <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                              {review.photos.map((p: string, i: number) => (
+                                <img key={i} src={p} alt="Traveler photo" style={{ width: '45px', height: '35px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Supplier Response Indicator */}
+                        {review.supplier_reply && (
+                          <div style={{ marginTop: '8px', padding: '6px 8px', background: '#f0f9ff', borderRadius: '6px', borderLeft: '3px solid #0284c7' }}>
+                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#0369a1' }}>🛡️ Supplier Replied</div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
-              {reviews.length === 0 && (
+                </>
+              ) : (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
                   No reviews yet. Be the first to share your experience!
                 </div>
@@ -604,8 +726,8 @@ export default function TourDetailPage() {
             </div>
           </div>
         </div>
-
-        {/* RIGHT COLUMN: REAL-TIME OPTION SELECTOR & REDIS SLOT LOCK */}
+        
+      {/* RIGHT COLUMN: REAL-TIME OPTION SELECTOR & REDIS SLOT LOCK */}
         <div>
           <div className="card-panel" style={{ padding: '30px', position: 'sticky', top: '100px', background: '#ffffff', border: '1px solid #cbd5e1', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '20px', flexWrap: 'nowrap' }}>

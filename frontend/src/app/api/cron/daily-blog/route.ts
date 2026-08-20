@@ -19,9 +19,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Generate 1–2 draft articles (never auto-published).
+    // 2. Generate 1-2 draft articles (never auto-published).
+    // One request consumes ~6.8k of the 8k free-tier TPM budget, so a second
+    // immediate request can hit the rate limit. Default to 1 per run unless
+    // BLOG_DAILY_COUNT is explicitly set to 2.
     const results: { success: boolean; id?: string; error?: string }[] = [];
-    const count = Math.random() < 0.5 ? 1 : 2; // 1-2 drafts daily.
+    const count = process.env.BLOG_DAILY_COUNT === '2' ? 2 : 1;
 
     for (let i = 0; i < count; i++) {
       const result = await generateDailyBlog();

@@ -23,7 +23,8 @@ import {
   Clock,
   FileText,
   Settings,
-  MapPin
+  MapPin,
+  Newspaper
 } from 'lucide-react';
 
 const PAGE_TITLES: Record<string, string> = {
@@ -37,6 +38,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/destinations': 'Destinations Management',
   '/admin/reviews': 'Reviews & Feedback',
   '/admin/cms': 'Content Management System (CMS)',
+  '/admin/blogs': 'Blog Management',
   '/admin/promotions': 'Promotions & Coupons',
   '/admin/payouts': 'Payouts Ledger',
   '/admin/security': 'Security & Audit Center',
@@ -72,6 +74,7 @@ const NAV_SECTIONS = [
       { href: '/admin/destinations', icon: MapPin, label: 'Destinations' },
       { href: '/admin/reviews', icon: Star, label: 'Review and Feedback' },
       { href: '/admin/cms', icon: FileText, label: 'CMS' },
+      { href: '/admin/blogs', icon: Newspaper, label: 'Blogs' },
       { href: '/admin/promotions', icon: Tag, label: 'Promotions' },
       { href: '/admin/payouts', icon: Wallet, label: 'Payouts' },
     ],
