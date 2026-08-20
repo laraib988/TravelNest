@@ -9,7 +9,7 @@ const signupSchema = z.object({
   // Only allow letters, spaces, hyphens, and apostrophes to prevent script injection (XSS)
   name: z.string().min(2, "Name must be at least 2 characters").max(100).regex(/^[a-zA-Z\s\-\']+$/, "Name contains invalid characters. No HTML or scripts allowed."),
   role: z.enum(['CUSTOMER', 'SUPPLIER', 'ADMIN']).default('CUSTOMER'),
-  kycData: z.record(z.any()).optional(), // Ensure it's an object if provided
+  kycData: z.record(z.string(), z.any()).optional(), // Ensure it's an object if provided
 });
 
 export async function POST(request: Request) {

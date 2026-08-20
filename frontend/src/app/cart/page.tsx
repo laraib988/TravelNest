@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const { user } = useAuth();
-  const { formatPrice } = useCurrency();
+  const { cart, removeFromCart, updateCartQuantity, formatPrice } = useCurrency();
   const router = useRouter();
   
   const [promoCode, setPromoCode] = useState('');
@@ -29,40 +29,9 @@ export default function CartPage() {
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [promoMsg, setPromoMsg] = useState('');
 
-  // Mock cart items
-  const [cartItems, setCartItems] = useState([
-    {
-      id: '1',
-      title: 'Luxury Bali Sunset Catamaran Cruise',
-      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      date: '2026-08-15',
-      timeSlot: '16:00 - 19:00',
-      variant: 'Adult (VIP Upper Deck)',
-      quantity: 2,
-      price: 89.00
-    },
-    {
-      id: '2',
-      title: 'Skip-the-Line Louvre Museum Guided Tour',
-      image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      date: '2026-08-20',
-      timeSlot: '10:00 - 12:30',
-      variant: 'Guided Small Group',
-      quantity: 2,
-      price: 75.00
-    }
-  ]);
-
-  const removeItem = (id: string) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
-
-  const updateQuantity = (id: string, newQty: number) => {
-    if (newQty < 1) return;
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQty } : item
-    ));
-  };
+  const cartItems = cart;
+  const removeItem = removeFromCart;
+  const updateQuantity = updateCartQuantity;
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();

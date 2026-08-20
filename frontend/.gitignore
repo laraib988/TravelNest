@@ -1,2 +1,5 @@
 .vercel
 .env*
+
+# Local JSON cache for destination news (GNews)
+/data/news/

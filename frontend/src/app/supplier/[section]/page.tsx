@@ -50,10 +50,29 @@ const DUMMY_LISTINGS = [
 
 
 export default function SupplierDashboard() {
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
   const params = useParams();
 const section = (params?.section as string) || 'dashboard';
+
+  // Auth guard: supplier pages must not be accessible without login.
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/supplier/login');
+    }
+  }, [authLoading, user, router]);
+
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+        <div style={{ fontSize: '1rem', color: '#64748b' }}>Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Redirect handled above
+  }
   
   const activeTab = section === 'listings' ? 'LISTINGS' : section === 'bookings' ? 'BOOKINGS' : (section === 'finance' || section === 'account-settings') ? 'FINANCE' : section === 'availability' ? 'AVAILABILITY' : 'DASHBOARD';
   const [listings, setListings] = useState<any[]>([]);

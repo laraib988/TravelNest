@@ -35,7 +35,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import SortFilterDropdown, { SortOption } from '@/components/SortFilterDropdown';
 
 export default function HomePage() {
-  const { formatPrice, currency, t } = useCurrency();
+  const { formatPrice, currency, t, wishlist, toggleWishlist } = useCurrency();
 
   const toursSliderRef = useRef<HTMLDivElement>(null);
   const reviewsSliderRef = useRef<HTMLDivElement>(null);
@@ -66,7 +66,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [listings, setListings] = useState<any[]>([]);
   const [destinations, setDestinations] = useState<any[]>([]);
-  const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
+
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
 
@@ -103,20 +103,6 @@ export default function HomePage() {
         setListings(supabaseListingsRes || []);
         
         setDestinations(destsRes || []);
-
-        // Load user's saved wishlist to show correct heart icon states
-        try {
-          const wishlistRes = await fetchFromAPI('/users/me/wishlist');
-          const wishlistItems = Array.isArray(wishlistRes) ? wishlistRes : (wishlistRes?.data || []);
-          const wishlistMap: Record<string, boolean> = {};
-          wishlistItems.forEach((item: any) => {
-            const id = item.listingId || item.listing_id || item.id;
-            if (id) wishlistMap[id] = true;
-          });
-          setWishlist(wishlistMap);
-        } catch {
-          // Wishlist API not available — use default empty state
-        }
       } catch (err) {
         console.error('Error fetching storefront data:', err);
       } finally {
@@ -187,23 +173,7 @@ export default function HomePage() {
     }
   };
 
-  const toggleWishlist = async (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const isCurrentlyWishlisted = wishlist[id];
-    // Optimistic UI update
-    setWishlist((prev) => ({ ...prev, [id]: !prev[id] }));
-    try {
-      if (isCurrentlyWishlisted) {
-        await fetchFromAPI(`/users/me/wishlist/${id}`, { method: 'DELETE' });
-      } else {
-        await fetchFromAPI(`/users/me/wishlist/${id}`, { method: 'POST' });
-      }
-    } catch (err) {
-      // API may not be available — keep local state toggle working
-      console.log('Wishlist API unavailable, using local state');
-    }
-  };
+
 
   const handleAiPlanSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -417,15 +387,15 @@ export default function HomePage() {
               <Sparkles size={14} /> AI ENGINE 2.0
             </div>
             <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>
-              Plan Your Custom Dream Trip in Seconds
+              {t('planner_title')}
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '28px' }}>
-              Enter your duration, budget, and select personal interests. Our AI will instantly map out a secure local itinerary.
+              {t('planner_sub')}
             </p>
 
             <form onSubmit={handleAiPlanSubmit} style={{ background: '#ffffff', padding: '24px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Destination</label>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>{t('planner_dest')}</label>
                 <select value={aiDest} onChange={(e) => setAiDest(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
                   {publishedDestinations.length > 0 ? (
                     publishedDestinations.map(d => (
@@ -439,7 +409,7 @@ export default function HomePage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Days</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>{t('planner_days')}</label>
                   <select value={aiDays} onChange={(e) => setAiDays(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
                     <option value="1">1 Day</option>
                     <option value="3">3 Days</option>
@@ -448,7 +418,7 @@ export default function HomePage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>Budget</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>{t('planner_budget')}</label>
                   <select value={aiBudget} onChange={(e) => setAiBudget(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-xs)', border: '1px solid #cbd5e1', outline: 'none' }}>
                     <option value="budget">Value Budget</option>
                     <option value="premium">Mid Premium</option>
@@ -530,10 +500,36 @@ export default function HomePage() {
           }}
         >
           {listings.slice(0, 8).map((item) => (
-            <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', height: '100%' }}>
-              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+            <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', alignSelf: 'stretch' }}>
+              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', flex: 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleWishlist(item.id);
+                    }} 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '12px', 
+                      right: '12px', 
+                      background: 'rgba(255,255,255,0.9)', 
+                      backdropFilter: 'blur(4px)', 
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: '32px', 
+                      height: '32px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      cursor: 'pointer', 
+                      zIndex: 10, 
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                  >
+                    <Heart size={15} color={wishlist.includes(item.id) ? '#e11d48' : '#64748b'} fill={wishlist.includes(item.id) ? '#e11d48' : 'none'} />
+                  </button>
                   {item.selling_point && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                       {item.selling_point}
@@ -582,7 +578,7 @@ export default function HomePage() {
       {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
       <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-          Why Choose TravelNest
+          {t('why_choose_title')}
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
           We guarantee safety, speed, and premium support for travelers worldwide
@@ -627,7 +623,7 @@ export default function HomePage() {
       <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
           <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-            🧭 How TravelNest Works
+            🧭 {t('how_works_title')}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
             Book premium local experiences in 4 simple steps
@@ -745,10 +741,36 @@ export default function HomePage() {
             }}
           >
             {filteredListings.filter(item => item.id !== 'list-bali-sunset').map((item) => (
-              <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', height: '100%' }}>
-              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+              <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', alignSelf: 'stretch' }}>
+              <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', flex: 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
                   <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleWishlist(item.id);
+                    }} 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '12px', 
+                      right: '12px', 
+                      background: 'rgba(255,255,255,0.9)', 
+                      backdropFilter: 'blur(4px)', 
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: '32px', 
+                      height: '32px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      cursor: 'pointer', 
+                      zIndex: 10, 
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                  >
+                    <Heart size={15} color={wishlist.includes(item.id) ? '#e11d48' : '#64748b'} fill={wishlist.includes(item.id) ? '#e11d48' : 'none'} />
+                  </button>
                   {item.selling_point && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                       {item.selling_point}
@@ -798,8 +820,8 @@ export default function HomePage() {
       {/* 9. TOP RATED SUPPLIERS */}
       <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
         <div style={{ marginBottom: '24px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>🛡️ Verified Top Rated Operators</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>100% KYC checked global partners</p>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>🛡️ {t('top_operators_title')}</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{t('top_operators_sub')}</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -1051,7 +1073,7 @@ export default function HomePage() {
       {/* 12. DYNAMIC FAQ ACCORDION */}
       <section style={{ maxWidth: '800px', margin: '0 auto 60px', padding: '0 24px' }}>
         <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
-          Frequently Asked Questions
+          {t('faq_title')}
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '32px' }}>
           Everything you need to know about TravelNest bookings & verification
@@ -1101,7 +1123,7 @@ export default function HomePage() {
       {/* 13. NEWSLETTER */}
       <section style={{ maxWidth: '1100px', margin: '0 auto 60px', padding: '0 24px' }}>
         <div style={{ background: 'var(--brand-gradient)', padding: '50px 30px', borderRadius: 'var(--radius-lg)', color: '#ffffff', textAlign: 'center', boxShadow: '0 12px 36px rgba(2, 132, 199, 0.25)' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '12px' }}>Unlock Secret Travel Deals</h2>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '12px' }}>{t('newsletter_title')}</h2>
           <p style={{ fontSize: '1rem', color: '#e0f2fe', marginBottom: '28px', maxWidth: '600px', margin: '0 auto 28px' }}>
             Subscribe to our weekly dispatch and receive 15% discount code for your first verified experience booking!
           </p>
@@ -1127,7 +1149,7 @@ export default function HomePage() {
                 style={{ flex: 1, minWidth: '240px', padding: '14px 20px', borderRadius: 'var(--radius-pill)', border: 'none', outline: 'none', color: '#0f172a', fontSize: '0.95rem' }}
               />
               <button type="submit" className="btn-secondary" style={{ padding: '14px 30px', borderRadius: 'var(--radius-pill)', color: '#0f172a', fontWeight: 700, border: 'none', background: '#ffffff', cursor: 'pointer' }}>
-                Subscribe Now
+                {t('newsletter_button')}
               </button>
             </form>
           )}
@@ -1138,7 +1160,7 @@ export default function HomePage() {
       {/* 15. WHERE TO GO NEXT SECTION */}
       <section style={{ maxWidth: '1280px', margin: '60px auto 40px', padding: '0 24px', borderTop: '1px solid #e2e8f0', paddingTop: '40px' }}>
         <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>
-          Where to Go Next
+          {t('where_next_title')}
         </h2>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 16px' }}>

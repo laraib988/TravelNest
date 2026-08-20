@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Compass, Bell, User, ChevronDown, LogOut, Settings, Calendar, ShoppingCart, ShieldAlert, Package, CreditCard, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import CurrencyLanguageDropdown from './CurrencyLanguageDropdown';
 
 export default function SupplierHeader() {
   const { user, logout } = useAuth();
@@ -118,8 +117,8 @@ export default function SupplierHeader() {
           gap: '20px'
         }}
       >
-        {/* BRAND LOGO - Routes to Supplier Dashboard, NOT Customer Site */}
-        <Link href="/supplier/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
+        {/* BRAND LOGO - Routes to Supplier Dashboard if logged in, otherwise to signup */}
+        <Link href={user ? '/supplier/dashboard' : '/supplier/signup'} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
           <div 
             style={{ 
               background: 'linear-gradient(135deg, #0f172a, #334155)', 
@@ -144,9 +143,6 @@ export default function SupplierHeader() {
         {/* RIGHT ACTIONS */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
           
-          {/* CURRENCY & LANGUAGE DROPDOWN */}
-          <CurrencyLanguageDropdown />
-
           {/* NOTIFICATION BELL */}
           <div style={{ position: 'relative' }}>
             <button 

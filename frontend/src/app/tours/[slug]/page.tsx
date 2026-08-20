@@ -1,13 +1,15 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
-import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, Heart, XCircle } from 'lucide-react';
+import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, XCircle } from 'lucide-react';
 
 export default function TourDetailPage() {
-  const { formatPrice } = useCurrency();
+  const { formatPrice, t } = useCurrency();
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
@@ -33,7 +35,6 @@ export default function TourDetailPage() {
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -259,7 +260,9 @@ export default function TourDetailPage() {
             <span key={i} className="badge-rose">{badge}</span>
           ))}
         </div>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#0f172a' }}>{tour.title}</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#0f172a', flex: 1 }}>{tour.title}</h1>
+        </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '20px', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={16} color="#d97706" fill="#d97706" /> <strong style={{ color: '#0f172a' }}>{tour.cached_rating_avg}</strong> ({tour.cached_review_count} reviews)</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={16} /> {tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
@@ -324,7 +327,7 @@ export default function TourDetailPage() {
 
           {tour.highlights?.length > 0 && (
             <div style={{ marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '1.6rem', marginBottom: '16px', color: '#0f172a' }}>Highlights</h2>
+              <h2 style={{ fontSize: '1.6rem', marginBottom: '16px', color: '#0f172a' }}>{t('highlights')}</h2>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {tour.highlights.filter((h: string) => h.trim().length > 0).map((item: string, idx: number) => (
                   <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '1.05rem', color: '#334155' }}>
@@ -339,7 +342,7 @@ export default function TourDetailPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '40px' }}>
               {tour.inclusions?.length > 0 && (
                 <div>
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>What's Included</h3>
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>{t('whats_included')}</h3>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {tour.inclusions.map((item: string, idx: number) => (
                       <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '1rem', color: '#334155' }}>
@@ -351,7 +354,7 @@ export default function TourDetailPage() {
               )}
               {tour.know_before_you_go?.length > 0 && (
                 <div>
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>What's Excluded / To Know</h3>
+                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>{t('whats_excluded')}</h3>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', color: 'var(--text-secondary)' }}>
                     {tour.know_before_you_go.map((item: string, idx: number) => (
                       <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -438,12 +441,12 @@ export default function TourDetailPage() {
                         
                         {!item.isLogistics && item.hasEntryFee && (
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#fef2f2', color: '#b91c1c', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
-                            <span>Entry Fee: ${item.entryFeeAmount}</span>
+                            <span>{t('entry_fee')}: ${item.entryFeeAmount}</span>
                           </div>
                         )}
                         {!item.isLogistics && item.hasEntryFee === false && (
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', color: '#047857', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
-                            <span>Free Entry</span>
+                            <span>{t('free_entry')}</span>
                           </div>
                         )}
                       </div>
@@ -458,7 +461,7 @@ export default function TourDetailPage() {
           {tour.faqs && tour.faqs.length > 0 && (
             <div style={{ marginTop: '40px' }}>
               <h2 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <HelpCircle size={22} color="var(--brand-primary)" /> Frequently Asked Questions
+                <HelpCircle size={22} color="var(--brand-primary)" /> {t('faq_title')}
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {tour.faqs.map((faq: any, idx: number) => (
@@ -475,7 +478,7 @@ export default function TourDetailPage() {
           <div style={{ marginTop: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <h2 style={{ fontSize: '1.6rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Star size={22} color="#d97706" fill="#d97706" /> Traveler Reviews
+                <Star size={22} color="#d97706" fill="#d97706" /> {t('traveler_reviews')}
                 <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>({reviews.length})</span>
               </h2>
               <button
@@ -605,21 +608,21 @@ export default function TourDetailPage() {
         {/* RIGHT COLUMN: REAL-TIME OPTION SELECTOR & REDIS SLOT LOCK */}
         <div>
           <div className="card-panel" style={{ padding: '30px', position: 'sticky', top: '100px', background: '#ffffff', border: '1px solid #cbd5e1', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div>
-                <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                  {formatPrice(currentPrice)} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/ {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '20px', flexWrap: 'nowrap' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-primary)', whiteSpace: 'nowrap' }}>
+                  {formatPrice(currentPrice)} <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/ {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
                 </div>
               </div>
-              <div className="badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Lock size={12} /> Secure Payment
+              <div className="badge-emerald" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0, whiteSpace: 'nowrap', padding: '4px 10px', fontSize: '0.78rem' }}>
+                <Lock size={12} /> {t('secure_payment')}
               </div>
             </div>
 
             {/* SRS 3.3 / 4.4: MULTI-OPTION SKU SELECTOR */}
             {tour.options?.length > 0 && tour.options[0].title && (
               <>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '8px', color: '#0f172a' }}>Select Ticket Option / Variant</label>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '8px', color: '#0f172a' }}>{t('select_variant')}</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                   {tour.options.map((opt: any) => {
                     const isOptSelected = selectedOption?.id === opt.id;
@@ -668,7 +671,7 @@ export default function TourDetailPage() {
 
             {/* DATE & TIME SLOT SELECTOR */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <label style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>Select Date & Time Slot</label>
+              <label style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>{t('select_slots')}</label>
               <input 
                 type="date" 
                 onChange={(e) => {
@@ -751,7 +754,7 @@ export default function TourDetailPage() {
       {/* RELEVANT PRODUCTS ROW */}
       {relevantProducts.length > 0 && (
         <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid #e2e8f0', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>Relevant Products</h2>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>{t('relevant_products')}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
             {relevantProducts.map(p => (
               <a key={p.id} href={`/tours/${p.slug || p.id}`} style={{ textDecoration: 'none', display: 'block', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', background: '#fff', transition: 'transform 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>

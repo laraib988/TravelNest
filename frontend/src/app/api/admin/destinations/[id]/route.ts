@@ -26,13 +26,19 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const updates: any = { updated_at: new Date().toISOString() };
     const allowedFields = [
       'name', 'slug', 'country', 'country_code', 'hero_image', 'description',
-      'best_points', 'trending_places', 'faqs', 'gallery', 'itinerary',
+      'meta_title', 'meta_description',
+      'best_points', 'highlights', 'trending_places', 'faqs', 'gallery', 'itinerary',
       'best_time_to_visit', 'meta_data', 'popular_activities_count', 'is_published'
     ];
 
     allowedFields.forEach((field) => {
       if (body[field] !== undefined) updates[field] = body[field];
     });
+
+    // Clean highlights to only non-empty strings
+    if (body.highlights !== undefined) {
+      updates.highlights = (body.highlights || []).filter((h: any) => typeof h === 'string' && h.trim() !== '');
+    }
 
     // Auto-generate slug if name changed but slug wasn't explicitly provided
     if (body.name && !body.slug) {
@@ -61,18 +67,43 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .select()
       .maybeSingle();
 
-    // Smart Retry for best_time_to_visit
-    if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
-      console.warn('best_time_to_visit column not found, retrying without it...');
-      const { best_time_to_visit, ...fallbackData } = sanitized;
-      const retry = await supabase
+    // Smart Retry loop for missing schema columns (e.g. best_time_to_visit, highlights)
+    const MISSING_COLUMN_MAP: Record<string, string> = {
+      best_time_to_visit: 'best_time_to_visit',
+      highlights: 'highlights',
+      meta_title: 'meta_title',
+      meta_description: 'meta_description',
+    };
+
+    let attempts = 0;
+    let updatePayload = sanitized;
+    while (attempts < 6) {
+      const updateRes = await supabase
         .from('destinations')
-        .update(fallbackData)
+        .update(updatePayload)
         .eq('id', id)
         .select()
         .maybeSingle();
-      data = retry.data;
-      error = retry.error;
+      data = updateRes.data;
+      error = updateRes.error;
+
+      if (!error) {
+        break;
+      }
+
+      if (error.message?.includes('schema cache') || error.message?.includes('Could not find the')) {
+        const missing = Object.keys(MISSING_COLUMN_MAP).find((key) =>
+          error.message?.includes(`'${key}'`) || error.message?.includes(key)
+        );
+        if (missing) {
+          console.warn(`${missing} column not found, retrying update without it...`);
+          const { [missing]: _drop, ...remaining } = updatePayload;
+          updatePayload = remaining;
+          attempts++;
+          continue;
+        }
+      }
+      break;
     }
 
     if (error) throw error;

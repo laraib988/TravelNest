@@ -29,7 +29,7 @@ export const useCityAutocomplete = () => {
           });
         }
         
-        setCities([...citySet].sort().filter((c) => c.length > 1));
+        setCities(Array.from(citySet).sort().filter((c) => c.length > 1));
         setLoading(false);
       } catch (err) {
         console.error('Error fetching cities:', err);

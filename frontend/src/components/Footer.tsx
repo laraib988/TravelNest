@@ -19,7 +19,8 @@ export default function Footer() {
   const { t } = useCurrency();
 
   // On admin and supplier pages, hide the public footer
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/supplier')) {
+  const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '';
+  if (cleanPath.startsWith('/admin') || cleanPath.startsWith('/supplier')) {
     return null;
   }
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendBookingEmails } from '@/lib/mailer';
 
 export async function POST(request: Request) {
   try {
@@ -23,8 +24,30 @@ export async function POST(request: Request) {
       dropoff_location,
       payment_token,
       payment_status,
-      confirmation_type
+      confirmation_type,
+      verified_user_id,
+      new_account_credentials
     } = body;
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // Resolve the authenticated user (if any) so the booking is linked to a real profile.
+    // Priority: explicit verified_user_id (from checkout OTP flow) > Bearer token > none
+    let customerId: string | null = verified_user_id ? String(verified_user_id) : null;
+    if (supabaseUrl && supabaseServiceKey && !customerId) {
+      const authHeader = request.headers.get('authorization') || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (token) {
+        try {
+          const authClient = createClient(supabaseUrl, supabaseServiceKey);
+          const { data: userData } = await authClient.auth.getUser(token);
+          if (userData?.user) customerId = userData.user.id;
+        } catch (e) {
+          // ignore — fall back to email-based lookup below
+        }
+      }
+    }
 
     if (!lead_email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -39,7 +62,7 @@ export async function POST(request: Request) {
     const bookingData: any = {
       id: `book-${Date.now()}`,
       booking_reference,
-      customer_id: 'cust-current-user',
+      customer_id: customerId || 'cust-current-user',
       supplier_id: supplier_id || 'unknown-supplier',
       listing_id: listing_id || 'unknown-listing',
       option_id: option_id || 'opt-default',
@@ -69,11 +92,7 @@ export async function POST(request: Request) {
     };
 
     // Try inserting into Supabase
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (supabaseUrl && supabaseServiceKey) {
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
       const { data, error } = await supabaseAdmin
         .from('bookings')
@@ -99,6 +118,56 @@ export async function POST(request: Request) {
           console.error('Failed to create supplier notification:', notifError);
         }
 
+        // Resolve supplier email to notify them of the new order.
+        let supplierEmail: string | null = null;
+        try {
+          const { data: supplierProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('email')
+            .eq('id', supplier_id)
+            .maybeSingle();
+          if (supplierProfile?.email) {
+            supplierEmail = supplierProfile.email;
+          } else {
+            const { data: supplierUser } = await supabaseAdmin
+              .from('users')
+              .select('email')
+              .eq('id', supplier_id)
+              .maybeSingle();
+            if (supplierUser?.email) supplierEmail = supplierUser.email;
+          }
+        } catch (e) {
+          console.error('Failed to resolve supplier email:', e);
+        }
+
+        // Send confirmation + new order emails (customer + supplier).
+        const emailResult = await sendBookingEmails({
+          booking_reference,
+          qr_voucher_code,
+          listing_title,
+          option_name,
+          slot_start_time,
+          total_travelers: Number(total_travelers) || 1,
+          gross_amount: Number(gross_amount) || 0,
+          currency: currency || 'USD',
+          payment_status: payment_status || 'PAID',
+          status: data.status,
+          confirmation_type: confirmation_type === 'MANUAL' ? 'MANUAL' : 'INSTANT',
+          pickup_time: pickup_time || '',
+          pickup_location: pickup_location || '',
+          dropoff_location: dropoff_location || '',
+          lead_name: lead_name || '',
+          lead_email: lead_email || '',
+          lead_phone: lead_phone || '',
+          special_requirements: special_requirements || '',
+          supplier_email: supplierEmail || '',
+          appUrl: process.env.APP_URL || 'http://localhost:3000',
+          newAccountCredentials: new_account_credentials || undefined,
+        });
+        if (emailResult.errors.length > 0) {
+          console.warn('Booking email issues:', emailResult.errors.join('; '));
+        }
+
         // Successfully saved to Supabase
         return NextResponse.json({ success: true, booking: data }, { status: 201 });
       }
@@ -107,7 +176,6 @@ export async function POST(request: Request) {
       if (error) {
         console.warn('Supabase insert warning (table may not exist yet):', error.code, error.message);
       }
-    }
 
     // Fallback: Return booking data without database persistence
     // This ensures the checkout flow ALWAYS completes for the user

@@ -7,7 +7,6 @@ import {
   Compass,
   Sparkles,
   ShieldCheck,
-  Heart,
   MapPin,
   LogOut,
   ChevronDown,
@@ -17,7 +16,6 @@ import {
   Settings,
   MessageSquare,
   Award,
-  ShoppingCart,
   LogIn,
   Globe,
   Star,
@@ -30,7 +28,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import CurrencyLanguageDropdown from './CurrencyLanguageDropdown';
-// import removed
+import { fetchFromAPI } from '@/lib/api-client';
 
 export default function Header() {
   const pathname = usePathname();
@@ -38,7 +36,8 @@ export default function Header() {
   const { t } = useCurrency();
 
   // On admin and supplier pages, hide the public customer header
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/supplier')) {
+  const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '';
+  if (cleanPath.startsWith('/admin') || cleanPath.startsWith('/supplier')) {
     return null;
   }
   
@@ -49,6 +48,21 @@ export default function Header() {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   const subHeaderRef = useRef<HTMLDivElement>(null);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  useEffect(() => {
+    async function loadNotifications() {
+      try {
+        const data = await fetchFromAPI('/users/me/notifications');
+        const list = Array.isArray(data) ? data : (data?.data || []);
+        setUnreadNotifications(list.filter((n: any) => !n.is_read && !n.read).length);
+      } catch (e) {
+        setUnreadNotifications(0);
+      }
+    }
+    loadNotifications();
+  }, [pathname]);
+
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -210,13 +224,6 @@ export default function Header() {
                       style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.88rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
                     >
                       <Calendar size={15} color="#0284c7" /> {t('my_bookings')}
-                    </Link>
-                    <Link
-                      href="/wishlist"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.88rem', color: '#0f172a', textDecoration: 'none', fontWeight: 600 }}
-                    >
-                      <Heart size={15} color="#e11d48" /> Wishlist
                     </Link>
                     <Link
                       href="/profile"
@@ -488,144 +495,6 @@ export default function Header() {
             {/* SECOND HEADER RIGHT ACTIONS: ONLY ICONS WITH UNIFORM PROFESSIONAL COLOR (#475569) & BLUE FLOATING TOOLTIPS */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
               
-              {/* FAVORITES ICON */}
-              <Link 
-                href="/wishlist" 
-                aria-label="Favorites" 
-                style={{ textDecoration: 'none', position: 'relative' }}
-                onMouseEnter={() => setActiveTooltip('FAVORITES')}
-                onMouseLeave={() => setActiveTooltip(null)}
-              >
-                <div 
-                  style={{ 
-                    position: 'relative', 
-                    cursor: 'pointer', 
-                    background: '#f8fafc', 
-                    padding: '9px', 
-                    borderRadius: '50%', 
-                    border: '1px solid #cbd5e1', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    boxShadow: 'var(--shadow-sm)',
-                    transition: 'all 0.2s' 
-                  }}
-                >
-                  <Heart size={17} color="#475569" />
-                  <span 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '-3px', 
-                      right: '-3px', 
-                      background: '#0284c7', 
-                      color: '#ffffff', 
-                      fontSize: '0.62rem', 
-                      fontWeight: 800, 
-                      borderRadius: '50%', 
-                      width: '16px', 
-                      height: '16px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center' 
-                    }}
-                  >
-                    1
-                  </span>
-                </div>
-
-                {activeTooltip === 'FAVORITES' && (
-                  <div 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '46px', 
-                      left: '50%', 
-                      transform: 'translateX(-50%)', 
-                      background: '#0284c7', 
-                      color: '#ffffff', 
-                      fontSize: '0.72rem', 
-                      fontWeight: 700, 
-                      padding: '4px 10px', 
-                      borderRadius: '6px', 
-                      whiteSpace: 'nowrap', 
-                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
-                      pointerEvents: 'none', 
-                      zIndex: 250 
-                    }}
-                  >
-                    Favorites
-                  </div>
-                )}
-              </Link>
-
-              {/* CART ICON */}
-              <Link 
-                href="/cart" 
-                aria-label="Cart" 
-                style={{ textDecoration: 'none', position: 'relative' }}
-                onMouseEnter={() => setActiveTooltip('CART')}
-                onMouseLeave={() => setActiveTooltip(null)}
-              >
-                <div 
-                  style={{ 
-                    position: 'relative', 
-                    cursor: 'pointer', 
-                    background: '#f8fafc', 
-                    padding: '9px', 
-                    borderRadius: '50%', 
-                    border: '1px solid #cbd5e1', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    boxShadow: 'var(--shadow-sm)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <ShoppingCart size={17} color="#475569" />
-                  <span 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '-3px', 
-                      right: '-3px', 
-                      background: '#0284c7', 
-                      color: '#ffffff', 
-                      fontSize: '0.62rem', 
-                      fontWeight: 800, 
-                      borderRadius: '50%', 
-                      width: '16px', 
-                      height: '16px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center' 
-                    }}
-                  >
-                    2
-                  </span>
-                </div>
-
-                {activeTooltip === 'CART' && (
-                  <div 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '46px', 
-                      left: '50%', 
-                      transform: 'translateX(-50%)', 
-                      background: '#0284c7', 
-                      color: '#ffffff', 
-                      fontSize: '0.72rem', 
-                      fontWeight: 700, 
-                      padding: '4px 10px', 
-                      borderRadius: '6px', 
-                      whiteSpace: 'nowrap', 
-                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
-                      pointerEvents: 'none', 
-                      zIndex: 250 
-                    }}
-                  >
-                    Cart
-                  </div>
-                )}
-              </Link>
-
               {/* MY BOOKINGS ICON */}
               <Link 
                 href="/my-bookings" 
@@ -677,7 +546,7 @@ export default function Header() {
 
               {/* COMPARE ICON */}
               <Link 
-                href="/destinations" 
+                href="/compare" 
                 aria-label="Compare" 
                 style={{ textDecoration: 'none', position: 'relative' }}
                 onMouseEnter={() => setActiveTooltip('COMPARE')}
@@ -748,25 +617,27 @@ export default function Header() {
                   }}
                 >
                   <Bell size={17} color="#475569" />
-                  <span 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '-3px', 
-                      right: '-3px', 
-                      background: '#0284c7', 
-                      color: '#ffffff', 
-                      fontSize: '0.62rem', 
-                      fontWeight: 800, 
-                      borderRadius: '50%', 
-                      width: '16px', 
-                      height: '16px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center' 
-                    }}
-                  >
-                    3
-                  </span>
+                  {unreadNotifications > 0 && (
+                    <span 
+                      style={{ 
+                        position: 'absolute', 
+                        top: '-3px', 
+                        right: '-3px', 
+                        background: '#e11d48', 
+                        color: '#ffffff', 
+                        fontSize: '0.62rem', 
+                        fontWeight: 800, 
+                        borderRadius: '50%', 
+                        width: '16px', 
+                        height: '16px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center' 
+                      }}
+                    >
+                      {unreadNotifications}
+                    </span>
+                  )}
                 </div>
 
                 {activeTooltip === 'NOTIFICATIONS' && (

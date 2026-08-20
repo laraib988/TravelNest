@@ -43,17 +43,35 @@ export async function GET(request: Request, { params }: { params: { slug: string
       // Avoids downloading massive base64 product image blobs from Supabase.
       const { data: products } = await supabase
         .from('products')
-        .select('id, title, slug, images, base_price, currency, status, basic_info, logistics, cached_rating_avg')
+        .select('id, status, basic_info')
         .eq('status', 'PUBLISHED')
         .order('created_at', { ascending: false })
-        .limit(8);
+        .limit(20);
 
-      // Filter products whose basic_info destination matches this destination
+      // Filter products whose TITLE or destination matches this destination
       if (products) {
+        // Match on any word from the destination name (case-insensitive)
+        const nameWords = (destination.name || '')
+          .toLowerCase()
+          .split(/[\s\-()]+/)
+          .filter((w: string) => w.length > 2);
+
+        const destNameLower = destination.name.toLowerCase();
+        const destSlugLower = destination.slug.toLowerCase();
+
         relatedProducts = products.filter((p: any) => {
-          const dest = p.basic_info?.destination || p.basic_info?.city || '';
-          return dest.toLowerCase().includes(destination.name.toLowerCase()) ||
-                 dest.toLowerCase().includes(destination.slug.toLowerCase());
+          const title = (p.basic_info?.title || '').toLowerCase();
+          const dest = (p.basic_info?.destination || p.basic_info?.city || '').toLowerCase();
+
+          // Direct title match with destination name (e.g. "Mount Fuji" in product title)
+          if (destNameLower && title.includes(destNameLower)) return true;
+          if (destSlugLower && title.includes(destSlugLower)) return true;
+          // Title matches any significant word of the destination name
+          if (nameWords.some((w: string) => title.includes(w))) return true;
+          // Destination/city field match
+          if (dest.includes(destNameLower) || dest.includes(destSlugLower)) return true;
+
+          return false;
         });
       }
     } catch (e) {

@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ArrowLeft, Save, Send, Plus, Trash2, 
-  MapPin, Image as ImageIcon, HelpCircle, Map, Camera, Route, Calendar, ShieldCheck
+  MapPin, Image as ImageIcon, HelpCircle, Map, Camera, Route, Calendar, ShieldCheck, Sparkles
 } from 'lucide-react';
 
 function DestinationFormContent() {
@@ -25,19 +25,23 @@ function DestinationFormContent() {
     country_code: '',
     description: '',
     hero_image: '',
+    meta_title: '',
+    meta_description: '',
+    highlights: [''],
     best_points: [{ title: '', description: '' }],
     trending_places: [{ name: '', image: '', description: '' }],
     faqs: [{ question: '', answer: '' }],
     gallery: [{ image_url: '', caption: '' }],
     itinerary: [{ title: '', description: '', image: '' }],
-    best_time_to_visit: { months: [] as string[], description: '' },
+    best_time_to_visit: { months: [] as string[], descriptions: {} as Record<string, string> },
     meta_data: {
       safety: {
         is_safe_for_women: false,
         safety_score: 0,
         trusted_transport: '',
         emergency_contacts: { police: '', ambulance: '', women_helpline: '' }
-      }
+      },
+      geo: { latitude: '', longitude: '' }
     },
     is_published: false
   });
@@ -64,19 +68,26 @@ function DestinationFormContent() {
               country_code: dest.country_code || '',
               description: dest.description || '',
               hero_image: dest.hero_image || '',
+              meta_title: dest.meta_title || '',
+              meta_description: dest.meta_description || '',
+              highlights: dest.highlights?.length ? dest.highlights : [''],
               best_points: dest.best_points?.length ? dest.best_points : [{ title: '', description: '' }],
               trending_places: dest.trending_places?.length ? dest.trending_places : [{ name: '', image: '', description: '' }],
               faqs: dest.faqs?.length ? dest.faqs : [{ question: '', answer: '' }],
               gallery: dest.gallery?.length ? dest.gallery : [{ image_url: '', caption: '' }],
               itinerary: dest.itinerary?.length ? dest.itinerary : [{ title: '', description: '', image: '' }],
-              best_time_to_visit: dest.best_time_to_visit || { months: [], description: '' },
+              best_time_to_visit: {
+                months: dest.best_time_to_visit?.months || [],
+                descriptions: dest.best_time_to_visit?.descriptions || {},
+              },
               meta_data: dest.meta_data || {
                 safety: {
                   is_safe_for_women: false,
                   safety_score: 0,
                   trusted_transport: '',
                   emergency_contacts: { police: '', ambulance: '', women_helpline: '' }
-                }
+                },
+                geo: { latitude: '', longitude: '' }
               },
               is_published: dest.is_published || false
             });
@@ -151,6 +162,14 @@ function DestinationFormContent() {
     }));
   };
 
+  const handleHighlightChange = (index: number, value: string) => {
+    setFormData(prev => {
+      const newArr = [...prev.highlights];
+      newArr[index] = value;
+      return { ...prev, highlights: newArr };
+    });
+  };
+
   const removeArrayItem = (field: string, index: number) => {
     setFormData(prev => {
       const array = [...(prev as any)[field]];
@@ -168,7 +187,18 @@ function DestinationFormContent() {
     
     setLoading(true);
     try {
-      const dataToSubmit = { ...formData, is_published: isPublished };
+      const geoLat = formData.meta_data.geo?.latitude;
+      const geoLng = formData.meta_data.geo?.longitude;
+      const geo = {
+        ...(formData.meta_data.geo || {}),
+        latitude: geoLat === '' || geoLat == null ? null : Number(geoLat),
+        longitude: geoLng === '' || geoLng == null ? null : Number(geoLng),
+      };
+      const dataToSubmit = {
+        ...formData,
+        meta_data: { ...formData.meta_data, geo },
+        is_published: isPublished,
+      };
       const url = id ? `/api/admin/destinations/${id}` : '/api/admin/destinations';
       const method = id ? 'PUT' : 'POST';
 
@@ -454,6 +484,56 @@ function DestinationFormContent() {
         </div>
       </div>
 
+      {/* A2) SEO META */}
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>
+          <Sparkles size={22} color="#7c3aed" />
+          SEO Meta (for Google Search)
+        </h2>
+        <div style={formGroupStyle}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <label style={labelStyle}>Meta Title</label>
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: formData.meta_title.length >= 50 && formData.meta_title.length <= 60 ? '#059669' : formData.meta_title.length > 0 ? '#d97706' : '#94a3b8' }}>
+              {formData.meta_title.length}/60 {formData.meta_title.length >= 50 ? '(good)' : '(aim 50-60)'}
+            </span>
+          </div>
+          <input 
+            style={inputStyle} 
+            name="meta_title" 
+            value={formData.meta_title} 
+            onChange={handleChange} 
+            maxLength={60}
+            placeholder="e.g. 10 Best Things to Do in Tokyo | TravelNest"
+          />
+          {formData.meta_title.length < 50 && (
+            <div style={{ fontSize: '0.8rem', color: '#d97706', marginTop: '4px' }}>
+              {50 - formData.meta_title.length} more characters recommended (ideal 50-60).
+            </div>
+          )}
+        </div>
+        <div style={formGroupStyle}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <label style={labelStyle}>Meta Description</label>
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: formData.meta_description.length >= 150 && formData.meta_description.length <= 160 ? '#059669' : formData.meta_description.length > 0 ? '#d97706' : '#94a3b8' }}>
+              {formData.meta_description.length}/160 {formData.meta_description.length >= 150 ? '(good)' : '(aim 150-160)'}
+            </span>
+          </div>
+          <textarea 
+            style={{ ...inputStyle, minHeight: '90px', resize: 'vertical' }} 
+            name="meta_description" 
+            value={formData.meta_description} 
+            onChange={handleChange} 
+            maxLength={160}
+            placeholder="e.g. Discover Tokyo's best attractions, food, culture and day trips with our expert travel guides and curated tour packages."
+          />
+          {formData.meta_description.length < 150 && (
+            <div style={{ fontSize: '0.8rem', color: '#d97706', marginTop: '4px' }}>
+              {150 - formData.meta_description.length} more characters recommended (ideal 150-160).
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* B) BEST POINTS */}
       <div style={sectionStyle}>
         <h2 style={sectionTitleStyle}>
@@ -488,6 +568,47 @@ function DestinationFormContent() {
         ))}
         <button style={addBtnStyle} onClick={() => addArrayItem('best_points', { title: '', description: '' })}>
           <Plus size={20} /> Add Item
+        </button>
+      </div>
+
+      {/* B2) HIGHLIGHTS */}
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>
+          <Sparkles size={22} color="#f43f5e" />
+          Highlights
+        </h2>
+        <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '16px' }}>
+          Each line becomes one bullet point. Add a new line to create the next bullet.
+        </p>
+        {formData.highlights.map((item, index) => (
+          <div key={index} style={repeatableCardStyle}>
+            {formData.highlights.length > 1 && (
+              <button style={removeBtnStyle} onClick={() => removeArrayItem('highlights', index)} title="Remove item">
+                <Trash2 size={18} />
+              </button>
+            )}
+            <div style={formGroupStyle}>
+              <label style={labelStyle}>Highlight Point {index + 1}</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f43f5e', flexShrink: 0 }} />
+                <input 
+                  style={inputStyle} 
+                  value={item} 
+                  onChange={(e) => handleHighlightChange(index, e.target.value)} 
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addArrayItem('highlights', '');
+                    }
+                  }}
+                  placeholder="e.g. 4K HD photos & videos included"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+        <button style={addBtnStyle} onClick={() => addArrayItem('highlights', '')}>
+          <Plus size={20} /> Add Highlight
         </button>
       </div>
 
@@ -683,7 +804,7 @@ function DestinationFormContent() {
           Best Time to Visit
         </h2>
         <div style={formGroupStyle}>
-          <label style={labelStyle}>Select Best Months</label>
+          <label style={labelStyle}>Select Best Months (click a month to add/remove it)</label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => {
               const isSelected = formData.best_time_to_visit.months.includes(m);
@@ -714,18 +835,43 @@ function DestinationFormContent() {
             })}
           </div>
         </div>
-        <div style={formGroupStyle}>
-          <label style={labelStyle}>Description / Timing Details</label>
-          <textarea 
-            style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} 
-            value={formData.best_time_to_visit.description} 
-            onChange={(e) => setFormData(prev => ({
-              ...prev, 
-              best_time_to_visit: { ...prev.best_time_to_visit, description: e.target.value }
-            }))} 
-            placeholder="e.g. The best time to visit Lahore is between October and March when the weather is cool and pleasant..."
-          />
-        </div>
+
+        {/* Per-month descriptions: one editable box for each selected month */}
+        {formData.best_time_to_visit.months.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '4px' }}>
+            <label style={labelStyle}>Month Descriptions (custom text for each selected month)</label>
+            {formData.best_time_to_visit.months.map((m) => (
+              <div key={m} style={{
+                border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px',
+                background: '#f8fafc'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <span style={{
+                    padding: '6px 14px', borderRadius: '999px', background: '#0284c7',
+                    color: '#ffffff', fontWeight: 700, fontSize: '0.85rem'
+                  }}>
+                    {m}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                    Description shown to customers when they click {m}
+                  </span>
+                </div>
+                <textarea
+                  style={{ ...inputStyle, minHeight: '80px', resize: 'vertical', background: '#ffffff' }}
+                  value={formData.best_time_to_visit.descriptions[m] || ''}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    best_time_to_visit: {
+                      ...prev.best_time_to_visit,
+                      descriptions: { ...prev.best_time_to_visit.descriptions, [m]: e.target.value }
+                    }
+                  }))}
+                  placeholder={`e.g. In ${m}, the weather is mild and perfect for sightseeing...`}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* D) FAQs (Moved to Bottom) */}
@@ -852,6 +998,48 @@ function DestinationFormContent() {
                 onChange={(e) => setFormData(prev => ({ ...prev, meta_data: { ...prev.meta_data, safety: { ...prev.meta_data.safety, emergency_contacts: { ...prev.meta_data.safety.emergency_contacts, women_helpline: e.target.value } } } }))}
               />
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* I.5) WEATHER LOCATION COORDINATES */}
+      <div style={sectionStyle}>
+        <h2 style={{ ...sectionTitleStyle, color: '#0e7490' }}>
+          <Map size={22} color="#06b6d4" />
+          Weather Location (Coordinates)
+        </h2>
+        <p style={{ fontSize: '0.88rem', color: '#64748b', marginBottom: '20px', lineHeight: 1.6 }}>
+          Add the latitude and longitude of this destination so the live weather widget shows accurate conditions.
+          If left empty, we automatically geocode the destination name.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div style={formGroupStyle}>
+            <label style={labelStyle}>Latitude</label>
+            <input
+              type="number"
+              step="any"
+              style={inputStyle}
+              value={formData.meta_data.geo?.latitude ?? ''}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                meta_data: { ...prev.meta_data, geo: { ...prev.meta_data.geo, latitude: e.target.value } }
+              }))}
+              placeholder="e.g. 35.3606"
+            />
+          </div>
+          <div style={formGroupStyle}>
+            <label style={labelStyle}>Longitude</label>
+            <input
+              type="number"
+              step="any"
+              style={inputStyle}
+              value={formData.meta_data.geo?.longitude ?? ''}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                meta_data: { ...prev.meta_data, geo: { ...prev.meta_data.geo, longitude: e.target.value } }
+              }))}
+              placeholder="e.g. 138.7274"
+            />
           </div>
         </div>
       </div>

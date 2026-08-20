@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS public.destinations (
     hero_image TEXT,
     description TEXT,
     best_points JSONB DEFAULT '[]'::jsonb,
+    highlights JSONB DEFAULT '[]'::jsonb,
+    meta_title TEXT DEFAULT '',
+    meta_description TEXT DEFAULT '',
     trending_places JSONB DEFAULT '[]'::jsonb,
     faqs JSONB DEFAULT '[]'::jsonb,
     gallery JSONB DEFAULT '[]'::jsonb,
@@ -90,7 +93,10 @@ export async function POST(request: Request) {
       country_code: body.country_code || 'PK',
       hero_image: body.hero_image || '',
       description: body.description || '',
+      meta_title: body.meta_title || '',
+      meta_description: body.meta_description || '',
       best_points: body.best_points || [],
+      highlights: (body.highlights || []).filter((h: any) => typeof h === 'string' && h.trim() !== ''),
       trending_places: body.trending_places || [],
       faqs: body.faqs || [],
       gallery: body.gallery || [],
@@ -111,23 +117,52 @@ export async function POST(request: Request) {
 
     const sanitized = stripBase64(destination);
 
-    let { data, error } = await supabase
-      .from('destinations')
-      .insert(sanitized)
-      .select()
-      .maybeSingle();
+    // Smart Retry: if a column is missing (schema cache / column not created),
+    // strip that field and retry so creation still succeeds.
+    const MISSING_COLUMN_MAP: Record<string, string[]> = {
+      highlights: ['highlights'],
+      meta_title: ['meta_title'],
+      meta_description: ['meta_description'],
+      best_time_to_visit: ['best_time_to_visit'],
+    };
 
-    // Smart Retry for best_time_to_visit
-    if (error && (error.message?.includes('best_time_to_visit') || error.message?.includes('schema cache'))) {
-      console.warn('best_time_to_visit column not found, retrying without it...');
-      const { best_time_to_visit, ...fallbackData } = sanitized;
-      const retry = await supabase
+    let data: any;
+    let error: any;
+    let insertPayload: any = sanitized;
+
+    const attemptInsert = async (payload: any) => {
+      const res = await supabase
         .from('destinations')
-        .insert(fallbackData)
+        .insert(payload)
         .select()
         .maybeSingle();
-      data = retry.data;
-      error = retry.error;
+      return res;
+    };
+
+    // Attempt progressively stripping missing columns if they fail database schema check
+    let attempts = 0;
+    while (attempts < 6) {
+      const attemptRes = await attemptInsert(insertPayload);
+      data = attemptRes.data;
+      error = attemptRes.error;
+
+      if (!error) {
+        break;
+      }
+
+      if (error.message?.includes('schema cache') || error.message?.includes('Could not find the')) {
+        const missing = Object.keys(MISSING_COLUMN_MAP).find((key) =>
+          error.message?.includes(`'${key}'`) || error.message?.includes(key)
+        );
+        if (missing) {
+          console.warn(`${missing} column not found, retrying without it...`);
+          const { [missing]: _drop, ...remaining } = insertPayload;
+          insertPayload = remaining;
+          attempts++;
+          continue;
+        }
+      }
+      break;
     }
 
     if (error) {
