@@ -79,27 +79,44 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* COLUMN 4: CONTACT INFO */}
+            {/* COLUMN 3: PAYMENT CHANNELS */}
             <div>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
-                {t('contact_info')}
+                Payment Channels
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', fontSize: '0.93rem', color: '#d1d5db' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Mail size={18} color="#38bdf8" style={{ flexShrink: 0 }} />
-                  <a href="mailto:support@travelnest.com" style={{ color: '#d1d5db', textDecoration: 'none' }}>
-                    support@travelnest.com
-                  </a>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', maxWidth: '380px' }}>
+                {/* Row 1 */}
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                  VISA
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Phone size={18} color="#38bdf8" style={{ flexShrink: 0 }} />
-                  <span>+81 80-8357-2662</span>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', gap: '3px', whiteSpace: 'nowrap' }}>
+                  <span style={{ color: '#f59e0b' }}>●</span><span style={{ color: '#ef4444' }}>●</span> mc
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', lineHeight: 1.5 }}>
-                  <MapPin size={18} color="#38bdf8" style={{ flexShrink: 0, marginTop: '3px' }} />
-                  <span>2nd Floor, Sotoike Shukugo Building, Utsunomiya City, Tochigi.</span>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                  AMEX
+                </div>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                  JCB
+                </div>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                  UPI
+                </div>
+                
+                {/* Row 2 */}
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                  DISCOVER
+                </div>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', textAlign: 'center', lineHeight: 1.1 }}>
+                  Diners
+                </div>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                   Pay
+                </div>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
+                  G Pay
+                </div>
+                <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', fontStyle: 'italic', whiteSpace: 'nowrap' }}>
+                  PayPal
                 </div>
               </div>
             </div>
@@ -107,55 +124,6 @@ export default function Footer() {
           </div>
 
           
-          {/* PAYMENT CHANNELS */}
-          <div style={{ borderTop: '1px solid #1e293b', paddingTop: '30px', paddingBottom: '30px' }}>
-            <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Payment channels
-            </h4>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-              {/* Visa */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', letterSpacing: '1px' }}>
-                <span style={{ color: '#38bdf8', marginRight: '4px' }}>💳</span> VISA
-              </div>
-              {/* Mastercard */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', gap: '6px' }}>
-                <span style={{ color: '#f59e0b' }}>●</span><span style={{ color: '#ef4444' }}>●</span> mastercard
-              </div>
-              {/* Amex */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
-                AMEX
-              </div>
-              {/* JCB */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
-                JCB
-              </div>
-              {/* UnionPay */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
-                UnionPay
-              </div>
-              {/* Discover */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
-                DISCOVER
-              </div>
-              {/* Diners Club */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
-                Diners Club
-              </div>
-              {/* Apple Pay */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155' }}>
-                 Pay
-              </div>
-              {/* Google Pay */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', gap: '4px' }}>
-                <span style={{ color: '#38bdf8' }}>G</span> Pay
-              </div>
-              {/* PayPal */}
-              <div style={{ background: '#1e293b', color: '#f8fafc', padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.82rem', display: 'flex', alignItems: 'center', height: '34px', border: '1px solid #334155', fontStyle: 'italic' }}>
-                PayPal
-              </div>
-            </div>
-          </div>
-
           {/* BOTTOM COPYRIGHT BAR */}
           <div
             style={{
