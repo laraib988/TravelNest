@@ -14,7 +14,8 @@ export async function GET() {
   try {
     const { data, error } = await getSupabase()
       .from('destinations')
-      .select('id, name, slug, country, hero_image, popular_activities_count')\n      .range(0, 49)
+      .select('id, name, slug, country, hero_image, popular_activities_count')
+      .range(0, 49)
       .eq('is_published', true)
       .order('name', { ascending: true });
 
