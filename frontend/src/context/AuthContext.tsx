@@ -34,7 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authMode, setAuthMode] = useState<'LOGIN' | 'SIGNUP'>('LOGIN');
 
   useEffect(() => {
-    // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         fetchProfile(session.user.id, session.user.email || '');
@@ -43,12 +42,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // Listen for changes on auth state (sign in, sign out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         fetchProfile(session.user.id, session.user.email || '');
       } else {
         setUser(null);
+        setLoading(false);
       }
     });
 
@@ -63,41 +62,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
         
-      if (error) {
-        console.warn('Profiles table not found or error fetching profile. Falling back to Auth metadata.');
+      if (error || !data) {
+        // Fallback: use auth metadata directly
         const { data: authData } = await supabase.auth.getUser();
         if (authData?.user) {
-           setUser({
-             id: authData.user.id,
-             email: authData.user.email || email,
-             name: authData.user.user_metadata?.name || 'Administrator',
-             role: authData.user.user_metadata?.role || 'ADMIN',
-             avatar: authData.user.user_metadata?.avatar,
-           });
+          setUser({
+            id: authData.user.id,
+            email: authData.user.email || email,
+            name: authData.user.user_metadata?.name || email.split('@')[0],
+            role: authData.user.user_metadata?.role || 'CUSTOMER',
+            avatar: authData.user.user_metadata?.avatar,
+          });
         }
         return;
       }
       
       let supplierStatus;
       if (data.role === 'SUPPLIER') {
-         const { data: kycData } = await supabase
-           .from('supplier_kyc_records')
-           .select('status')
-           .eq('user_id', userId)
-           .single();
-         if (kycData) supplierStatus = kycData.status;
+        const { data: kycData } = await supabase
+          .from('supplier_kyc_records')
+          .select('status')
+          .eq('user_id', userId)
+          .maybeSingle();
+        if (kycData) supplierStatus = kycData.status;
       }
 
       setUser({
         id: data.id,
-        name: data.name,
+        name: data.name || email.split('@')[0],
         email: data.email,
         avatar: data.avatar,
         role: data.role as 'CUSTOMER' | 'SUPPLIER' | 'ADMIN',
         supplierStatus
       });
     } catch (e) {
-      console.error(e);
+      console.error('fetchProfile error:', e);
     } finally {
       setLoading(false);
     }
@@ -122,13 +121,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check if MFA is required
     const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (!aalError && aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
-      // User has enrolled in MFA but hasn't verified this session
       return { needsMFA: true, user: data.user };
     }
     
-    // Wait for the profile to be fetched so the caller gets the full user object
     await fetchProfile(data.user.id, data.user.email || '');
-    return { needsMFA: false, user: user }; 
+    return { needsMFA: false, user: data.user };
   };
 
   const checkUserExists = async (email: string) => {
@@ -142,10 +139,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (name: string, email: string, pass: string, requestedRole?: string, kycData?: any) => {
     let role = requestedRole || 'CUSTOMER';
-    if (email.toLowerCase().includes('admin')) role = 'ADMIN';
-    if (email.toLowerCase().includes('supplier')) role = 'SUPPLIER';
+    // Don't override role based on email content for security
+    // The requestedRole from the supplier signup form is what we trust
 
-    // Call the backend API to create the user directly via Admin API to bypass rate limits
+    // Call the backend API — it handles user creation, profiles upsert, and KYC insert server-side
     const response = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -155,55 +152,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const resData = await response.json();
 
     if (!response.ok) {
-      if (resData.error && resData.error.includes('already registered')) {
-        throw new Error('This email address is already registered. If your account was suspended or recently rejected, you cannot create a new account.');
-      }
-      let errMsg = resData.error;
-      if (resData.details) {
-        const messages = [];
-        for (const key in resData.details) {
-          if (key !== '_errors' && resData.details[key]._errors && resData.details[key]._errors.length > 0) {
-            messages.push(resData.details[key]._errors[0]);
-          }
-        }
-        if (messages.length > 0) errMsg = messages.join(', ');
-      }
-      throw new Error(errMsg);
+      throw new Error(resData.error || 'Signup failed. Please try again.');
     }
 
-    // Now sign in automatically so the client has the session
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    // Auto sign-in after successful creation
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password: pass
     });
 
     if (signInError) {
-      console.warn('User created but auto-login failed:', signInError);
-    }
-
-    const user = resData.user || signInData?.user;
-
-    if (user && role === 'SUPPLIER' && kycData) {
-      // Insert KYC Record
-      const { error: kycError } = await supabase
-        .from('supplier_kyc_records')
-        .insert({
-          user_id: user.id,
-          company_name: kycData.companyName,
-          business_type: kycData.partnerType,
-          location: kycData.location,
-          phone: kycData.phone,
-          currency: kycData.currency,
-          business_reg: kycData.business_reg,
-          tax_id: kycData.tax_id,
-          documents: kycData.documents,
-          status: 'PENDING'
-        });
-        
-      if (kycError) {
-        console.error('Failed to create KYC record', kycError);
-        throw new Error(`KYC Record failed: ${kycError.message}`);
-      }
+      console.warn('User created but auto-login failed:', signInError.message);
+      // Don't throw — user was created successfully, they can log in manually
     }
 
     return true;
@@ -243,7 +203,7 @@ export function useAuth() {
       authMode: 'LOGIN' as const,
       openAuthModal: () => {},
       closeAuthModal: () => {},
-      login: async () => true,
+      login: async () => ({ needsMFA: false, user: null }),
       signup: async () => true,
       checkUserExists: async () => false,
       logout: () => {},
@@ -252,4 +212,3 @@ export function useAuth() {
   }
   return context;
 }
-

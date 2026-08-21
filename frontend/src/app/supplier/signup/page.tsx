@@ -17,13 +17,14 @@ import {
   DollarSign,
   UploadCloud,
   FileCheck,
-  ChevronLeft
+  ChevronLeft,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function SupplierSignupPage() {
   const router = useRouter();
-  const { checkUserExists, signup } = useAuth();
+  const { checkUserExists, signup, logout } = useAuth();
 
   // Wizard Step State (1: Basic Signup, 2: Select Solo/Company, 3: Detailed Form, 4: Success)
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -34,6 +35,7 @@ export default function SupplierSignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
+  const [signupError, setSignupError] = useState('');
 
   // Solo Fields
   const [soloLocation, setSoloLocation] = useState('');
@@ -67,6 +69,9 @@ export default function SupplierSignupPage() {
     setLoading(true);
     setAuthError('');
     try {
+      // If already logged in as another user, sign them out first
+      await logout();
+      
       const exists = await checkUserExists(email);
       if (exists) {
         setAuthError('This email is already registered. Please sign in or use a different email.');
@@ -83,9 +88,10 @@ export default function SupplierSignupPage() {
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSignupError('');
     try {
       // Construct documents array based on partner type
-      let docs = [];
+      let docs: any[] = [];
       if (partnerType === 'SOLO') {
         if (soloIdFile) docs.push({ doc_id: `doc-${Date.now()}-1`, doc_type: 'CNIC/Passport', file_name: soloIdFile.name, status: 'PENDING' });
       } else {
@@ -116,7 +122,7 @@ export default function SupplierSignupPage() {
       setStep(4);
     } catch (err: any) {
       console.error('Signup error:', err);
-      alert(`Signup Failed: ${err.message || 'Unknown error occurred.'}`);
+      setSignupError(err.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -519,6 +525,12 @@ export default function SupplierSignupPage() {
                     </div>
                   </div>
                 </>
+              )}
+              {signupError && (
+                <div style={{ padding: '12px 16px', borderRadius: '12px', background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', fontSize: '0.875rem', fontWeight: 500, display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+                  <span>{signupError}</span>
+                </div>
               )}
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '14px', fontSize: '1rem', fontWeight: 700, borderRadius: 'var(--radius-pill)', justifyContent: 'center', marginTop: '8px' }}>
                 {loading ? 'Submitting Application...' : 'Complete Registration & Submit Verification'} <ArrowRight size={18} />
