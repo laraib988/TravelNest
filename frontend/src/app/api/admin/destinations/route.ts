@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +49,7 @@ const stripBase64 = (obj: any): any => {
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('destinations')
       .select('*')
       .order('created_at', { ascending: false });
@@ -131,7 +134,7 @@ export async function POST(request: Request) {
     let insertPayload: any = sanitized;
 
     const attemptInsert = async (payload: any) => {
-      const res = await supabase
+      const res = await getSupabase()
         .from('destinations')
         .insert(payload)
         .select()

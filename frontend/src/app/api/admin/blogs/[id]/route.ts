@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +30,7 @@ type Params = { params: Promise<{ id: string }> };
 export async function GET(request: Request, { params }: Params) {
   try {
     const { id } = await params;
-    const { data, error } = await supabase.from('blogs').select('*').eq('id', id).maybeSingle();
+    const { data, error } = await getSupabase().from('blogs').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     if (!data) return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     return NextResponse.json({ data });
@@ -43,7 +46,7 @@ export async function PUT(request: Request, { params }: Params) {
     const body = await request.json();
 
     // Normalize published_at: set on publish transition, clear on unpublish.
-    const current = await supabase.from('blogs').select('status').eq('id', id).maybeSingle();
+    const current = await getSupabase().from('blogs').select('status').eq('id', id).maybeSingle();
     const currentStatus = current.data?.status;
 
     let published_at: string | null = undefined;
@@ -115,7 +118,7 @@ export async function PUT(request: Request, { params }: Params) {
 export async function DELETE(request: Request, { params }: Params) {
   try {
     const { id } = await params;
-    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    const { error } = await getSupabase().from('blogs').delete().eq('id', id);
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error: any) {

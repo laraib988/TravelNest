@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +14,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
   try {
     const { slug } = params;
 
-    const { data: destination, error } = await supabase
+    const { data: destination, error } = await getSupabase()
       .from('destinations')
       .select('*')
       .ilike('slug', slug)
@@ -41,7 +44,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
     try {
       // Root cause fix for slow loading: only select small, necessary columns.
       // Avoids downloading massive base64 product image blobs from Supabase.
-      const { data: products } = await supabase
+      const { data: products } = await getSupabase()
         .from('products')
         .select('id, status, basic_info')
         .eq('status', 'PUBLISHED')

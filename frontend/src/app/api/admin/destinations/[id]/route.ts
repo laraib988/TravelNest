@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -60,7 +63,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     const sanitized = stripBase64(updates);
 
-    let { data, error } = await supabase
+    let { data, error } = await getSupabase()
       .from('destinations')
       .update(sanitized)
       .eq('id', id)
@@ -78,7 +81,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     let attempts = 0;
     let updatePayload = sanitized;
     while (attempts < 6) {
-      const updateRes = await supabase
+      const updateRes = await getSupabase()
         .from('destinations')
         .update(updatePayload)
         .eq('id', id)
@@ -140,7 +143,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   try {
     const { id } = params;
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('destinations')
       .delete()
       .eq('id', id);

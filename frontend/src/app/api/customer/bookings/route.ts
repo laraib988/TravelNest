@@ -4,11 +4,16 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder';
-const supabase = createClient(supabaseUrl, supabaseKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export async function GET() {
   try {
-    const { data: bookings, error } = await supabase
+    const { data: bookings, error } = await getSupabase()
       .from('bookings')
       .select('*')
       // Assuming 'cust-current-user' since there's no real auth yet
@@ -22,7 +27,7 @@ export async function GET() {
 
     if (bookings && bookings.length > 0) {
       const listingIds = Array.from(new Set(bookings.map((b: any) => b.listing_id)));
-      const { data: listings } = await supabase
+      const { data: listings } = await getSupabase()
         .from('products')
         .select('id, basic_info')
         .in('id', listingIds);

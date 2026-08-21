@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -90,7 +93,7 @@ export async function POST(request: Request) {
       .maybeSingle();
     if (existing) blog.slug = `${slug}-${Date.now()}`;
 
-    const { data, error } = await supabase.from('blogs').insert(blog).select().maybeSingle();
+    const { data, error } = await getSupabase().from('blogs').insert(blog).select().maybeSingle();
 
     if (error) throw error;
 
