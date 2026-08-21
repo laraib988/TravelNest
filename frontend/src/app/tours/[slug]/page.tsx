@@ -42,7 +42,7 @@ export default function TourDetailPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
   const [reviewsSliderIndex, setReviewsSliderIndex] = useState(0);
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -126,8 +126,8 @@ export default function TourDetailPage() {
           photos: [],
           tour_types: reviewTourTypes,
           user_id: user?.id,
-          user_name: profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : (user?.email?.split('@')[0] || 'Anonymous'),
-          user_avatar: profile?.avatar_url || null
+          user_name: user?.name || (user?.email?.split('@')[0] || 'Anonymous'),
+          user_avatar: user?.avatar || null
         }),
       });
       if (!nextReviewRes.ok) {
