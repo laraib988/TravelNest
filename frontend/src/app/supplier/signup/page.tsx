@@ -18,7 +18,7 @@ import {
   UploadCloud,
   FileCheck,
   ChevronLeft,
-  AlertTriangle
+  AlertTriangle,
   Eye,
   EyeOff,
 } from 'lucide-react';
