@@ -27,7 +27,7 @@ function buildFaqSchema(faqs: { question?: string; answer?: string }[]): string 
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('blogs')
       .select('*')
       .order('created_at', { ascending: false });
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     // Ensure unique slug.
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('blogs')
       .select('id')
       .eq('slug', slug)

@@ -90,7 +90,7 @@ export async function PUT(request: Request, { params }: Params) {
     }
 
     // Ensure unique slug (exclude self).
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('blogs')
       .select('id')
       .eq('slug', updatePayload.slug)
@@ -98,7 +98,7 @@ export async function PUT(request: Request, { params }: Params) {
       .maybeSingle();
     if (existing) updatePayload.slug = `${updatePayload.slug}-${Date.now()}`;
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('blogs')
       .update(updatePayload)
       .eq('id', id)
