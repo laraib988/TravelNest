@@ -16,16 +16,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <CurrencyProvider>
           <AuthProvider>
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#ffffff' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', /* minHeight: '100vh', */ background: '#ffffff' }}>
               {/* FUNCTIONAL NAVBAR WITH LOGIN/SIGNUP & CURRENCY/LANGUAGE SWITCHER */}
               <HeaderClient />
-
-              {/* MAIN CONTENT */}
-              <main style={{ flex: 1 }}>{children}</main>
-
-              {/* ENTERPRISE FOOTER */}
+        
+        {/* MAIN CONTENT */}
+        <main style={{ flex: 1 }}>{children}</main>
+        
+        {/* Footer Client */}
               <FooterClient />
-            </div>
+      </div>
           </AuthProvider>
         </CurrencyProvider>
       </body>
