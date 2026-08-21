@@ -20,9 +20,11 @@ function getSupabase() {
 const MODEL = process.env.GROQ_BLOG_MODEL || 'openai/gpt-oss-120b';
 const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-let groq: Groq | null = null;
-if (process.env.GROQ_API_KEY) {
-  groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGroq() {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error('GROQ_API_KEY is not defined');
+  }
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
 // --- Rotating destination focus (Japan + global) --------------------------
