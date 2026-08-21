@@ -37,6 +37,7 @@ export default function AdminReviewsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedReviewIds, setExpandedReviewIds] = useState<Set<string>>(new Set());
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [listingsMap, setListingsMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadReviews();
@@ -45,62 +46,36 @@ export default function AdminReviewsPage() {
   const loadReviews = async () => {
     try {
       setIsLoading(true);
-      let data = await fetchFromAPI('/reviews').catch(() => null);
+      const res = await fetch('/api/admin/reviews');
+      let data = await res.json().catch(() => null);
 
-      if (!data || !Array.isArray(data) || data.length === 0) {
-        data = [
-          {
-            id: 'rev-1',
-            booking_id: 'bk-101',
-            user_id: 'u-1',
-            user_name: 'Suneel Pirkash',
-            user_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-            listing_id: 'list-bali-sunset',
-            rating: 5,
-            title: 'Incredible Catamaran Experience!',
-            comment: 'The sunset cruise in Uluwatu was breathtaking. Delicious seafood buffet, fantastic live music, and super attentive crew. Will definitely book again!',
-            photos: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'],
-            helpful_count: 14,
-            supplier_reply: { text: 'Thank you Suneel! We are thrilled you enjoyed the cruise experience.', replied_at: new Date(Date.now() - 86400000).toISOString() },
-            ai_fraud_score: 0.04,
-            status: 'PUBLISHED',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 'rev-2',
-            booking_id: 'bk-102',
-            user_id: 'u-2',
-            user_name: 'Bob Smith',
-            user_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-            listing_id: 'list-tokyo-food',
-            rating: 1,
-            title: 'Suspicious / Fake Complaint',
-            comment: 'Guide never showed up. Completely ruined our night. Do not book this! I want a full refund right now. SCAM SCAM SCAM.',
-            photos: [],
-            helpful_count: 2,
-            ai_fraud_score: 0.88,
-            status: 'FLAGGED',
-            created_at: new Date(Date.now() - 43200000).toISOString()
-          },
-          {
-            id: 'rev-3',
-            booking_id: 'bk-103',
-            user_id: 'u-3',
-            user_name: 'Alice Ocean',
-            user_avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
-            listing_id: 'list-paris-louvre',
-            rating: 4,
-            title: 'Great Louvre Tour but Crowded',
-            comment: 'The expert art historian guide was fantastic and knowledgeable. Priority skip-the-line entrance saved us hours of waiting.',
-            photos: [],
-            helpful_count: 8,
-            ai_fraud_score: 0.12,
-            status: 'PENDING',
-            created_at: new Date(Date.now() - 172800000).toISOString()
-          }
-        ];
+      if (!data || !Array.isArray(data)) {
+        data = [];
       }
-      setReviews(data);
+      
+      // Map Supabase properties and status to match UI requirements
+      const mappedData = data.map((r: any) => ({
+        ...r,
+        ai_fraud_score: r.ai_fraud_score || 0,
+        helpful_count: r.helpful_count || 0,
+        status: r.status === 'APPROVED' ? 'PUBLISHED' : r.status === 'REJECTED' ? 'REMOVED' : r.status
+      }));
+      
+      setReviews(mappedData);
+
+      // Fetch listings to map IDs to titles
+      try {
+        const listingsRes = await fetch('/api/public/listings');
+        if (listingsRes.ok) {
+          const listings = await listingsRes.json();
+          const map: Record<string, string> = {};
+          if (Array.isArray(listings)) {
+            listings.forEach(l => { map[l.id] = l.title; });
+          }
+          setListingsMap(map);
+        }
+      } catch (e) {}
+
     } catch (err) {
       console.error(err);
       setReviews([]);
@@ -126,36 +101,30 @@ export default function AdminReviewsPage() {
     setExpandedReviewIds(newSet);
   };
 
-  const handleAction = async (id: string, action: 'Approve' | 'Flag' | 'Remove', title: string) => {
-    let targetStatus: 'PUBLISHED' | 'FLAGGED' | 'REMOVED' = 'PUBLISHED';
-    if (action === 'Flag') targetStatus = 'FLAGGED';
-    if (action === 'Remove') targetStatus = 'REMOVED';
-
+  const handleStatusChange = async (id: string, action: 'Approve' | 'Remove') => {
     try {
-      await fetchFromAPI(`/reviews/${id}/status`, {
+      let targetStatus = 'PENDING';
+      let uiStatus = 'PENDING';
+      if (action === 'Approve') { targetStatus = 'APPROVED'; uiStatus = 'PUBLISHED'; }
+      if (action === 'Remove') { targetStatus = 'REJECTED'; uiStatus = 'REMOVED'; }
+
+      const res = await fetch(`/api/admin/reviews/${id}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: targetStatus })
       });
+      
+      if (!res.ok) throw new Error('Failed to update status');
 
-      setReviews((prev) =>
-        prev.map((r) => {
-          if (r.id === id) {
-            return { ...r, status: targetStatus };
-          }
-          return r;
-        })
-      );
-
-      triggerAction(
-        action === 'Approve'
-          ? `Review "${title}" Approved & Published!`
-          : action === 'Flag'
-          ? `Review "${title}" Flagged for Fraud Audit!`
-          : `Review "${title}" Removed from Marketplace!`
-      );
-    } catch (err) {
-      console.error('Failed to update review status:', err);
+      // Update local state with UI status
+      setReviews(prev => prev.map(r => 
+        r.id === id ? { ...r, status: uiStatus as any } : r
+      ));
+      
+      triggerAction(action === 'Approve' ? 'Review Published!' : 'Review Removed!');
+    } catch (error) {
+      console.error('Action failed:', error);
+      alert('Failed to update review status');
     }
   };
 
@@ -384,10 +353,10 @@ export default function AdminReviewsPage() {
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>{review.title}</h3>
                 </div>
 
-                {/* Listing ID Monospace Tag */}
+                {/* Listing ID Tag */}
                 <div style={{ marginBottom: '12px' }}>
-                  <span className="code-ref" style={{ fontSize: '0.8rem' }}>
-                    Target Tour: {review.listing_id}
+                  <span className="code-ref" style={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155' }}>
+                    Target Tour: {listingsMap[review.listing_id] || review.listing_id}
                   </span>
                 </div>
 
@@ -465,31 +434,9 @@ export default function AdminReviewsPage() {
                           gap: '6px',
                           boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
                         }}
-                        onClick={() => handleAction(review.id, 'Approve', review.title)}
+                        onClick={() => handleStatusChange(review.id, 'Approve')}
                       >
                         <CheckCircle2 size={14} color="#ffffff" /> Approve & Publish
-                      </button>
-                    )}
-
-                    {review.status !== 'FLAGGED' && (
-                      <button
-                        style={{
-                          padding: '8px 16px',
-                          fontSize: '0.84rem',
-                          fontWeight: 800,
-                          borderRadius: '9999px',
-                          background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-                          color: '#ffffff',
-                          border: 'none',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)'
-                        }}
-                        onClick={() => handleAction(review.id, 'Flag', review.title)}
-                      >
-                        <AlertTriangle size={14} color="#ffffff" /> Flag Fraud Risk
                       </button>
                     )}
 
@@ -509,9 +456,9 @@ export default function AdminReviewsPage() {
                           gap: '6px',
                           boxShadow: '0 4px 12px rgba(225, 29, 72, 0.35)'
                         }}
-                        onClick={() => handleAction(review.id, 'Remove', review.title)}
+                        onClick={() => handleStatusChange(review.id, 'Remove')}
                       >
-                        <XCircle size={14} color="#ffffff" /> Remove Review
+                        <XCircle size={14} color="#ffffff" /> Reject / Remove
                       </button>
                     )}
                   </div>

@@ -1,7 +1,7 @@
 import './globals.css';
 import { Sparkles } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import HeaderClient from '@/components/HeaderClient';
+import FooterClient from '@/components/FooterClient';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -18,13 +18,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthProvider>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#ffffff' }}>
               {/* FUNCTIONAL NAVBAR WITH LOGIN/SIGNUP & CURRENCY/LANGUAGE SWITCHER */}
-              <Header />
+              <HeaderClient />
 
               {/* MAIN CONTENT */}
               <main style={{ flex: 1 }}>{children}</main>
 
               {/* ENTERPRISE FOOTER */}
-              <Footer />
+              <FooterClient />
             </div>
           </AuthProvider>
         </CurrencyProvider>

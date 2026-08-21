@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useAuth } from '@/context/AuthContext';
 import { Star, Clock, MapPin, CheckCircle2, AlertCircle, ShieldCheck, Lock, ArrowRight, Sparkles, MessageSquare, HelpCircle, ThumbsUp, Camera, Send, ChevronDown, ChevronLeft, ChevronRight, XCircle } from 'lucide-react';
 
 export default function TourDetailPage() {
@@ -32,6 +33,7 @@ export default function TourDetailPage() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -40,6 +42,7 @@ export default function TourDetailPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
   const [reviewsSliderIndex, setReviewsSliderIndex] = useState(0);
+  const { user, profile } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -122,6 +125,9 @@ export default function TourDetailPage() {
           comment: reviewComment,
           photos: [],
           tour_types: reviewTourTypes,
+          user_id: user?.id,
+          user_name: profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : (user?.email?.split('@')[0] || 'Anonymous'),
+          user_avatar: profile?.avatar_url || null
         }),
       });
       if (!nextReviewRes.ok) {
@@ -558,11 +564,15 @@ export default function TourDetailPage() {
                     {[1,2,3,4,5].map(s => (
                       <Star
                         key={s}
-                        size={28}
+                        size={32}
                         color="#d97706"
-                        fill={s <= reviewRating ? '#d97706' : 'none'}
-                        style={{ cursor: 'pointer', transition: 'transform 0.15s' }}
+                        fill={s <= (hoverRating || reviewRating) ? '#d97706' : 'none'}
+                        style={{ cursor: 'pointer', transition: 'transform 0.15s, fill 0.15s' }}
                         onClick={() => setReviewRating(s)}
+                        onMouseEnter={() => setHoverRating(s)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        onMouseDown={(e: any) => e.currentTarget.style.transform = 'scale(0.9)'}
+                        onMouseUp={(e: any) => e.currentTarget.style.transform = 'scale(1.1)'}
                       />
                     ))}
                   </div>
@@ -627,64 +637,67 @@ export default function TourDetailPage() {
               </form>
             )}
 
-            {/* REVIEW SLIDER CONTAINER (SHOWS 4 REVIEWS PER ROW) */}
+            {/* REVIEW SLIDER CONTAINER (SHOWS 3 REVIEWS PER ROW) */}
             <div style={{ position: 'relative', overflow: 'hidden', padding: '0 4px' }}>
               {reviews.length > 0 ? (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Showing {Math.min(reviews.length, reviewsSliderIndex + 1)} - {Math.min(reviews.length, reviewsSliderIndex + 4)} of {reviews.length} reviews</span>
+                    <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Showing {Math.min(reviews.length, reviewsSliderIndex + 1)} - {Math.min(reviews.length, reviewsSliderIndex + 3)} of {reviews.length} reviews</span>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button
-                        onClick={() => setReviewsSliderIndex(prev => Math.max(0, prev - 4))}
+                        onClick={() => setReviewsSliderIndex(prev => Math.max(0, prev - 3))}
                         disabled={reviewsSliderIndex === 0}
-                        style={{ border: '1px solid #cbd5e1', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#ffffff', cursor: reviewsSliderIndex === 0 ? 'not-allowed' : 'pointer', opacity: reviewsSliderIndex === 0 ? 0.4 : 1 }}
+                        style={{ border: '1px solid #cbd5e1', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#ffffff', cursor: reviewsSliderIndex === 0 ? 'not-allowed' : 'pointer', opacity: reviewsSliderIndex === 0 ? 0.4 : 1, transition: 'all 0.2s' }}
                       >
-                        <ChevronLeft size={16} />
+                        <ChevronLeft size={18} />
                       </button>
                       <button
-                        onClick={() => setReviewsSliderIndex(prev => Math.min(reviews.length - (reviews.length % 4 || 4), prev + 4))}
-                        disabled={reviewsSliderIndex + 4 >= reviews.length}
-                        style={{ border: '1px solid #cbd5e1', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#ffffff', cursor: reviewsSliderIndex + 4 >= reviews.length ? 'not-allowed' : 'pointer', opacity: reviewsSliderIndex + 4 >= reviews.length ? 0.4 : 1 }}
+                        onClick={() => setReviewsSliderIndex(prev => Math.min(reviews.length - (reviews.length % 3 || 3), prev + 3))}
+                        disabled={reviewsSliderIndex + 3 >= reviews.length}
+                        style={{ border: '1px solid #cbd5e1', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: '#ffffff', cursor: reviewsSliderIndex + 3 >= reviews.length ? 'not-allowed' : 'pointer', opacity: reviewsSliderIndex + 3 >= reviews.length ? 0.4 : 1, transition: 'all 0.2s' }}
                       >
-                        <ChevronRight size={16} />
+                        <ChevronRight size={18} />
                       </button>
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-                    {reviews.slice(reviewsSliderIndex, reviewsSliderIndex + 4).map((review: any) => (
-                      <div key={review.id} className="card-panel" style={{ padding: '16px', background: '#ffffff', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', minHeight: '300px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                    {reviews.slice(reviewsSliderIndex, reviewsSliderIndex + 3).map((review: any) => (
+                      <div key={review.id} style={{ padding: '24px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', minHeight: '320px', transition: 'transform 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
                         <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                            <img src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0284c7&color=fff`} alt={review.user_name} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                            <img src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0ea5e9&color=fff`} alt={review.user_name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                             <div style={{ minWidth: 0 }}>
-                              <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{review.user_name}</div>
-                              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{new Date(review.created_at).toLocaleDateString()}</div>
+                              <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{review.user_name}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{new Date(review.created_at).toLocaleDateString()}</div>
                             </div>
                           </div>
                           
-                          <div style={{ display: 'flex', gap: '2px', marginBottom: '6px' }}>
-                            {[1,2,3,4,5].map(s => <Star key={s} size={11} color="#d97706" fill={s <= review.rating ? '#d97706' : 'none'} />)}
+                          <div style={{ display: 'flex', gap: '2px', marginBottom: '10px' }}>
+                            {[1,2,3,4,5].map(s => <Star key={s} size={14} color="#d97706" fill={s <= review.rating ? '#d97706' : 'none'} />)}
                           </div>
 
                           {/* Tour Types / Trip Companion Tags */}
                           {review.tour_types && review.tour_types.length > 0 && (
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
                               {review.tour_types.map((type: string) => (
-                                <span key={type} style={{ background: '#f1f5f9', color: '#475569', fontSize: '0.62rem', fontWeight: 700, padding: '2px 6px', borderRadius: '10px' }}>
+                                <span key={type} style={{ background: '#f1f5f9', color: '#334155', fontSize: '0.7rem', fontWeight: 700, padding: '4px 8px', borderRadius: '12px' }}>
                                   {type}
                                 </span>
                               ))}
                             </div>
                           )}
 
-                          {review.title && <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0f172a', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{review.title}</div>}
-                          <p style={{ color: '#475569', fontSize: '0.78rem', lineHeight: 1.5, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}>{review.comment}</p>
+                          {review.title && <div style={{ fontWeight: 800, fontSize: '1rem', color: '#0f172a', marginBottom: '8px' }}>{review.title}</div>}
+                          
+                          <p style={{ color: '#334155', fontSize: '0.9rem', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>
+                            {review.comment}
+                          </p>
                           
                           {review.photos && review.photos.length > 0 && (
-                            <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                               {review.photos.map((p: string, i: number) => (
-                                <img key={i} src={p} alt="Traveler photo" style={{ width: '45px', height: '35px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                                <img key={i} src={p} alt="Traveler photo" style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} />
                               ))}
                             </div>
                           )}
@@ -692,8 +705,9 @@ export default function TourDetailPage() {
 
                         {/* Supplier Response Indicator */}
                         {review.supplier_reply && (
-                          <div style={{ marginTop: '8px', padding: '6px 8px', background: '#f0f9ff', borderRadius: '6px', borderLeft: '3px solid #0284c7' }}>
-                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#0369a1' }}>🛡️ Supplier Replied</div>
+                          <div style={{ marginTop: '16px', padding: '12px', background: '#f0f9ff', borderRadius: '8px', borderLeft: '4px solid #0284c7' }}>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0369a1', marginBottom: '4px' }}>💬 Supplier Replied</div>
+                            <div style={{ fontSize: '0.85rem', color: '#0f172a', fontStyle: 'italic' }}>"{review.supplier_reply.text}"</div>
                           </div>
                         )}
                       </div>

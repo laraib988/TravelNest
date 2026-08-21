@@ -1,21 +1,31 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // Using service role for backend logic
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const listingId = searchParams.get('listing_id') || '';
+    const listingId = searchParams.get('listing_id');
     
-    const backendUrl = `http://127.0.0.1:4000/api/v1/reviews?listing_id=${listingId}`;
-    const res = await fetch(backendUrl, { cache: 'no-store' });
+    let query = supabase.from('reviews').select('*').eq('status', 'APPROVED');
     
-    if (!res.ok) {
-      return NextResponse.json([], { status: res.status });
+    if (listingId) {
+      query = query.eq('listing_id', listingId);
     }
     
-    const data = await res.json();
+    const { data, error } = await query.order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error('[Next.js Reviews Proxy GET Error]:', error);
+    console.error('[Supabase Reviews GET Error]:', error);
     return NextResponse.json([], { status: 500 });
   }
 }
@@ -24,24 +34,24 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     
-    const backendUrl = 'http://127.0.0.1:4000/api/v1/reviews';
-    const res = await fetch(backendUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+    // Insert new review as PENDING
+    const { data, error } = await supabase.from('reviews').insert([{
+      listing_id: body.listing_id,
+      user_id: body.user_id || null,
+      user_name: body.user_name || 'Anonymous',
+      user_avatar: body.user_avatar || null,
+      rating: body.rating,
+      title: body.title,
+      comment: body.comment,
+      tour_types: body.tour_types || [],
+      status: 'PENDING' // Awaiting Admin Approval
+    }]).select().single();
     
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      return NextResponse.json(errBody, { status: res.status });
-    }
+    if (error) throw error;
     
-    const data = await res.json();
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error('[Next.js Reviews Proxy POST Error]:', error);
+    console.error('[Supabase Reviews POST Error]:', error);
     return NextResponse.json({ message: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
