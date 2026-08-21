@@ -234,10 +234,12 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
     }
   }, [user, activeTab]);
 
+
+
   if (authLoading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-        <div style={{ fontSize: '1rem', color: '#64748b' }}>Loading…</div>
+        <div style={{ fontSize: '1rem', color: '#64748b' }}>Loading...</div>
       </div>
     );
   }

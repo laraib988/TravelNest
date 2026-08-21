@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
+import { CreateBookingDto } from './dto/create-booking.dto';
 
 @Controller('api/v1/bookings')
 export class BookingsController {
@@ -8,14 +9,7 @@ export class BookingsController {
   @Post()
   async checkout(
     @Body()
-    body: {
-      hold_id: string;
-      lead_name: string;
-      lead_email: string;
-      lead_phone: string;
-      special_requirements?: string;
-      payment_token?: string;
-    },
+    body: CreateBookingDto,
   ) {
     return this.bookingsService.createBooking(body);
   }

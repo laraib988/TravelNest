@@ -2,6 +2,7 @@
 
 import { Star, Clock, MapPin, ShieldCheck } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
+import Image from 'next/image';
 
 export default function TourGallery({ tour }: { tour: any }) {
   const { t } = useCurrency();
@@ -30,15 +31,40 @@ export default function TourGallery({ tour }: { tour: any }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', height: '450px', marginBottom: '40px' }}>
-        <img src={tour.images?.[0]?.url} alt={tour.title} style={{ width: '100%', height: '100%', objectFit: 'fill', borderRadius: 'var(--radius-md)' }} />
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Image 
+            src={tour.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'} 
+            alt={tour.title} 
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 66vw"
+            style={{ objectFit: 'cover', borderRadius: 'var(--radius-md)' }} 
+          />
+        </div>
         {tour.images?.length > 1 ? (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '16px' }}>
             {tour.images.slice(1, 5).map((img: any, i: number) => (
-              <img key={i} src={img.url} alt={`Gallery ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'fill', borderRadius: 'var(--radius-md)' }} />
+              <div key={i} style={{ position: 'relative', width: '100%', height: '100%' }}>
+                <Image 
+                  src={img.url} 
+                  alt={`Gallery ${i+1}`} 
+                  fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  style={{ objectFit: 'cover', borderRadius: 'var(--radius-md)' }} 
+                />
+              </div>
             ))}
           </div>
         ) : (
-          <img src={tour.images?.[0]?.url} alt="Secondary View" style={{ width: '100%', height: '100%', objectFit: 'fill', borderRadius: 'var(--radius-md)' }} />
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Image 
+              src={tour.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'} 
+              alt="Secondary View" 
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              style={{ objectFit: 'cover', borderRadius: 'var(--radius-md)' }} 
+            />
+          </div>
         )}
       </div>
     </>

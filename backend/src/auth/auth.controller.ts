@@ -1,19 +1,19 @@
 import { Controller, Post, Get, Body, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RegisterDto, LoginDto } from './dto/auth.dto';
 
 @Controller('api/v1/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() body: any) {
+  register(@Body() body: RegisterDto) {
     const { name, email, password } = body;
-    if (!name || !email || !password) throw new BadRequestException('Missing fields');
     return this.authService.register(name, email, password);
   }
 
   @Post('login')
-  login(@Body() body: any) {
+  login(@Body() body: LoginDto) {
     const { email, password } = body;
     const result = this.authService.login(email, password);
     if (!result) throw new UnauthorizedException('Invalid credentials');

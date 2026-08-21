@@ -28,6 +28,8 @@ export async function GET(request: Request) {
     // Auto-reactivate products whose temporary availability block has expired
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const reactivatePromises: Promise<any>[] = [];
+
     for (const p of products) {
       const block = p.logistics?.availability_block;
       if (block && block.to) {
@@ -35,14 +37,22 @@ export async function GET(request: Request) {
         blockTo.setHours(23, 59, 59, 999);
         if (blockTo < today) {
           const updatedLogistics = { ...p.logistics, availability_block: null };
-          const { error: reactivateError } = await supabaseAdmin
-            .from('products')
-            .update({ logistics: updatedLogistics, updated_at: new Date().toISOString() })
-            .eq('id', p.id);
-          if (reactivateError) console.error('Auto-reactivate failed:', reactivateError);
+          reactivatePromises.push(
+            supabaseAdmin
+              .from('products')
+              .update({ logistics: updatedLogistics, updated_at: new Date().toISOString() })
+              .eq('id', p.id)
+              .then(({ error }) => {
+                if (error) console.error('Auto-reactivate failed:', error);
+              })
+          );
           p.logistics = updatedLogistics;
         }
       }
+    }
+
+    if (reactivatePromises.length > 0) {
+      await Promise.all(reactivatePromises);
     }
 
     const clones = products.filter(p => p.logistics?.parent_id);
@@ -96,4 +106,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-

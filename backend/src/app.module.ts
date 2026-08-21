@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import * as redisStore from 'cache-manager-redis-store';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { ReviewsController } from './reviews/reviews.controller';
@@ -27,7 +31,18 @@ import { AdminController } from './admin/admin.controller';
 import { AdminService } from './admin/admin.service';
 
 @Module({
-  imports: [],
+  imports: [
+    CacheModule.register({
+      store: redisStore,
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: process.env.REDIS_PORT || 6379,
+      ttl: 300, // 5 minutes
+    }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100, // 100 requests per minute per IP
+    }]),
+  ],
   controllers: [
     AuthController,
     ReviewsController,
@@ -43,6 +58,10 @@ import { AdminService } from './admin/admin.service';
     AdminController,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     AuthService,
     ReviewsService,
     PromotionsService,

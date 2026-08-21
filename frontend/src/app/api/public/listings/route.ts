@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
     let query = supabaseAdmin
       .from('products')
-      .select('id, slug, status, updated_at, logistics, basic_info, transport_pricing, merchandising_badges, cached_rating_avg, cached_review_count, destination_id, category_name')
+      .select('id, supplier_id, status, updated_at, logistics, basic_info, transport_pricing, experience_details, itinerary')
       .range(0, 49)
       .in('status', ['PUBLISHED', 'APPROVED'])
       .order('updated_at', { ascending: false });
@@ -36,21 +36,27 @@ export async function GET(req: Request) {
     today.setHours(0, 0, 0, 0);
 
     const activeProducts: any[] = [];
+    const reactivatePromises: Promise<any>[] = [];
+    
     for (const p of products) {
       const block = p.logistics?.availability_block;
       if (block && block.from && block.to) {
         const blockTo = new Date(block.to);
         blockTo.setHours(23, 59, 59, 999);
         if (blockTo < today) {
-          // Block expired -> auto-reactivate (clear the block so it shows again)
-          const { error: reactivateError } = await supabaseAdmin
-            .from('products')
-            .update({
-              logistics: { ...p.logistics, availability_block: null },
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', p.id);
-          if (reactivateError) console.error('Auto-reactivate failed:', reactivateError);
+          // Block expired -> auto-reactivate in parallel
+          reactivatePromises.push(
+            supabaseAdmin
+              .from('products')
+              .update({
+                logistics: { ...p.logistics, availability_block: null },
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', p.id)
+              .then(({ error }) => {
+                if (error) console.error('Auto-reactivate failed:', error);
+              })
+          );
           activeProducts.push(p);
           continue;
         }
@@ -62,6 +68,10 @@ export async function GET(req: Request) {
         }
       }
       activeProducts.push(p);
+    }
+    
+    if (reactivatePromises.length > 0) {
+      await Promise.all(reactivatePromises);
     }
 
     let filteredProducts = activeProducts;

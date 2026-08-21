@@ -36,6 +36,8 @@ import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
 import SortFilterDropdown, { SortOption } from '@/components/SortFilterDropdown';
 
+import Image from 'next/image';
+
 export default function HomePage() {
   const { formatPrice, currency, t } = useCurrency();
 
@@ -381,7 +383,13 @@ export default function HomePage() {
             return filteredDests.map((dest) => (
               <Link key={dest.id} href={`/destinations/${dest.slug}`}>
                 <div className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', height: '220px', position: 'relative' }}>
-                  <img src={dest.hero_image} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image 
+                    src={dest.hero_image} 
+                    alt={dest.name} 
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    style={{ objectFit: 'cover' }} 
+                  />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.05) 70%)' }} />
                   <div style={{ position: 'absolute', bottom: '18px', left: '18px' }}>
                     <h3 style={{ fontSize: '1.4rem', color: '#ffffff', marginBottom: '4px', fontWeight: 800 }}>{dest.name}</h3>
@@ -522,7 +530,13 @@ export default function HomePage() {
             <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', alignSelf: 'stretch' }}>
               <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', flex: 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
-                  <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image 
+                    src={item.images[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'} 
+                    alt={item.title} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    style={{ objectFit: 'cover' }} 
+                  />
                   {item.selling_point && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                       {item.selling_point}
@@ -701,7 +715,13 @@ export default function HomePage() {
               <Link href={`/tours/${item.slug}`} key={item.id} style={{ textDecoration: 'none', display: 'flex', flex: '0 0 calc(25% - 18px)', minWidth: '300px', alignSelf: 'stretch' }}>
               <div className="card-panel" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', flex: 1, transition: 'transform 0.2s, box-shadow 0.2s' }}>
                 <div style={{ height: '200px', position: 'relative' }}>
-                  <img src={item.images[0]?.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image 
+                    src={item.images[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'} 
+                    alt={item.title} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    style={{ objectFit: 'cover' }} 
+                  />
                   {item.selling_point && (
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-accent)', color: '#ffffff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                       {item.selling_point}

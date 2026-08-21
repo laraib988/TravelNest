@@ -2,12 +2,20 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as compression from 'compression';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Add response compression
   app.use(compression());
+
+  // Fail fast: Global validation and transformation of DTOs
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    forbidNonWhitelisted: true,
+  }));
 
   const { json, urlencoded } = require('express');
   app.use(json({ limit: '10mb' }));

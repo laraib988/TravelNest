@@ -8,6 +8,8 @@ interface Props {
   initialDestinations: any[];
 }
 
+import Image from 'next/image';
+
 export default function DestinationsClientPage({ initialDestinations }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('ALL');
@@ -92,7 +94,13 @@ export default function DestinationsClientPage({ initialDestinations }: Props) {
                   }}
                 >
                   <div style={{ height: '200px', position: 'relative' }}>
-                    <img src={dest.hero_image} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Image 
+                      src={dest.hero_image} 
+                      alt={dest.name} 
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      style={{ objectFit: 'cover' }} 
+                    />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.8) 0%, rgba(15,23,42,0.05) 70%)' }} />
                     <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', padding: '4px 10px', borderRadius: 'var(--radius-pill)', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a' }}>
                       {dest.country}

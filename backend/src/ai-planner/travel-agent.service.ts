@@ -170,8 +170,12 @@ export class TravelAgentService {
     const chosen: SearchHit[] = hits.slice(0, Math.max(c.days, 1));
     push('search_knowledge_base', `Retrieved ${chosen.length} live, bookable experiences from Supabase catalog.`);
 
-    // Real weather via Open-Meteo (live)
-    const weather = await this.tools.getWeatherForecast(destSlug, c.dateFrom, c.dateTo);
+    // Fetch weather and recommendations in parallel (independent operations)
+    const [weather, recommendations] = await Promise.all([
+      this.tools.getWeatherForecast(destSlug, c.dateFrom, c.dateTo),
+      this.safeRecommendations(destSlug)
+    ]);
+
     if (weather.length) {
       push('get_weather_forecast', `Live forecast: ${weather.map((w) => `${w.date} ${w.temp_max}°C ${w.label}`).join(', ')}.`);
     } else {
@@ -252,8 +256,7 @@ export class TravelAgentService {
       ? `Estimated trip cost $${budget.total_cost} fits within your $${c.budget} budget ($${budget.remaining} to spare).`
       : `Estimated trip cost $${budget.total_cost} exceeds budget by $${budget.over_by}. Suggestions: ${budget.savings_suggestions.join(' ')}`);
 
-    // Recommendations from the REAL catalog
-    const recommendations = await this.safeRecommendations(destSlug);
+    // Recommendations from the REAL catalog (fetched in parallel earlier)
     if (recommendations.length) {
       push('search_restaurants', `Found ${recommendations.length} more live experiences from the catalog.`);
     }

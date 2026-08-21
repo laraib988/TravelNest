@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Query, NotFoundException, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { VectorSearchService } from './vector-search.service';
 import { dbStore } from '../mock-db/db.store';
 
@@ -6,6 +7,8 @@ import { dbStore } from '../mock-db/db.store';
 export class ListingsController {
   constructor(private readonly vectorSearchService: VectorSearchService) {}
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300)
   @Get()
   getAllListings(
     @Query('destination') destination?: string,
@@ -27,11 +30,15 @@ export class ListingsController {
     return results;
   }
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300)
   @Get('categories')
   getCategories() {
     return dbStore.categories;
   }
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300)
   @Get('destinations')
   getDestinations() {
     return dbStore.destinations;
