@@ -42,7 +42,7 @@ export default function TourDetailPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
   const [reviewsSliderIndex, setReviewsSliderIndex] = useState(0);
-  const { user } = useAuth();
+  const { user, openAuthModal } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -513,7 +513,13 @@ export default function TourDetailPage() {
                 <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>({reviews.length})</span>
               </h2>
               <button
-                onClick={() => setShowReviewForm(!showReviewForm)}
+                onClick={() => {
+                  if (!user) {
+                    openAuthModal('LOGIN');
+                    return;
+                  }
+                  setShowReviewForm(!showReviewForm);
+                }}
                 className="btn-primary"
                 style={{ padding: '10px 20px', fontSize: '0.88rem' }}
               >
@@ -548,7 +554,7 @@ export default function TourDetailPage() {
             </div>
 
             {/* REVIEW SUBMISSION FORM (UPDATED WITH IMAGE & TOUR PILLS) */}
-            {showReviewForm && (
+            {showReviewForm && user && (
               <form onSubmit={handleSubmitReview} className="card-panel" style={{ padding: '24px', marginBottom: '24px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Share Your Experience</h3>
                 
