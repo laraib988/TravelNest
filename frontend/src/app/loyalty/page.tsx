@@ -84,7 +84,7 @@ export default function LoyaltyPage() {
               <Award size={14} /> TravelNest Rewards & Loyalty Program
             </div>
             <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>
-              Welcome back, {user?.first_name || 'Explorer'}!
+              Welcome back, {(user as any)?.first_name || 'Explorer'}!
             </h1>
             <p style={{ color: '#475569', fontSize: '1.05rem', marginTop: '6px', maxWidth: '640px' }}>
               Earn points on every experience booking, unlock exclusive Silver & Gold membership perks, and invite travel companions.
