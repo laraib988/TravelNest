@@ -6,7 +6,7 @@
 DROP POLICY IF EXISTS "select_own" ON bookings;
 CREATE POLICY "select_own" ON bookings 
   FOR SELECT 
-  USING ((select auth.uid()) = customer_id); -- assuming customer_id is used for users
+  USING (((select auth.uid())::text) = customer_id);
 
 -- 2. Optimize Forum Discussions
 DROP POLICY IF EXISTS "Auth users can insert discussions" ON public.forum_discussions;
@@ -19,6 +19,3 @@ DROP POLICY IF EXISTS "Auth users can insert replies" ON public.forum_replies;
 CREATE POLICY "Auth users can insert replies" ON public.forum_replies 
   FOR INSERT TO authenticated 
   WITH CHECK ((select auth.uid()) = user_id);
-
--- Note: Apply this same pattern to any other tables (e.g. reviews, products) 
--- that use auth.uid() in their RLS policies inside your Supabase Dashboard.
