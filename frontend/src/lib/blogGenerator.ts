@@ -7,7 +7,6 @@ import Groq from 'groq-sdk';
 // then persists them to Supabase as DRAFTS (never auto-published).
 // ============================================================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -369,7 +368,7 @@ export async function generateDailyBlog(): Promise<{ success: boolean; blog?: an
   const author = AUTHORS[Math.floor(Math.random() * AUTHORS.length)];
 
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       messages: [
         {
           role: 'system',
@@ -396,7 +395,7 @@ export async function generateDailyBlog(): Promise<{ success: boolean; blog?: an
     const slug = SLUGIFY(title);
 
     // Ensure unique slug in DB.
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('blogs')
       .select('id')
       .eq('slug', slug)
@@ -447,7 +446,7 @@ export async function generateDailyBlog(): Promise<{ success: boolean; blog?: an
     // Build article schema after slug is finalised.
     article.schema_json = JSON.stringify(buildArticleSchema(article));
 
-    const { data: inserted, error } = await supabase
+    const { data: inserted, error } = await getSupabase()
       .from('blogs')
       .insert(article)
       .select()

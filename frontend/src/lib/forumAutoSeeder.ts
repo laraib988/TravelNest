@@ -1,11 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+function getGroq() {
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+}
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 const HUBS = ['Tokyo, Japan', 'Kyoto, Japan', 'Osaka, Japan', 'Mount Fuji, Japan', 'Hokkaido, Japan', 'Bali, Indonesia', 'Paris, France', 'Rome, Italy'];
 const CATEGORIES = ['Transport', 'Etiquette', 'Food & Dining', 'Itinerary Review', 'Hidden Gems'];
@@ -50,7 +55,7 @@ export async function seedNewDiscussion() {
   `;
 
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'llama3-8b-8192',
       response_format: { type: 'json_object' },
@@ -65,7 +70,7 @@ export async function seedNewDiscussion() {
     // 1. Insert Discussion with time offset
     const discussionCreatedAt = new Date(Date.now() - result.discussion.minutes_ago * 60000).toISOString();
     
-    const { data: discussion, error: dError } = await supabase
+    const { data: discussion, error: dError } = await getSupabase()
       .from('forum_discussions')
       .insert({
         title: result.discussion.title,
@@ -93,7 +98,7 @@ export async function seedNewDiscussion() {
     }));
 
     if (repliesToInsert.length > 0) {
-      const { error: rError } = await supabase.from('forum_replies').insert(repliesToInsert);
+      const { error: rError } = await getSupabase().from('forum_replies').insert(repliesToInsert);
       if (rError) throw rError;
     }
 
@@ -106,7 +111,7 @@ export async function seedNewDiscussion() {
 
 export async function generateAutoReply(discussionId: string, userContent: string) {
   try {
-    const { data: discussion } = await supabase.from('forum_discussions').select('*').eq('id', discussionId).single();
+    const { data: discussion } = await getSupabase().from('forum_discussions').select('*').eq('id', discussionId).single();
     if (!discussion) return;
 
     const prompt = `
@@ -119,7 +124,7 @@ export async function generateAutoReply(discussionId: string, userContent: strin
       Return ONLY a JSON object: { "reply": "your detailed response here" }
     `;
 
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'llama3-8b-8192',
       response_format: { type: 'json_object' },
@@ -129,7 +134,7 @@ export async function generateAutoReply(discussionId: string, userContent: strin
     const result = JSON.parse(completion.choices[0]?.message?.content || '{}');
     if (!result.reply) return;
 
-    await supabase.from('forum_replies').insert({
+    await getSupabase().from('forum_replies').insert({
       discussion_id: discussionId,
       content: result.reply,
       author_name: 'TravelNest Guide AI',
