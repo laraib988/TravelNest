@@ -158,7 +158,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (resData.error && resData.error.includes('already registered')) {
         throw new Error('This email address is already registered. If your account was suspended or recently rejected, you cannot create a new account.');
       }
-      throw new Error(resData.error || 'Failed to create user via API');
+      let errMsg = resData.error;
+      if (resData.details) {
+        const messages = [];
+        for (const key in resData.details) {
+          if (key !== '_errors' && resData.details[key]._errors && resData.details[key]._errors.length > 0) {
+            messages.push(resData.details[key]._errors[0]);
+          }
+        }
+        if (messages.length > 0) errMsg = messages.join(', ');
+      }
+      throw new Error(errMsg);
     }
 
     // Now sign in automatically so the client has the session
