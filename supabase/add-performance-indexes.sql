@@ -11,8 +11,5 @@ CREATE INDEX IF NOT EXISTS idx_products_supplier ON products(supplier_id);
 -- 3. Index on bookings by user, sorting by date descending for order history
 CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(customer_id, created_at DESC);
 
--- 4. Index on availability slots by tour and date for the booking widget
-CREATE INDEX IF NOT EXISTS idx_availability_tour_date ON availability_slots(listing_id, start_time);
-
 -- Extra: Index on reviews by listing for fast tour detail page loading
 CREATE INDEX IF NOT EXISTS idx_reviews_listing ON reviews(listing_id, created_at DESC);
