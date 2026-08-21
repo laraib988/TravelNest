@@ -36,7 +36,7 @@ export async function GET(req: Request) {
     today.setHours(0, 0, 0, 0);
 
     const activeProducts: any[] = [];
-    const reactivatePromises: Promise<any>[] = [];
+    const reactivatePromises: any[] = [];
     
     for (const p of products) {
       const block = p.logistics?.availability_block;

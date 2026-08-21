@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     // Auto-reactivate products whose temporary availability block has expired
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const reactivatePromises: Promise<any>[] = [];
+    const reactivatePromises: any[] = [];
 
     for (const p of products) {
       const block = p.logistics?.availability_block;
