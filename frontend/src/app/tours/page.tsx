@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, Star, ArrowRight, Loader2, Compass, AlertCircle } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
+
 
 interface Tour {
   id: string;
@@ -43,7 +43,7 @@ export default function AllExperiencesPage() {
 
   return (
     <>
-      <Header />
+      
       <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px', paddingTop: '10px' }}>
         
         {/* HERO SECTION */}
@@ -173,7 +173,7 @@ export default function AllExperiencesPage() {
 
         </div>
       </div>
-      <Footer />
+      
     </>
   );
 }
