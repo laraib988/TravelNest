@@ -45,7 +45,11 @@ CREATE TABLE IF NOT EXISTS public.blogs (
     quick_takeaways JSONB DEFAULT '[]'::jsonb,
     itinerary JSONB DEFAULT '[]'::jsonb,
     cost_breakdown JSONB DEFAULT '[]'::jsonb,
-    best_time_to_visit JSONB DEFAULT '[]'::jsonb
+    best_time_to_visit JSONB DEFAULT '[]'::jsonb,
+
+    -- Manual FAQ editor entries (question + answer pairs). The FAQPage
+    -- JSON-LD schema is auto-generated from this array on save.
+    faqs JSONB DEFAULT '[]'::jsonb
 );
 
 -- Publish + unpublish convenience triggers to keep published_at in sync.

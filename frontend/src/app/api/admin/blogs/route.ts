@@ -7,6 +7,21 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export const dynamic = 'force-dynamic';
 
+// Build a valid FAQPage JSON-LD schema from structured FAQ entries.
+function buildFaqSchema(faqs: { question?: string; answer?: string }[]): string {
+  const valid = (faqs || []).filter((f) => f?.question?.trim() && f?.answer?.trim());
+  if (valid.length === 0) return '';
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: valid.map((f) => ({
+      '@type': 'Question',
+      name: f.question!.trim(),
+      acceptedAnswer: { '@type': 'Answer', text: f.answer!.trim() },
+    })),
+  });
+}
+
 export async function GET() {
   try {
     const { data, error } = await supabase
@@ -52,6 +67,7 @@ export async function POST(request: Request) {
       author_url: body.author_url || '',
       schema_json: body.schema_json || '',
       faq_schema_json: body.faq_schema_json || '',
+      faqs: body.faqs || [],
       quick_takeaways: body.quick_takeaways || [],
       itinerary: body.itinerary || [],
       cost_breakdown: body.cost_breakdown || [],
@@ -59,6 +75,12 @@ export async function POST(request: Request) {
       status: body.status || 'draft',
       published_at: body.status === 'published' ? new Date().toISOString() : null,
     };
+
+    // Auto-generate the FAQPage schema from the structured FAQ entries if the
+    // client did not already supply one.
+    if (!blog.faq_schema_json && blog.faqs.length > 0) {
+      blog.faq_schema_json = buildFaqSchema(blog.faqs);
+    }
 
     // Ensure unique slug.
     const { data: existing } = await supabase

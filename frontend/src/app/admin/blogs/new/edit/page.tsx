@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
 import RichTextEditor from '@/components/admin/RichTextEditor';
+import FaqEditor from '@/components/admin/FaqEditor';
 
 export default function AdminBlogNewPage() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function AdminBlogNewPage() {
     author_avatar: '',
     author_role: 'Contributor',
     author_url: '',
+    faqs: [] as { question: string; answer: string }[],
     quick_takeaways: [] as string[],
     itinerary: [] as any[],
     cost_breakdown: [] as any[],
@@ -168,6 +170,14 @@ export default function AdminBlogNewPage() {
                 </span>
               </div>
             </div>
+          </div>
+
+          <div className="admin-stat-card" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>FAQs (auto-generates FAQPage schema)</h3>
+            <FaqEditor
+              value={form.faqs || []}
+              onChange={(faqs) => setForm({ ...form, faqs })}
+            />
           </div>
 
           <div className="admin-stat-card" style={{ padding: '24px' }}>

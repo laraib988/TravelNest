@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Save, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
 import RichTextEditor from '@/components/admin/RichTextEditor';
+import FaqEditor from '@/components/admin/FaqEditor';
 
 export default function AdminBlogEditPage() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function AdminBlogEditPage() {
     author_url: '',
     schema_json: '',
     faq_schema_json: '',
+    faqs: [] as { question: string; answer: string }[],
     quick_takeaways: [] as string[],
     itinerary: [] as any[],
     cost_breakdown: [] as any[],
@@ -235,13 +237,24 @@ export default function AdminBlogEditPage() {
                 />
               </div>
               <div>
-                <label style={labelStyle}>JSON-LD FAQ Schema</label>
-                <textarea
-                  style={{ ...inputStyle, minHeight: '120px', fontFamily: 'monospace', fontSize: '0.8rem', resize: 'vertical' }}
-                  value={form.faq_schema_json}
-                  onChange={(e) => setForm({ ...form, faq_schema_json: e.target.value })}
+                <label style={labelStyle}>FAQs (auto-generates FAQPage schema)</label>
+                <FaqEditor
+                  value={form.faqs || []}
+                  onChange={(faqs) => setForm({ ...form, faqs })}
                 />
               </div>
+              {form.faq_schema_json && (
+                <details style={{ border: '1px solid #e2e8f0', borderRadius: '10px', padding: '10px 14px' }}>
+                  <summary style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', cursor: 'pointer' }}>
+                    View generated FAQPage JSON-LD
+                  </summary>
+                  <textarea
+                    readOnly
+                    style={{ ...inputStyle, minHeight: '120px', fontFamily: 'monospace', fontSize: '0.8rem', marginTop: '10px', resize: 'vertical' }}
+                    value={form.faq_schema_json}
+                  />
+                </details>
+              )}
             </div>
           </div>
 

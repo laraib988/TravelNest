@@ -188,6 +188,7 @@ interface BlogArticle {
   author_url: string;
   schema_json: string;
   faq_schema_json: string;
+  faqs: { question: string; answer: string }[];
   quick_takeaways: string[];
   itinerary: { day: string; title: string; activities: string[] }[];
   cost_breakdown: { item: string; cost: string }[];
@@ -435,6 +436,7 @@ export async function generateDailyBlog(): Promise<{ success: boolean; blog?: an
       author_url: author.url,
       schema_json: '{}',
       faq_schema_json: JSON.stringify(buildFaqSchema(faqs)),
+      faqs,
       quick_takeaways: Array.isArray(parsed.quick_takeaways) ? parsed.quick_takeaways : [],
       itinerary: Array.isArray(parsed.itinerary) ? parsed.itinerary : topic.sampleItinerary,
       cost_breakdown: Array.isArray(parsed.cost_breakdown) ? parsed.cost_breakdown : [],

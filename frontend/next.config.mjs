@@ -1,10 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    // Workaround for Next.js 14.1.0 `ENOENT _ssgManifest.js` build-harvest
-    // race on Windows where the webpack build worker deletes the static
-    // build-id folder before the client manifest is written.
+    // Workaround for Next.js 14.1.0 `ENOENT _ssgManifest.js` / `/_document`
+    // build-harvest races on Windows. Disabling the webpack build worker and
+    // capping CPU concurrency serializes the build so the static build-id
+    // folder and pages manifest are written before they are read.
     webpackBuildWorker: false,
+    cpus: 1,
   },
   images: {
     remotePatterns: [

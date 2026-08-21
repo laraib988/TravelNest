@@ -101,7 +101,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!blog) notFound();
 
   const toc = buildToC(blog.content_markdown || '');
-  const faqs = extractFaqs(blog.content_markdown || '');
+  // Prefer the structured FAQs column (edited by the admin); fall back to
+  // extracting them from the markdown body for older articles.
+  const structuredFaqs = Array.isArray(blog.faqs)
+    ? (blog.faqs as { question: string; answer: string }[]).filter((f) => f?.question && f?.answer)
+    : [];
+  const faqs = structuredFaqs.length > 0 ? structuredFaqs : extractFaqs(blog.content_markdown || '');
   const related = await getRelatedDestinations();
 
   let articleSchema: any = null;
@@ -194,6 +199,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {blog.content_markdown || ''}
               </ReactMarkdown>
             </div>
+
+            {/* Rendered FAQs (admin-editable, mirrors the FAQPage schema) */}
+            {faqs.length > 0 && (
+              <div style={{ marginTop: '32px', borderTop: '1px solid #e2e8f0', paddingTop: '28px' }}>
+                <h2 style={{ fontSize: '1.5rem', color: '#0f172a', fontWeight: 800, margin: '0 0 20px' }}>
+                  Frequently Asked Questions
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {faqs.map((faq, i) => (
+                    <div key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '18px 20px' }}>
+                      <h3 style={{ fontSize: '1.02rem', fontWeight: 700, color: '#0f172a', margin: '0 0 8px' }}>{faq.question}</h3>
+                      <p style={{ fontSize: '0.95rem', color: '#475569', lineHeight: 1.7, margin: 0 }}>{faq.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </article>
 
           {/* Sidebar */}

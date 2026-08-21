@@ -7,6 +7,21 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export const dynamic = 'force-dynamic';
 
+// Build a valid FAQPage JSON-LD schema from structured FAQ entries.
+function buildFaqSchema(faqs: { question?: string; answer?: string }[]): string {
+  const valid = (faqs || []).filter((f) => f?.question?.trim() && f?.answer?.trim());
+  if (valid.length === 0) return '';
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: valid.map((f) => ({
+      '@type': 'Question',
+      name: f.question!.trim(),
+      acceptedAnswer: { '@type': 'Answer', text: f.answer!.trim() },
+    })),
+  });
+}
+
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: Params) {
@@ -56,6 +71,7 @@ export async function PUT(request: Request, { params }: Params) {
       author_url: body.author_url || '',
       schema_json: body.schema_json || '',
       faq_schema_json: body.faq_schema_json || '',
+      faqs: body.faqs || [],
       quick_takeaways: body.quick_takeaways || [],
       itinerary: body.itinerary || [],
       cost_breakdown: body.cost_breakdown || [],
@@ -63,6 +79,12 @@ export async function PUT(request: Request, { params }: Params) {
       status: body.status || 'draft',
     };
     if (published_at !== undefined) updatePayload.published_at = published_at;
+
+    // Auto-generate the FAQPage schema from the structured FAQ entries if the
+    // client did not already supply one.
+    if (!updatePayload.faq_schema_json && updatePayload.faqs.length > 0) {
+      updatePayload.faq_schema_json = buildFaqSchema(updatePayload.faqs);
+    }
 
     // Ensure unique slug (exclude self).
     const { data: existing } = await supabase
