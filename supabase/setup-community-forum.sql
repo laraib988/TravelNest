@@ -56,8 +56,8 @@ CREATE POLICY "Public can view discussions" ON public.forum_discussions FOR SELE
 CREATE POLICY "Public can view replies" ON public.forum_replies FOR SELECT USING (true);
 
 -- Authenticated users can insert
-CREATE POLICY "Auth users can insert discussions" ON public.forum_discussions FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Auth users can insert replies" ON public.forum_replies FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Auth users can insert discussions" ON public.forum_discussions FOR INSERT TO authenticated WITH CHECK ((select auth.uid()) = user_id);
+CREATE POLICY "Auth users can insert replies" ON public.forum_replies FOR INSERT TO authenticated WITH CHECK ((select auth.uid()) = user_id);
 
 -- Note: The Service Role Key (used by our API) bypasses RLS, so it can auto-insert AI posts.
 
