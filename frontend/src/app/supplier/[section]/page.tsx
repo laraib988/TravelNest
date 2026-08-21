@@ -222,7 +222,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
 
       // Real-time Supabase subscription for new bookings
       const channel = supabase
-        .channel('supplier_bookings_updates')
+        .channel(`supplier_bookings_${user.id}`)
         .on(
           'postgres_changes',
           {
