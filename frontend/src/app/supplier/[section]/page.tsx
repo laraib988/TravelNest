@@ -62,17 +62,7 @@ const section = (params?.section as string) || 'dashboard';
     }
   }, [authLoading, user, router]);
 
-  if (authLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-        <div style={{ fontSize: '1rem', color: '#64748b' }}>Loading…</div>
-      </div>
-    );
-  }
 
-  if (!user) {
-    return null; // Redirect handled above
-  }
   
   const activeTab = section === 'listings' ? 'LISTINGS' : section === 'bookings' ? 'BOOKINGS' : (section === 'finance' || section === 'account-settings') ? 'FINANCE' : section === 'availability' ? 'AVAILABILITY' : 'DASHBOARD';
   const [listings, setListings] = useState<any[]>([]);
@@ -243,6 +233,18 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
       };
     }
   }, [user, activeTab]);
+
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+        <div style={{ fontSize: '1rem', color: '#64748b' }}>Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Redirect handled above
+  }
 
   const handleLogout = () => {
     logout();
