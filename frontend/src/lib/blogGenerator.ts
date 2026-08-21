@@ -366,7 +366,9 @@ Return ONLY valid JSON — no markdown fences, no commentary. Use this exact sha
 
 // --- Main entry: generate one article and persist as draft -----------------
 export async function generateDailyBlog(): Promise<{ success: boolean; blog?: any; error?: string }> {
-  if (!groq) {
+  try {
+    getGroq();
+  } catch (e) {
     return { success: false, error: 'GROQ_API_KEY not configured' };
   }
 
