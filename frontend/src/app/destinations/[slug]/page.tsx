@@ -1,4 +1,4 @@
-export const revalidate = 60; // ISR revalidate every 60 seconds
+export const revalidate = 3600; // ISR revalidate every 60 seconds
 export const dynamicParams = true; // Enable ISR generation for new/unrendered slugs
 
 export async function generateStaticParams() {

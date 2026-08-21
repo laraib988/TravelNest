@@ -1,4 +1,4 @@
-export const revalidate = 60;
+export const revalidate = 3600;
 
 import { createClient } from '@supabase/supabase-js';
 import DestinationsClientPage from '@/components/DestinationsClientPage';
