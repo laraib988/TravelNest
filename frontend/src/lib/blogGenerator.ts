@@ -7,8 +7,12 @@ import Groq from 'groq-sdk';
 // then persists them to Supabase as DRAFTS (never auto-published).
 // ============================================================================
 
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  );
+}
 
 // Configurable model. The spec asked for llama-3.3-70b-versatile, but that
 // model is not provisioned on this account — openai/gpt-oss-120b is the
