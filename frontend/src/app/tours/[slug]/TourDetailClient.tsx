@@ -8,9 +8,10 @@ import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
 import { Sparkles, MapPin, CheckCircle2, HelpCircle, Star, XCircle } from 'lucide-react';
 
-import TourGallery from '@/components/tours/TourGallery';
-import TourReviews from '@/components/tours/TourReviews';
-import TourBookingWidget from '@/components/tours/TourBookingWidget';
+import dynamic from 'next/dynamic';
+const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
+const TourReviews = dynamic(() => import('@/components/tours/TourReviews'));
+const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWidget'));
 
 export default function TourDetailPage() {
   const { formatPrice, t } = useCurrency();
