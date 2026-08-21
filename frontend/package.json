@@ -8,7 +8,8 @@
     "start": "next start -p 3000",
     "lint": "next lint",
     "deploy": "npm run deploy --prefix ..",
-    "deploy:preview": "npm run deploy:preview --prefix .."
+    "deploy:preview": "npm run deploy:preview --prefix ..",
+    "type-check": "tsc --noEmit --watch"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
