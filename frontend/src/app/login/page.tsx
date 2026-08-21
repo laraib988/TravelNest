@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ShieldCheck, Mail, Lock } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Mail, Lock   Eye,
+  EyeOff,
+} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import TurnstileWidget from '@/components/TurnstileWidget';
 
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
