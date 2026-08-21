@@ -28,6 +28,6 @@ export async function GET() {
     return NextResponse.json(data || []);
   } catch (error: any) {
     console.error('Error fetching public destinations:', error);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json([], { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
   }
 }

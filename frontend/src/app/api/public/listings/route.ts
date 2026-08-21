@@ -11,7 +11,7 @@ export async function GET(req: Request) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
     if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json([], { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 
     if (error) {
       console.error('Error fetching public listings from Supabase:', error);
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json([], { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
     }
 
     // Handle temporary availability blocks: auto-reactivate expired blocks and
@@ -125,9 +125,9 @@ export async function GET(req: Request) {
       };
     });
 
-    return NextResponse.json(mappedListings, { status: 200 });
+    return NextResponse.json(mappedListings, { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
   } catch (error: any) {
     console.error('Supabase fetch error:', error);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json([], { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
   }
 }
