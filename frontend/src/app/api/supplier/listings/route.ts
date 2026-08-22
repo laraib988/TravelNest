@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     const { data: products, error } = await supabaseAdmin
       .from('products')
-      .select('*')
+      .select('id, supplier_id, status, updated_at, logistics, transport_pricing, basic_info')
       .eq('supplier_id', userId)
       .neq('status', 'PENDING_DELETION')
       .order('updated_at', { ascending: false });
@@ -52,7 +52,8 @@ export async function GET(request: Request) {
     }
 
     if (reactivatePromises.length > 0) {
-      await Promise.all(reactivatePromises);
+      // Fire and forget, don't await to block the API response
+      Promise.all(reactivatePromises).catch(console.error);
     }
 
     const clones = products.filter(p => p.logistics?.parent_id);
