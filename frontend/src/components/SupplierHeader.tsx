@@ -2,11 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Compass, Bell, User, ChevronDown, LogOut, Settings, Calendar, ShoppingCart, ShieldAlert, Package, CreditCard, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function SupplierHeader() {
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/supplier/login' || pathname === '/supplier/signup';
+  if (isAuthPage) return null;
   const { user, logout } = useAuth();
   const router = useRouter();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);

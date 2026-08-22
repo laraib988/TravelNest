@@ -317,7 +317,7 @@ export default function AdminReviewsPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <img
-                      src={review.user_avatar}
+                      src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name || 'Anonymous')}&background=0ea5e9&color=fff`}
                       alt={review.user_name}
                       style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
                     />

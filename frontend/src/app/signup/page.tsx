@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User as UserIcon, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
@@ -15,14 +15,29 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [redirectUrl, setRedirectUrl] = useState('/');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redir = params.get('redirect');
+    if (redir) setRedirectUrl(redir);
+  }, []);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signup(name, email, password);
-    setLoading(false);
-    router.push('/');
+    setAuthError('');
+    try {
+      await signup(name, email, password);
+      router.push(redirectUrl);
+    } catch (err: any) {
+      console.error(err);
+      setAuthError(err.message || 'Sign up failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -88,6 +103,11 @@ export default function SignupPage() {
 
           <TurnstileWidget onVerify={(token) => setTurnstileToken(token)} />
 
+          {authError && (
+            <div style={{ padding: '12px', borderRadius: '12px', background: '#fef2f2', border: '1px solid #fecaca', color: '#ef4444', fontSize: '0.85rem', fontWeight: 600, marginBottom: '12px' }}>
+              {authError}
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
@@ -109,7 +129,7 @@ export default function SignupPage() {
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
           Already have an account?{' '}
-          <Link href="/login" style={{ color: 'var(--brand-primary)', fontWeight: 700, textDecoration: 'underline' }}>
+          <Link href={redirectUrl !== '/' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'} style={{ color: 'var(--brand-primary)', fontWeight: 700, textDecoration: 'underline' }}>
             Sign In
           </Link>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, ShieldCheck, Mail, Lock, Eye, EyeOff } from 'lucide-react';
@@ -14,14 +14,29 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [redirectUrl, setRedirectUrl] = useState('/');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redir = params.get('redirect');
+    if (redir) setRedirectUrl(redir);
+  }, []);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await login(email, password);
-    setLoading(false);
-    router.push('/');
+    setAuthError('');
+    try {
+      await login(email, password);
+      router.push(redirectUrl);
+    } catch (err: any) {
+      console.error(err);
+      setAuthError(err.message || 'Invalid login credentials. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,6 +87,11 @@ export default function LoginPage() {
 
           <TurnstileWidget onVerify={(token) => setTurnstileToken(token)} />
 
+          {authError && (
+            <div style={{ padding: '12px', borderRadius: '12px', background: '#fef2f2', border: '1px solid #fecaca', color: '#ef4444', fontSize: '0.85rem', fontWeight: 600, marginBottom: '12px' }}>
+              {authError}
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
@@ -93,9 +113,12 @@ export default function LoginPage() {
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
           Don't have an account?{' '}
-          <Link href="/signup" style={{ color: 'var(--brand-primary)', fontWeight: 700, textDecoration: 'underline' }}>
+          <Link href={redirectUrl !== '/' ? `/signup?redirect=${encodeURIComponent(redirectUrl)}` : '/signup'} style={{ color: 'var(--brand-primary)', fontWeight: 700, textDecoration: 'underline' }}>
             Create Account
           </Link>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+          Are you a Supplier/Partner? <Link href="/supplier/login" style={{ color: 'var(--brand-primary)', fontWeight: 700, textDecoration: 'underline' }}>Supplier Login</Link>
         </div>
       </div>
     </div>

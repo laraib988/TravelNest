@@ -4,11 +4,14 @@ import { useState, useEffect } from 'react';
 import { Star, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter, usePathname } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 
 export default function TourReviews({ tour }: { tour: any }) {
   const { t } = useCurrency();
-  const { user } = useAuth();
+  const { user, openAuthModal } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
   
   const [reviews, setReviews] = useState<any[]>([]);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -18,6 +21,7 @@ export default function TourReviews({ tour }: { tour: any }) {
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewTourTypes, setReviewTourTypes] = useState<string[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState<string | null>(null);
   const [reviewsSliderIndex, setReviewsSliderIndex] = useState(0);
@@ -46,6 +50,29 @@ export default function TourReviews({ tour }: { tour: any }) {
     setSubmittingReview(true);
     setUploadError(null);
     setReviewSuccessMsg(null);
+    
+    let uploadedPhotoUrl = null;
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      try {
+        const uploadRes = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          uploadedPhotoUrl = uploadData.url;
+        } else {
+          throw new Error('Image upload failed');
+        }
+      } catch (err) {
+        setUploadError('Failed to upload image. Please try again.');
+        setSubmittingReview(false);
+        return;
+      }
+    }
+
     try {
       const nextReviewRes = await fetch('/api/public/reviews', {
         method: 'POST',
@@ -55,7 +82,7 @@ export default function TourReviews({ tour }: { tour: any }) {
           rating: reviewRating,
           title: reviewTitle,
           comment: reviewComment,
-          photos: [],
+          photos: uploadedPhotoUrl ? [uploadedPhotoUrl] : [],
           tour_types: reviewTourTypes,
           user_id: user?.id,
           user_name: user?.name || (user?.email?.split('@')[0] || 'Anonymous'),
@@ -91,7 +118,7 @@ export default function TourReviews({ tour }: { tour: any }) {
           <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>({reviews.length})</span>
         </h2>
         <button
-          onClick={() => setShowReviewForm(!showReviewForm)}
+          onClick={() => { if (!user) { router.push(`/login?redirect=${encodeURIComponent(pathname)}`); return; } setShowReviewForm(!showReviewForm); }}
           className="btn-primary"
           style={{ padding: '10px 20px', fontSize: '0.88rem' }}
         >
@@ -187,6 +214,31 @@ export default function TourReviews({ tour }: { tour: any }) {
             </div>
           </div>
 
+          {/* File Upload UI */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Attach Photo (Max 2MB)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (file.size > 2 * 1024 * 1024) {
+                    setUploadError('Image size must be less than 2MB');
+                    e.target.value = '';
+                    setImageFile(null);
+                    return;
+                  }
+                  setImageFile(file);
+                  setUploadError(null);
+                }
+              }}
+              style={{ fontSize: '0.85rem' }}
+            />
+            {imageFile && <span style={{ marginLeft: '10px', fontSize: '0.8rem', color: '#16a34a' }}>Selected: {imageFile.name}</span>}
+            {uploadError && <div style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '4px' }}>{uploadError}</div>}
+          </div>
+          
           <input
             type="text"
             placeholder="Review title (e.g. 'Amazing sunset cruise!')"

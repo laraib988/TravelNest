@@ -173,6 +173,9 @@ export default function SupplierLoginPage() {
             Sign Up
           </Link>
         </div>
+        <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+          Are you a Traveler/Customer? <Link href="/login" style={{ color: 'var(--brand-primary)', fontWeight: 700, textDecoration: 'underline' }}>Customer Login</Link>
+        </div>
       </div>
     </div>
   );

@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       title: body.title,
       comment: body.comment,
       tour_types: body.tour_types || [],
+      photos: body.photos || [],
       status: 'PENDING' // Awaiting Admin Approval
     }]).select().single();
     

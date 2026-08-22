@@ -5,7 +5,10 @@ import Header from '@/components/Header';
 export default function HeaderClient() {
   const pathname = usePathname();
   // Hide header on login and signup pages
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  
+  const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '').replace(/\/$/, '') || '';
+  const isAuthPage = cleanPath === '/login' || cleanPath === '/signup' || cleanPath === '/supplier/login' || cleanPath === '/admin/login' || cleanPath === '/supplier/signup';
+  
   
   if (isAuthPage) return null;
   return <Header />;

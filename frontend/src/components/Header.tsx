@@ -247,6 +247,7 @@ export default function Header() {
                     >
                       <ShieldCheck size={15} color="#059669" /> {t('supplier_portal')}
                     </Link>
+                    {user?.role === 'ADMIN' && (
                     <Link
                       href="/admin"
                       onClick={() => setIsUserMenuOpen(false)}
@@ -254,6 +255,7 @@ export default function Header() {
                     >
                       <LayoutDashboard size={15} color="#7c3aed" /> Admin Portal
                     </Link>
+                    )}
                     <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '4px 0' }} />
                     <button
                       onClick={() => {
@@ -280,7 +282,12 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : null}
+            ) : (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Link href={`/login?redirect=${encodeURIComponent(pathname)}`} style={{ padding: '6px 16px', fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none', border: '1px solid #cbd5e1', borderRadius: '20px', background: '#fff' }}>Sign In</Link>
+                <Link href={`/signup?redirect=${encodeURIComponent(pathname)}`} style={{ padding: '6px 16px', fontSize: '0.85rem', fontWeight: 700, color: '#fff', textDecoration: 'none', border: '1px solid var(--brand-primary)', borderRadius: '20px', background: 'var(--brand-primary)' }}>Sign Up</Link>
+              </div>
+            )}
 
           </div>
         </div>
