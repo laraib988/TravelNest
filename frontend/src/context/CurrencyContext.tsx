@@ -60,8 +60,8 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   // Sync language with local storage and current URL path
   useEffect(() => {
-    const savedCurr = localStorage.getItem('travelnest_currency');
-    const savedLang = localStorage.getItem('travelnest_language');
+    const savedCurr = localStorage.getItem('vaitour_currency');
+    const savedLang = localStorage.getItem('vaitour_language');
     if (savedCurr && SUPPORTED_CURRENCIES[savedCurr]) {
       setCurrency(SUPPORTED_CURRENCIES[savedCurr]);
     }
@@ -71,7 +71,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       const pathLocale = parts[1];
       if (pathLocale && SUPPORTED_LANGUAGES[pathLocale]) {
         setLanguage(SUPPORTED_LANGUAGES[pathLocale]);
-        localStorage.setItem('travelnest_language', pathLocale);
+        localStorage.setItem('vaitour_language', pathLocale);
         if (pathLocale === 'ar' || pathLocale === 'ur') {
           document.documentElement.setAttribute('dir', 'rtl');
         } else {
@@ -128,14 +128,14 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         ...SUPPORTED_CURRENCIES[code],
         rate: resolvedRate(code),
       });
-      localStorage.setItem('travelnest_currency', code);
+      localStorage.setItem('vaitour_currency', code);
     }
   };
 
   const setLanguageCode = (code: string) => {
     if (SUPPORTED_LANGUAGES[code]) {
       setLanguage(SUPPORTED_LANGUAGES[code]);
-      localStorage.setItem('travelnest_language', code);
+      localStorage.setItem('vaitour_language', code);
       
       if (code === 'ar' || code === 'ur') {
         document.documentElement.setAttribute('dir', 'rtl');
@@ -182,9 +182,9 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   // Load wishlist and cart from localStorage
   useEffect(() => {
     try {
-      const savedWish = localStorage.getItem('travelnest_wishlist');
+      const savedWish = localStorage.getItem('vaitour_wishlist');
       if (savedWish) setWishlist(JSON.parse(savedWish));
-      const savedCart = localStorage.getItem('travelnest_cart');
+      const savedCart = localStorage.getItem('vaitour_cart');
       if (savedCart) setCart(JSON.parse(savedCart));
     } catch (e) {
       console.error('Error loading wishlist/cart:', e);
@@ -194,7 +194,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const toggleWishlist = (id: string) => {
     setWishlist((prev) => {
       const updated = prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id];
-      localStorage.setItem('travelnest_wishlist', JSON.stringify(updated));
+      localStorage.setItem('vaitour_wishlist', JSON.stringify(updated));
       return updated;
     });
   };
@@ -208,7 +208,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       } else {
         updated = [...prev, { ...item, quantity: item.quantity || 1 }];
       }
-      localStorage.setItem('travelnest_cart', JSON.stringify(updated));
+      localStorage.setItem('vaitour_cart', JSON.stringify(updated));
       return updated;
     });
   };
@@ -216,7 +216,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const removeFromCart = (id: string) => {
     setCart((prev) => {
       const updated = prev.filter((i) => i.id !== id);
-      localStorage.setItem('travelnest_cart', JSON.stringify(updated));
+      localStorage.setItem('vaitour_cart', JSON.stringify(updated));
       return updated;
     });
   };
@@ -224,14 +224,14 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const updateCartQuantity = (id: string, qty: number) => {
     setCart((prev) => {
       const updated = prev.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, qty) } : i));
-      localStorage.setItem('travelnest_cart', JSON.stringify(updated));
+      localStorage.setItem('vaitour_cart', JSON.stringify(updated));
       return updated;
     });
   };
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem('travelnest_cart');
+    localStorage.removeItem('vaitour_cart');
   };
 
   return (

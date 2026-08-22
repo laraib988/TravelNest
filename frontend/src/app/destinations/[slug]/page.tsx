@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   if (!destination) return {};
   return {
-    title: destination.meta_title || `${destination.name} | TravelNest`,
+    title: destination.meta_title || `${destination.name} | Vaitour`,
     description: destination.meta_description || destination.description
   };
 }
@@ -149,13 +149,38 @@ export default async function DestinationTemplatePage({ params }: { params: { sl
       return false;
     });
   }
-  const relatedProducts = matched.length > 0 ? matched : (listings || []).slice(0, 3);
+  const relatedProducts = matched.length > 0 ? matched.slice(0, 8) : (listings || []).slice(0, 8);
   const locale = headers().get('x-locale') || 'en';
+
+  // Fetch 3 nearby destinations for SEO interlinking
+  let { data: nearbyDestinations } = await supabase
+    .from('destinations')
+    .select('name, slug, hero_image, country')
+    .neq('slug', params.slug)
+    .limit(3);
+
+  // Fallback to real popular destinations if DB has fewer than 3
+  if (!nearbyDestinations || nearbyDestinations.length < 3) {
+    const realFallbacks = [
+      { name: 'Kyoto', slug: 'kyoto', country: 'Japan', hero_image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Dubai', slug: 'dubai', country: 'United Arab Emirates', hero_image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Paris', slug: 'paris', country: 'France', hero_image: 'https://images.unsplash.com/photo-1502602898657-3e907a5ea071?q=80&w=800&auto=format&fit=crop' },
+      { name: 'New York', slug: 'new-york', country: 'United States', hero_image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Rome', slug: 'rome', country: 'Italy', hero_image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=800&auto=format&fit=crop' }
+    ];
+    
+    // Filter out current slug and take enough to fill to 3
+    const needed = 3 - (nearbyDestinations?.length || 0);
+    const fillers = realFallbacks.filter(d => d.slug !== params.slug).slice(0, needed);
+    
+    nearbyDestinations = [...(nearbyDestinations || []), ...fillers];
+  }
 
   return (
     <DestinationDetailsClient 
       destination={destination} 
       relatedProducts={relatedProducts} 
+      nearbyDestinations={nearbyDestinations}
       locale={locale} 
     />
   );

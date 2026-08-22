@@ -281,7 +281,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
       {/* Sidebar */}
       <div style={{ width: '280px', background: '#ffffff', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>TravelNest Supplier</h2>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>Vaitour Supplier</h2>
           <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <CheckCircle2 size={14} color="#059669" /> Verified Partner
           </div>
@@ -623,7 +623,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                                       </style>
                                     </head>
                                     <body onload="window.print(); window.close();">
-                                      <h1>TravelNest Supplier Payout</h1>
+                                      <h1>Vaitour Supplier Payout</h1>
                                       <p><strong>Payment ID:</strong> ${p.paymentId}</p>
                                       <p><strong>Date:</strong> ${p.dateStr}</p>
                                       <p><strong>Total Amount:</strong> $${p.amount.toFixed(2)}</p>
@@ -740,7 +740,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                                       </style>
                                     </head>
                                     <body onload="window.print(); window.close();">
-                                      <h1>TravelNest Supplier Invoice</h1>
+                                      <h1>Vaitour Supplier Invoice</h1>
                                       <p><strong>Invoice #:</strong> ${p.invoiceId}</p>
                                       <p><strong>Date:</strong> ${p.dateStr}</p>
                                       <p><strong>Due Date:</strong> ${p.dueDateStr}</p>

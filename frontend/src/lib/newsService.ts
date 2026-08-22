@@ -206,16 +206,16 @@ function placeholderArticles(name: string): NewsArticle[] {
     {
       title: `Top Things to Do in ${name}`,
       description: `Discover the most memorable experiences, sightseeing spots, and hidden gems across ${name}.`,
-      source: { name: 'TravelNest Guide' },
+      source: { name: 'Vaitour Guide' },
       publishedAt: ts,
-      url: 'https://travelnest.local/guide/things-to-do',
+      url: 'https://vaitour.local/guide/things-to-do',
     },
     {
       title: `Best Time to Visit ${name} This Season`,
       description: `Plan your perfect trip to ${name} with our seasonal guide covering weather, crowds, and local highlights.`,
-      source: { name: 'TravelNest Guide' },
+      source: { name: 'Vaitour Guide' },
       publishedAt: ts,
-      url: 'https://travelnest.local/guide/best-time',
+      url: 'https://vaitour.local/guide/best-time',
     },
   ];
   return placeholders;

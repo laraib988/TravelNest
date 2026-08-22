@@ -17,7 +17,7 @@ export default function ContactPage() {
       
       <div style={{ textAlign: 'center', marginBottom: '48px' }}>
         <h1 style={{ fontSize: '2.5rem', color: '#0f172a', fontWeight: 800, marginBottom: '12px' }}>
-          Contact TravelNest Support
+          Contact Vaitour Support
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto' }}>
           Have a question about your booking, rescheduling, or supplier partnership? Our global support team is available 24/7.
@@ -102,7 +102,7 @@ export default function ContactPage() {
               <div style={{ background: '#e0f2fe', padding: '12px', borderRadius: '12px', color: '#0284c7' }}><Mail size={22} /></div>
               <div>
                 <h4 style={{ fontSize: '1.05rem', color: '#0f172a', margin: 0 }}>Customer Care Email</h4>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0 }}>support@travelnest.com</p>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0 }}>support@vaitour.com</p>
               </div>
             </div>
           </div>
@@ -123,8 +123,8 @@ export default function ContactPage() {
               <div>
                 <h4 style={{ fontSize: '1.05rem', color: '#0f172a', marginBottom: '4px' }}>Japan Headquarters</h4>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                  2nd Floor, Sotoike Shukugo Building,<br />
-                  Utsunomiya City, Tochigi, Japan.
+                  Sotoike Shukugo Building,<br />
+                  Utsunomiya City, Tochigi.
                 </p>
               </div>
             </div>

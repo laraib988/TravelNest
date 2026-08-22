@@ -120,7 +120,7 @@ export default function BookingsManagementPage() {
             qr_voucher_code: 'TN-VOUCH-4412-LHR',
             traveler_details: {
               lead_name: 'Ayesha Malik',
-              lead_email: 'ayesha.m@travelnest.com',
+              lead_email: 'ayesha.m@vaitour.com',
               lead_phone: '+92 321 9876543',
               special_requirements: 'Wheelchair access required for senior guest.',
               guest_names: ['Ayesha Malik', 'Tariq Malik', 'Fatima Malik', 'Zainab Malik']
@@ -205,7 +205,7 @@ export default function BookingsManagementPage() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `TravelNest_Bookings_Report_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `Vaitour_Bookings_Report_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     triggerAction('Exported Bookings Report CSV file!');
   };

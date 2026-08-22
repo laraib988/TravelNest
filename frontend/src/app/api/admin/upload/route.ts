@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder: 'travelnest' },
+        { folder: 'vaitour' },
         (error, uploadResult) => {
           if (error) {
             console.error('Cloudinary stream upload error:', error);

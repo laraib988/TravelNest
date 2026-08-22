@@ -20,7 +20,8 @@ export default function Footer() {
 
   // On admin and supplier pages, hide the public footer
   const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '';
-  if (cleanPath.startsWith('/admin') || cleanPath.startsWith('/supplier')) {
+  const isSupplierLanding = cleanPath === '/supplier';
+  if (cleanPath.startsWith('/admin') || (cleanPath.startsWith('/supplier') && !isSupplierLanding)) {
     return null;
   }
 
@@ -135,7 +136,7 @@ export default function Footer() {
               fontWeight: 600,
             }}
           >
-            © 2026 TravelNest Tours Powered by <strong style={{ color: '#ffffff' }}>Ebadah Group Co. Ltd</strong> Japan
+            © 2026 Vaitour Tours Powered by <strong style={{ color: '#ffffff' }}>Ebadah Group Co. Ltd</strong> Japan
           </div>
 
         </div>

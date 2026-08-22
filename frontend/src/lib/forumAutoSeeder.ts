@@ -137,7 +137,7 @@ export async function generateAutoReply(discussionId: string, userContent: strin
     await getSupabase().from('forum_replies').insert({
       discussion_id: discussionId,
       content: result.reply,
-      author_name: 'TravelNest Guide AI',
+      author_name: 'Vaitour Guide AI',
       author_badge: 'Verified Local Guide',
       is_guide: true
     });

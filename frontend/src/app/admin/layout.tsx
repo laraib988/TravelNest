@@ -179,7 +179,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={`admin-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
           <Link href="/admin" className="admin-sidebar-logo" style={{ textDecoration: 'none' }}>
-            <span className="admin-sidebar-logo-text">TravelNest</span>
+            <span className="admin-sidebar-logo-text">Vaitour</span>
             <span className="admin-sidebar-logo-badge">Admin</span>
           </Link>
         </div>

@@ -164,7 +164,7 @@ export default function AdminPayoutsPage() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `TravelNest_Payouts_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `Vaitour_Payouts_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     triggerAction('Exported Payouts Ledger CSV file!');
   };

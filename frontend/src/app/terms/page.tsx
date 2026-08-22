@@ -8,8 +8,8 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | TravelNest',
-  description: 'Legally binding terms, conditions, and user responsibilities for utilizing the TravelNest platform.',
+  title: 'Terms of Service | Vaitour',
+  description: 'Legally binding terms, conditions, and user responsibilities for utilizing the Vaitour platform.',
 };
 
 export default function TermsOfServicePage() {
@@ -25,9 +25,9 @@ export default function TermsOfServicePage() {
           marginBottom: '60px'
         }}
       >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>TravelNest Terms of Service Agreement</h1>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Vaitour Terms of Service Agreement</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
-          By accessing and using TravelNest, you agree to comply with our global standards. Review these 18 foundational rules that govern our marketplace, protect your rights, and ensure a secure ecosystem for all travelers and hosts.
+          By accessing and using Vaitour, you agree to comply with our global standards. Review these 18 foundational rules that govern our marketplace, protect your rights, and ensure a secure ecosystem for all travelers and hosts.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export default function TermsOfServicePage() {
           <div style={{ marginBottom: '32px', padding: '16px 20px', background: '#e0f2fe', borderRadius: '8px', borderLeft: '4px solid #0284c7', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
             <Info size={24} color="#0284c7" style={{ flexShrink: 0, marginTop: '2px' }} />
             <p style={{ margin: 0, color: '#0c4a6e', fontSize: '0.95rem' }}>
-              <strong>Effective Date: August 2026.</strong> These Terms of Service ("Terms") constitute a legally binding agreement between you and TravelNest. By accessing our platform, you agree to adhere to all stipulations listed below.
+              <strong>Effective Date: August 2026.</strong> These Terms of Service ("Terms") constitute a legally binding agreement between you and Vaitour. By accessing our platform, you agree to adhere to all stipulations listed below.
             </p>
           </div>
 
@@ -74,7 +74,7 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <CheckSquare size={28} color="#0284c7" /> Acceptance of Terms
             </h2>
-            <p>By creating an account, browsing our catalog, or initiating a booking on TravelNest, you signify your absolute and irrevocable acceptance of these Terms. If you do not agree with any part of these conditions, you must immediately cease all usage of the TravelNest platform, application, and associated services.</p>
+            <p>By creating an account, browsing our catalog, or initiating a booking on Vaitour, you signify your absolute and irrevocable acceptance of these Terms. If you do not agree with any part of these conditions, you must immediately cease all usage of the Vaitour platform, application, and associated services.</p>
           </section>
 
           <section id="sec-2" style={{ marginBottom: '40px' }}>
@@ -95,7 +95,7 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Globe size={28} color="#dc2626" /> Platform Role as Intermediary
             </h2>
-            <p>TravelNest acts strictly as a technological intermediary connecting independent travelers with local tour operators, hotels, and experience providers. We do not own, operate, or directly manage any of the tours listed. Therefore, the actual contract of service is formed directly between you and the local supplier.</p>
+            <p>Vaitour acts strictly as a technological intermediary connecting independent travelers with local tour operators, hotels, and experience providers. We do not own, operate, or directly manage any of the tours listed. Therefore, the actual contract of service is formed directly between you and the local supplier.</p>
           </section>
 
           <section id="sec-5" style={{ marginBottom: '40px' }}>
@@ -109,7 +109,7 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Tag size={28} color="#06b6d4" /> Pricing & Taxes
             </h2>
-            <p>All prices displayed on TravelNest are subject to real-time dynamic changes based on availability. While we strive to show the final inclusive price, certain local municipal taxes, environmental fees, or physical cash deposits may need to be paid directly to the supplier upon arrival, which will be clearly noted on your ticket.</p>
+            <p>All prices displayed on Vaitour are subject to real-time dynamic changes based on availability. While we strive to show the final inclusive price, certain local municipal taxes, environmental fees, or physical cash deposits may need to be paid directly to the supplier upon arrival, which will be clearly noted on your ticket.</p>
           </section>
 
           <section id="sec-7" style={{ marginBottom: '40px' }}>
@@ -123,7 +123,7 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <AlertTriangle size={28} color="#14b8a6" /> User Conduct
             </h2>
-            <p>You agree to behave respectfully towards local guides, other guests, and our support staff. We operate a zero-tolerance policy against physical violence, hate speech, severe intoxication, or harassment during any TravelNest experience. Violation of this clause grants the supplier the right to terminate your tour instantly without a refund.</p>
+            <p>You agree to behave respectfully towards local guides, other guests, and our support staff. We operate a zero-tolerance policy against physical violence, hate speech, severe intoxication, or harassment during any Vaitour experience. Violation of this clause grants the supplier the right to terminate your tour instantly without a refund.</p>
           </section>
 
           <section id="sec-9" style={{ marginBottom: '40px' }}>
@@ -137,14 +137,14 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <FileText size={28} color="#6366f1" /> Intellectual Property
             </h2>
-            <p>All content on this website, including logos, text, source code, UI designs, and proprietary booking algorithms, are the exclusive intellectual property of TravelNest. You may not scrape, copy, reverse-engineer, or reproduce any part of this platform for commercial purposes without our explicit written consent.</p>
+            <p>All content on this website, including logos, text, source code, UI designs, and proprietary booking algorithms, are the exclusive intellectual property of Vaitour. You may not scrape, copy, reverse-engineer, or reproduce any part of this platform for commercial purposes without our explicit written consent.</p>
           </section>
 
           <section id="sec-11" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <MessageSquare size={28} color="#0ea5e9" /> Reviews & Content
             </h2>
-            <p>By submitting a review or uploading photos of your trip, you grant TravelNest a perpetual, royalty-free, global license to display and utilize this content for marketing purposes. We reserve the right to delete reviews that contain profanity, personal information, or deliberate falsehoods intended to extort suppliers.</p>
+            <p>By submitting a review or uploading photos of your trip, you grant Vaitour a perpetual, royalty-free, global license to display and utilize this content for marketing purposes. We reserve the right to delete reviews that contain profanity, personal information, or deliberate falsehoods intended to extort suppliers.</p>
           </section>
 
           <section id="sec-12" style={{ marginBottom: '40px' }}>
@@ -165,14 +165,14 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <AlertCircle size={28} color="#ec4899" /> Limitation of Liability
             </h2>
-            <p>To the maximum extent permitted by law, TravelNest shall not be liable for any direct, indirect, incidental, or consequential damages resulting from personal injuries, lost baggage, or emotional distress that occur during a booked experience. All inherent risks of travel are assumed entirely by the user.</p>
+            <p>To the maximum extent permitted by law, Vaitour shall not be liable for any direct, indirect, incidental, or consequential damages resulting from personal injuries, lost baggage, or emotional distress that occur during a booked experience. All inherent risks of travel are assumed entirely by the user.</p>
           </section>
 
           <section id="sec-15" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Briefcase size={28} color="#64748b" /> Indemnification
             </h2>
-            <p>You agree to indemnify, defend, and hold harmless TravelNest, its directors, employees, and affiliates from any claims, lawsuits, liabilities, or expenses (including legal fees) arising out of your breach of these Terms, your violation of any laws, or any damages you cause to a local supplier's property.</p>
+            <p>You agree to indemnify, defend, and hold harmless Vaitour, its directors, employees, and affiliates from any claims, lawsuits, liabilities, or expenses (including legal fees) arising out of your breach of these Terms, your violation of any laws, or any damages you cause to a local supplier's property.</p>
           </section>
 
           <section id="sec-16" style={{ marginBottom: '40px' }}>
@@ -186,7 +186,7 @@ export default function TermsOfServicePage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Map size={28} color="#059669" /> Governing Law
             </h2>
-            <p>These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which TravelNest is officially headquartered. Any legal disputes, class actions, or arbitration proceedings must be filed strictly within our designated local courts.</p>
+            <p>These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which Vaitour is officially headquartered. Any legal disputes, class actions, or arbitration proceedings must be filed strictly within our designated local courts.</p>
           </section>
 
           <section id="sec-18" style={{ marginBottom: '40px' }}>
@@ -201,7 +201,7 @@ export default function TermsOfServicePage() {
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Legal Inquiries?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>If you have questions about these terms, reach out to our legal team.</p>
             </div>
-            <Link href="mailto:support@travelnest.com" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="mailto:support@vaitour.com" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               Contact Legal <ArrowRight size={16} />
             </Link>
           </div>

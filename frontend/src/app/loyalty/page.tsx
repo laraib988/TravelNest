@@ -1,105 +1,41 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import React from 'react';
 import { 
   Award, 
   Gift, 
-  Copy, 
   Share2, 
-  ChevronRight, 
   Crown, 
   Zap, 
-  CheckCircle2,
   Clock,
-  ArrowUpRight,
-  Sparkles,
-  ShieldCheck,
-  Tag
+  CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoyaltyPage() {
-  const { user } = useAuth();
-  const [copied, setCopied] = useState(false);
-  const [points, setPoints] = useState(0);
-  const [lastSynced, setLastSynced] = useState('Syncing...');
-  
-  const referralLink = `https://travelnest.com/ref/${user?.id?.substring(0, 8) || 'AYESHA2026'}`.toUpperCase();
-
-  const targetPoints = 1450; // Mock base target
-  const value = (points * 0.005).toFixed(2); // 100 points = $0.50
-
-  // Real-time animation and sync simulation
-  React.useEffect(() => {
-    // 1. Animate Points Counter on Load
-    let current = 0;
-    const step = 25;
-    const interval = setInterval(() => {
-      current += step;
-      if (current >= targetPoints) {
-        setPoints(targetPoints);
-        clearInterval(interval);
-      } else {
-        setPoints(current);
-      }
-    }, 15);
-
-    // 2. Real-time Live Sync Indicator
-    setLastSynced('Just now');
-    const syncInterval = setInterval(() => {
-      setLastSynced(new Date().toLocaleTimeString());
-    }, 60000); // update every minute
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(syncInterval);
-    };
-  }, []);
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const tiers = [
-    { name: 'Bronze', threshold: 0, current: points < 1000 },
-    { name: 'Silver', threshold: 1000, current: points >= 1000 && points < 5000 },
-    { name: 'Gold', threshold: 5000, current: points >= 5000 }
-  ];
-
-  // Calculate progress to next tier
-  const nextTier = tiers.find(t => t.threshold > points) || tiers[2];
-  const progressPercentage = Math.min(100, (points / nextTier.threshold) * 100);
-
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
         
-        {/* HERO BANNER with LIVE STATUS */}
+        {/* HERO BANNER */}
         <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div className="badge-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
-              <Award size={14} /> TravelNest Rewards & Loyalty Program
+              <Award size={14} /> Vaitour Rewards & Loyalty Program
             </div>
             <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>
-              Welcome back, {user?.name || 'Explorer'}!
+              Vaitour Explorer
             </h1>
             <p style={{ color: '#475569', fontSize: '1.05rem', marginTop: '6px', maxWidth: '640px' }}>
               Earn points on every experience booking, unlock exclusive Silver & Gold membership perks, and invite travel companions.
             </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#ecfdf5', padding: '8px 14px', borderRadius: '20px', border: '1px solid #10b981' }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981', animation: 'pulse 1.5s infinite' }} />
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#047857' }}>Live • Last Synced: {lastSynced}</span>
-          </div>
         </div>
 
-        {/* TOP SECTION: POINTS BALANCE & TIER PROGRESS */}
+        {/* TOP SECTION: INFORMATIONAL POINTS BALANCE & TIER BENEFITS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '28px', marginBottom: '36px' }}>
           
-          {/* POINTS BALANCE CARD */}
+          {/* POINTS EXPLANATION CARD */}
           <div 
             style={{ 
               background: 'linear-gradient(135deg, #fffbe6 0%, #fef3c7 100%)', 
@@ -119,167 +55,82 @@ export default function LoyaltyPage() {
             </div>
             <div>
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#b45309', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Available Rewards Balance
+                How Points Work
               </span>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '10px 0 4px' }}>
                 <span style={{ fontSize: '3.2rem', fontWeight: 800, color: '#92400e', lineHeight: 1 }}>
-                  {points.toLocaleString()}
+                  100
                 </span>
                 <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#b45309' }}>NestPoints</span>
               </div>
               <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#059669', marginBottom: '24px' }}>
-                ≈ ${value} USD Checkout Discount Value
+                = $0.50 USD Checkout Discount
               </div>
             </div>
-            <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem' }}>
-              Redeem Points at Checkout
-            </button>
+            <div style={{ background: '#f59e0b', color: '#fff', textAlign: 'center', padding: '14px', borderRadius: '12px', fontSize: '1rem', fontWeight: 700 }}>
+              Redeemable at Checkout
+            </div>
           </div>
-{/* THis is section 1 */}
-          {/* TIER PROGRESS CARD */}
+
+          {/* TIER BENEFITS CARD */}
           <div className="card-panel" style={{ padding: '32px', borderRadius: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <Crown size={20} color="#d97706" />
+                    <Crown size={20} color="#0f172a" />
                     <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                      Current Status: <span style={{ color: '#d97706' }}>Silver Tier</span>
+                      Tier Benefits Breakdown
                     </h2>
                   </div>
-                  <span style={{ fontSize: '0.88rem', color: '#64748b' }}>3,550 points needed to unlock Gold Status</span>
+                  <span style={{ fontSize: '0.88rem', color: '#64748b' }}>Move through tiers to unlock exclusive perks</span>
                 </div>
-                <span className="badge-emerald">Active Tier</span>
               </div>
 
-              {/* PROGRESS BAR */}
-              <div style={{ position: 'relative', margin: '30px 0 20px' }}>
-                <div style={{ height: '10px', background: '#e2e8f0', borderRadius: '5px', overflow: 'hidden' }}>
-                  <div style={{ width: `${progressPercentage}%`, height: '100%', background: 'var(--brand-gradient)', borderRadius: '5px', transition: 'width 1s ease-out' }} />
+              {/* UNLOCKED PERKS ROW */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '14px' }}>
+                  <CheckCircle2 size={18} color="#64748b" style={{ marginBottom: '6px' }} />
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>Bronze (0 - 999 pts)</div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Standard introductory benefits and point earning capabilities.</div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
-                  {tiers.map((tier) => (
-                    <div key={tier.name} style={{ textAlign: 'center' }}>
-                      <div style={{ 
-                        width: '24px', 
-                        height: '24px', 
-                        borderRadius: '50%', 
-                        background: points >= tier.threshold ? '#0284c7' : '#cbd5e1', 
-                        color: '#ffffff',
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        margin: '0 auto 6px',
-                        fontSize: '0.75rem',
-                        fontWeight: 800
-                      }}>
-                        {points >= tier.threshold ? '✓' : ''}
-                      </div>
-                      <div style={{ fontSize: '0.88rem', fontWeight: tier.current ? 800 : 600, color: tier.current ? 'var(--brand-primary)' : '#64748b' }}>
-                        {tier.name}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{tier.threshold} pts</div>
-                    </div>
-                  ))}
+                
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '14px' }}>
+                  <Zap size={18} color="#0284c7" style={{ marginBottom: '6px' }} />
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>Silver (1,000+ pts)</div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Added perks, seasonal discounts, and priority on popular tours.</div>
                 </div>
+                
+                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', padding: '14px', borderRadius: '14px' }}>
+                  <Gift size={18} color="#d97706" style={{ marginBottom: '6px' }} />
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>Gold (5,000+ pts)</div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Fast-track support, 100 extra points per booking, $0.01 per referral.</div>
+                </div>
+
               </div>
             </div>
-
-            {/* UNLOCKED PERKS ROW */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '14px' }}>
-                <Zap size={18} color="#d97706" style={{ marginBottom: '6px' }} />
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>100 Points Milestone</div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Unlocks $0.50 Base Credit</div>
-              </div>
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '14px' }}>
-                <Clock size={18} color="#0284c7" style={{ marginBottom: '6px' }} />
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>1,000 Points (Silver)</div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Unlocks $5.00 Credit & Priority</div>
-              </div>
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '14px' }}>
-                <Gift size={18} color="#7c3aed" style={{ marginBottom: '6px' }} />
-                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>5,000 Points (Gold)</div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Unlocks $25.00 Credit & VIP Status</div>
-              </div>
-            </div>
-
           </div>
-
         </div>
 
-        {/* BOTTOM SECTION: REFERRAL LINK GENERATOR & POINTS TIMELINE */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
+        {/* BOTTOM SECTION: INVITE EXPLANATION */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '28px' }}>
           
-          {/* REFERRAL LINK CARD */}
+          {/* INVITE CARD */}
           <div className="card-panel" style={{ padding: '32px', borderRadius: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <div style={{ background: '#ecfdf5', padding: '10px', borderRadius: '12px', color: '#059669' }}>
                 <Share2 size={22} />
               </div>
               <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Invite Friends & Earn</h3>
-                <span style={{ fontSize: '0.82rem', color: '#64748b' }}>Earn 1,000 NestPoints ($5.00) for every friend who books</span>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Invite & Earn</h3>
+                <span style={{ fontSize: '0.82rem', color: '#64748b' }}>Help your friends discover the world</span>
               </div>
             </div>
 
-            <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '20px' }}>
-              Share your unique referral link with travel buddies. They get a $5.00 discount on their first experience, and you receive 1,000 points upon completion.
+            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '20px', maxWidth: '800px' }}>
+              Share Vaitour with your travel companions. When you invite a friend, and they successfully complete a tour booking, you will automatically earn <strong>50 Reward Points</strong> added to your account balance. There is no limit to how many friends you can invite!
             </p>
-
-            {/* LINK COPY BOX */}
-            <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-              <code style={{ flex: 1, fontSize: '0.88rem', fontWeight: 700, color: 'var(--brand-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {referralLink}
-              </code>
-              <button 
-                onClick={copyToClipboard}
-                className="btn-secondary"
-                style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-              >
-                <Copy size={14} /> {copied ? 'Copied Link!' : 'Copy Link'}
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>3</div>
-                <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600 }}>Friends Invited</div>
-              </div>
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#059669' }}>3,000</div>
-                <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600 }}>Points Earned</div>
-              </div>
-            </div>
-          </div>
-
-          {/* POINTS HISTORY TIMELINE */}
-          <div className="card-panel" style={{ padding: '32px', borderRadius: '24px' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>Recent Points History</h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {[
-                { title: 'Booking: Luxury Bali Catamaran', date: 'Aug 01, 2026', pts: '+450 pts', type: 'earn' },
-                { title: 'Redeemed for Lahore Tour', date: 'Jul 15, 2026', pts: '-1,000 pts', type: 'spend' },
-                { title: 'Referral Bonus (David C.)', date: 'Jul 02, 2026', pts: '+1,000 pts', type: 'earn' },
-                { title: 'Account Registration Welcome Bonus', date: 'Jun 20, 2026', pts: '+500 pts', type: 'earn' }
-              ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: i < 3 ? '14px' : '0', borderBottom: i < 3 ? '1px solid #f1f5f9' : 'none' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: item.type === 'earn' ? '#ecfdf5' : '#f1f5f9', color: item.type === 'earn' ? '#059669' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {item.type === 'earn' ? <ArrowUpRight size={18} /> : <Clock size={18} />}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' }}>{item.title}</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{item.date}</div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.95rem', fontWeight: 800, color: item.type === 'earn' ? '#059669' : '#0f172a' }}>
-                    {item.pts}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
 
         </div>

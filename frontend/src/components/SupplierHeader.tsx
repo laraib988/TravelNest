@@ -9,8 +9,10 @@ import { useRouter } from 'next/navigation';
 
 export default function SupplierHeader() {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/supplier/login' || pathname === '/supplier/signup';
-  if (isAuthPage) return null;
+  const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '';
+  const isAuthPage = cleanPath === '/supplier/login' || cleanPath === '/supplier/signup';
+  const isLandingPage = cleanPath === '/supplier';
+  if (isAuthPage || isLandingPage) return null;
   const { user, logout } = useAuth();
   const router = useRouter();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -136,7 +138,7 @@ export default function SupplierHeader() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em', color: '#0f172a' }}>
-              TravelNest
+              Vaitour
             </span>
             <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em', color: '#059669', textTransform: 'uppercase', marginTop: '2px' }}>
               Supplier Portal

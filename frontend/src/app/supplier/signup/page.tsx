@@ -197,7 +197,7 @@ export default function SupplierSignupPage() {
           <>
             <div style={{ textAlign: 'center', marginBottom: '28px' }}>
               <div className="badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                <ShieldCheck size={14} /> TravelNest Partner Portal
+                <ShieldCheck size={14} /> Vaitour Partner Portal
               </div>
               <h2 style={{ fontSize: '1.75rem', color: '#0f172a', fontWeight: 800, marginBottom: '6px' }}>
                 Create Your Supplier Account
@@ -450,7 +450,7 @@ export default function SupplierSignupPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                       <div>
                         <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>Company Name *</label>
-                        <input type="text" required value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. TravelNest Voyages" style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }} />
+                        <input type="text" required value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. Vaitour Voyages" style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }} />
                       </div>
                       <div>
                         <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>Company Location *</label>

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Refund Policy | TravelNest',
+  title: 'Refund Policy | Vaitour',
   description: 'Comprehensive information regarding our refund rules, cancellation windows, and processing timelines.',
 };
 
@@ -66,7 +66,7 @@ export default function RefundPolicyPage() {
           <div style={{ marginBottom: '32px', padding: '16px 20px', background: '#e0f2fe', borderRadius: '8px', borderLeft: '4px solid #0284c7', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
             <Info size={24} color="#0284c7" style={{ flexShrink: 0, marginTop: '2px' }} />
             <p style={{ margin: 0, color: '#0c4a6e', fontSize: '0.95rem' }}>
-              <strong>Last Updated: August 2026.</strong> This document constitutes our legally binding refund terms. Please read carefully before finalizing any booking on the TravelNest platform. Local suppliers may have overriding conditions displayed at checkout.
+              <strong>Last Updated: August 2026.</strong> This document constitutes our legally binding refund terms. Please read carefully before finalizing any booking on the Vaitour platform. Local suppliers may have overriding conditions displayed at checkout.
             </p>
           </div>
 
@@ -106,7 +106,7 @@ export default function RefundPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <ShoppingBag size={28} color="#8b5cf6" /> Supplier-Specific Rules
             </h2>
-            <p>TravelNest operates as a global marketplace connecting you directly with thousands of independent local operators. While we enforce the baseline rules mentioned above, some highly exclusive suppliers (such as multi-day luxury safari operators or expedition cruise lines) enforce much stricter cancellation periods (e.g., requiring 14 or 30 days notice). If a supplier's specific refund policy differs from the TravelNest standard policy, the supplier's policy will always take legal precedence.</p>
+            <p>Vaitour operates as a global marketplace connecting you directly with thousands of independent local operators. While we enforce the baseline rules mentioned above, some highly exclusive suppliers (such as multi-day luxury safari operators or expedition cruise lines) enforce much stricter cancellation periods (e.g., requiring 14 or 30 days notice). If a supplier's specific refund policy differs from the Vaitour standard policy, the supplier's policy will always take legal precedence.</p>
           </section>
 
           <section id="process-timelines" style={{ marginBottom: '40px' }}>
@@ -117,7 +117,7 @@ export default function RefundPolicyPage() {
             <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
               <li><strong>Credit / Debit Cards:</strong> Typically 3 to 7 business days, though some international banks take up to 14 days.</li>
               <li><strong>PayPal / Digital Wallets:</strong> Extremely fast, usually processed within 1 to 2 business days.</li>
-              <li><strong>TravelNest Wallet Credits:</strong> Instantaneous and available for immediate rebooking.</li>
+              <li><strong>Vaitour Wallet Credits:</strong> Instantaneous and available for immediate rebooking.</li>
             </ul>
           </section>
 
@@ -125,7 +125,7 @@ export default function RefundPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <MousePointer size={28} color="#f97316" /> How to Request a Refund
             </h2>
-            <p>You do not need to call our support hotline or send emails for standard cancellations within the allowable window. Simply log in to your TravelNest account, navigate to the "Manage Bookings" dashboard, select the upcoming booking you wish to cancel, and click the "Cancel Booking" button. The system will calculate your exact refund amount automatically based on the hour you initiate the cancellation.</p>
+            <p>You do not need to call our support hotline or send emails for standard cancellations within the allowable window. Simply log in to your Vaitour account, navigate to the "Manage Bookings" dashboard, select the upcoming booking you wish to cancel, and click the "Cancel Booking" button. The system will calculate your exact refund amount automatically based on the hour you initiate the cancellation.</p>
           </section>
 
           <section id="partial-refunds" style={{ marginBottom: '40px' }}>
@@ -160,14 +160,14 @@ export default function RefundPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <CreditCard size={28} color="#15803d" /> Currency & Exchange Rates
             </h2>
-            <p>All refunds are processed by our payment gateways in the exact base currency that was used during your original checkout. TravelNest is not liable for any financial loss or fluctuations caused by changing exchange rates, nor are we responsible for any foreign transaction fees or conversion charges levied by your credit card provider between the time of purchase and the issuance of the refund.</p>
+            <p>All refunds are processed by our payment gateways in the exact base currency that was used during your original checkout. Vaitour is not liable for any financial loss or fluctuations caused by changing exchange rates, nor are we responsible for any foreign transaction fees or conversion charges levied by your credit card provider between the time of purchase and the issuance of the refund.</p>
           </section>
 
           <section id="wallet-credits" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Wallet size={28} color="#3b82f6" /> Wallet Credits vs Cash
             </h2>
-            <p>During a voluntary cancellation, the platform may occasionally offer you an additional financial incentive (bonus percentage) if you actively choose to receive your refund in the form of TravelNest Wallet Credits rather than cash back to your bank account. Please note that Wallet Credits do not expire, but once they are accepted, they are permanently locked to your account and cannot be retroactively withdrawn to a bank account.</p>
+            <p>During a voluntary cancellation, the platform may occasionally offer you an additional financial incentive (bonus percentage) if you actively choose to receive your refund in the form of Vaitour Wallet Credits rather than cash back to your bank account. Please note that Wallet Credits do not expire, but once they are accepted, they are permanently locked to your account and cannot be retroactively withdrawn to a bank account.</p>
           </section>
 
           <section id="promotions" style={{ marginBottom: '40px' }}>
@@ -188,28 +188,28 @@ export default function RefundPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Umbrella size={28} color="#6366f1" /> Third-Party Insurance Claims
             </h2>
-            <p>TravelNest strongly advises all guests to purchase comprehensive third-party travel insurance prior to departure. If your cancellation reason is not covered by our standard policy (e.g., missing a flight connection, lost passports, or minor illness), we will happily provide you with a formal "Cancellation Invoice" or "Proof of No-Show" document to assist you in claiming the lost amount from your travel insurance provider.</p>
+            <p>Vaitour strongly advises all guests to purchase comprehensive third-party travel insurance prior to departure. If your cancellation reason is not covered by our standard policy (e.g., missing a flight connection, lost passports, or minor illness), we will happily provide you with a formal "Cancellation Invoice" or "Proof of No-Show" document to assist you in claiming the lost amount from your travel insurance provider.</p>
           </section>
 
           <section id="fraud-suspension" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Lock size={28} color="#475569" /> Fraud & Account Suspension
             </h2>
-            <p>If our automated security systems detect fraudulent behavior, stolen credit card usage, or systemic abuse of the cancellation system (such as repeatedly booking and canceling tours to manipulate inventory), TravelNest reserves the immediate right to cancel all active bookings associated with the account without issuing any refunds. The account will be permanently suspended pending legal review.</p>
+            <p>If our automated security systems detect fraudulent behavior, stolen credit card usage, or systemic abuse of the cancellation system (such as repeatedly booking and canceling tours to manipulate inventory), Vaitour reserves the immediate right to cancel all active bookings associated with the account without issuing any refunds. The account will be permanently suspended pending legal review.</p>
           </section>
 
           <section id="disputes" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <AlertTriangle size={28} color="#64748b" /> Disputes & Chargebacks
             </h2>
-            <p>If you bypass our support team and unfairly initiate a credit card chargeback with your bank for a booking that was clearly marked non-refundable, your TravelNest account will be immediately frozen. We vigorously dispute fraudulent chargebacks using system logs, GPS check-in data from suppliers, and digital communication records. We always encourage resolving disputes directly with our customer support first.</p>
+            <p>If you bypass our support team and unfairly initiate a credit card chargeback with your bank for a booking that was clearly marked non-refundable, your Vaitour account will be immediately frozen. We vigorously dispute fraudulent chargebacks using system logs, GPS check-in data from suppliers, and digital communication records. We always encourage resolving disputes directly with our customer support first.</p>
           </section>
 
           <section id="policy-changes" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <FileText size={28} color="#334155" /> Changes to the Policy
             </h2>
-            <p>TravelNest firmly reserves the right to amend, modify, or update this refund policy at any time to reflect changing global travel regulations. However, you are always protected: the specific policy version that was active and displayed at the exact time of your booking confirmation will always govern your trip, ensuring absolute fairness and protection against retroactive changes.</p>
+            <p>Vaitour firmly reserves the right to amend, modify, or update this refund policy at any time to reflect changing global travel regulations. However, you are always protected: the specific policy version that was active and displayed at the exact time of your booking confirmation will always govern your trip, ensuring absolute fairness and protection against retroactive changes.</p>
           </section>
 
           <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginTop: '40px' }}>
@@ -217,7 +217,7 @@ export default function RefundPolicyPage() {
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Need manual assistance?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>If you missed your trip due to an emergency, contact us directly.</p>
             </div>
-            <Link href="mailto:support@travelnest.com" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="mailto:support@vaitour.com" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               Contact Support <ArrowRight size={16} />
             </Link>
           </div>

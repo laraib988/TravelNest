@@ -6,8 +6,8 @@ import FaqAccordion from './FaqAccordion';
 // Next.js will naturally pre-render it as a highly optimized static HTML page at build time.
 
 export const metadata: Metadata = {
-  title: 'Frequently Asked Questions | TravelNest',
-  description: 'Find answers to common questions about booking tours, managing payments, and becoming a supplier on TravelNest.',
+  title: 'Frequently Asked Questions | Vaitour',
+  description: 'Find answers to common questions about booking tours, managing payments, and becoming a supplier on Vaitour.',
 };
 
 export default function FaqPage() {
@@ -25,7 +25,7 @@ export default function FaqPage() {
       >
         <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '16px', color: '#ffffff' }}>How can we help you?</h1>
         <p style={{ fontSize: '1.2rem', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto' }}>
-          Browse through our frequently asked questions below to find quick answers about your TravelNest experience.
+          Browse through our frequently asked questions below to find quick answers about your Vaitour experience.
         </p>
       </div>
 

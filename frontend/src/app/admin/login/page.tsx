@@ -10,7 +10,7 @@ import TurnstileWidget from '@/components/TurnstileWidget';
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login, signup } = useAuth();
-  const [email, setEmail] = useState('admin@travelnest.com');
+  const [email, setEmail] = useState('admin@vaitour.com');
   const [password, setPassword] = useState('admin');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     setErrorMsg('');
 
-    const safeEmail = email.toLowerCase() === 'admin' ? 'admin@travelnest.com' : email;
+    const safeEmail = email.toLowerCase() === 'admin' ? 'admin@vaitour.com' : email;
     const safePassword = password === 'admin' ? 'password123' : password;
 
     try {

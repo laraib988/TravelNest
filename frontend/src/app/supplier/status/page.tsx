@@ -214,7 +214,7 @@ export default function SupplierStatusPage() {
               Your account has been permanently banned due to a violation of our Terms of Service or fraudulent activity detected.
             </p>
             <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', padding: '16px', borderRadius: '12px', fontSize: '0.9rem', color: '#b91c1c', fontWeight: 600, marginBottom: '16px' }}>
-              This email address is permanently banned from creating new accounts on TravelNest.
+              This email address is permanently banned from creating new accounts on Vaitour.
             </div>
             {kycRecord?.audit_reasons && kycRecord.audit_reasons.length > 0 && (
               <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', padding: '16px', borderRadius: '12px', textAlign: 'left', marginBottom: '24px' }}>

@@ -67,7 +67,7 @@ export async function PUT(request: Request, { params }: Params) {
       hero_image: body.hero_image || '',
       hero_image_alt: body.hero_image_alt || '',
       images: body.images || [],
-      author_name: body.author_name || 'TravelNest Editorial Team',
+      author_name: body.author_name || 'Vaitour Editorial Team',
       author_bio: body.author_bio || '',
       author_avatar: body.author_avatar || '',
       author_role: body.author_role || 'Contributor',

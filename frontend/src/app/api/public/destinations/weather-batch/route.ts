@@ -58,6 +58,18 @@ async function geocode(name: string): Promise<{ latitude: number; longitude: num
   return null;
 }
 
+const FALLBACK_COORDS: Record<string, { latitude: number; longitude: number }> = {
+  'kyoto': { latitude: 35.0116, longitude: 135.7681 },
+  'osaka': { latitude: 34.6937, longitude: 135.5023 },
+  'tokyo': { latitude: 35.6762, longitude: 139.6503 },
+  'hakone': { latitude: 35.1873, longitude: 139.0438 },
+  'nagano': { latitude: 36.6485, longitude: 138.1942 },
+  'narita': { latitude: 35.7767, longitude: 140.3183 },
+  'gotemba': { latitude: 35.3086, longitude: 138.9344 },
+  'nikko': { latitude: 36.7497, longitude: 139.6053 },
+  'cherry-blossom': { latitude: 35.6762, longitude: 139.6503 },
+};
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -90,7 +102,8 @@ export async function GET(request: Request) {
 
       let coords = geo?.latitude != null && geo?.longitude != null
         ? { latitude: geo.latitude, longitude: geo.longitude }
-        : null;
+        : FALLBACK_COORDS[dest.slug] || null;
+      
       if (!coords) {
         coords = await geocode(dest.country ? `${dest.name}, ${dest.country}` : dest.name);
       }

@@ -13,6 +13,7 @@ export default function AdminBlogNewPage() {
 
   const [form, setForm] = useState<any>({
     title: '',
+    slug: '',
     meta_title: '',
     meta_description: '',
     focus_keywords: [] as string[],
@@ -21,7 +22,7 @@ export default function AdminBlogNewPage() {
     hero_image: '',
     hero_image_alt: '',
     images: [] as { url: string; alt: string }[],
-    author_name: 'TravelNest Editorial Team',
+    author_name: 'Vaitour Editorial Team',
     author_bio: '',
     author_avatar: '',
     author_role: 'Contributor',
@@ -156,6 +157,10 @@ export default function AdminBlogNewPage() {
             <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>SEO</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
+                <label style={labelStyle}>Slug / URL</label>
+                <input style={inputStyle} value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="auto-generated from title" />
+              </div>
+              <div>
                 <label style={labelStyle}>Meta Title (55-60 chars)</label>
                 <input style={inputStyle} value={form.meta_title} onChange={(e) => setForm({ ...form, meta_title: e.target.value })} />
                 <span style={{ fontSize: '0.75rem', color: (form.meta_title || '').length <= 60 ? '#059669' : '#dc2626' }}>
@@ -169,35 +174,34 @@ export default function AdminBlogNewPage() {
                   {(form.meta_description || '').length}/160 characters
                 </span>
               </div>
+              <div>
+                <label style={labelStyle}>FAQs</label>
+                <FaqEditor
+                  value={form.faqs || []}
+                  onChange={(faqs) => setForm({ ...form, faqs })}
+                />
+                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px' }}>
+                  Schema generation runs automatically in the background.
+                </p>
+              </div>
             </div>
           </div>
 
           <div className="admin-stat-card" style={{ padding: '24px' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>FAQs (auto-generates FAQPage schema)</h3>
-            <FaqEditor
-              value={form.faqs || []}
-              onChange={(faqs) => setForm({ ...form, faqs })}
-            />
-          </div>
-
-          <div className="admin-stat-card" style={{ padding: '24px' }}>
             <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Author Information</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px' }}>Global author profile applied across the website.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={labelStyle}>Author Name</label>
-                <input style={inputStyle} value={form.author_name} onChange={(e) => setForm({ ...form, author_name: e.target.value })} />
+                <input style={{...inputStyle, background: '#f8fafc', color: '#64748b', cursor: 'not-allowed'}} readOnly value="Vaitour Editorial Team" />
               </div>
               <div>
                 <label style={labelStyle}>Author Role</label>
-                <input style={inputStyle} value={form.author_role} onChange={(e) => setForm({ ...form, author_role: e.target.value })} />
-              </div>
-              <div>
-                <label style={labelStyle}>Author Avatar URL</label>
-                <input style={inputStyle} value={form.author_avatar} onChange={(e) => setForm({ ...form, author_avatar: e.target.value })} />
+                <input style={{...inputStyle, background: '#f8fafc', color: '#64748b', cursor: 'not-allowed'}} readOnly value="Travel Experts" />
               </div>
               <div>
                 <label style={labelStyle}>Author Bio</label>
-                <textarea style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' }} value={form.author_bio} onChange={(e) => setForm({ ...form, author_bio: e.target.value })} />
+                <textarea style={{ ...inputStyle, background: '#f8fafc', color: '#64748b', cursor: 'not-allowed', minHeight: '70px', resize: 'vertical' }} readOnly value="Expert travel guides, itineraries, and tips from the Vaitour team." />
               </div>
             </div>
           </div>

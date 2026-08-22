@@ -96,7 +96,7 @@ export default function SupplierPage() {
       name: 'Ahmed Raza',
       role: 'Founder, Lahore Food Trails',
       location: 'Lahore, Pakistan',
-      quote: 'TravelNest transformed our small food tour business. We went from 5 bookings a month to over 60. The dashboard makes everything seamless.',
+      quote: 'Vaitour transformed our small food tour business. We went from 5 bookings a month to over 60. The dashboard makes everything seamless.',
       rating: 5
     },
     {
@@ -117,12 +117,12 @@ export default function SupplierPage() {
 
   const faqs = [
     {
-      q: 'What types of businesses can join TravelNest?',
+      q: 'What types of businesses can join Vaitour?',
       a: 'Tour operators, activity providers, food experience hosts, adventure companies, cultural guides, and any business offering travel experiences can apply.'
     },
     {
       q: 'What is the commission structure?',
-      a: 'TravelNest charges a transparent 15% commission on each booking. There are no listing fees, no monthly subscriptions, and no hidden charges.'
+      a: 'Vaitour charges a transparent 15% commission on each booking. There are no listing fees, no monthly subscriptions, and no hidden charges.'
     },
     {
       q: 'How quickly will I receive payouts?',
@@ -134,7 +134,7 @@ export default function SupplierPage() {
     },
     {
       q: 'Is there a minimum booking requirement?',
-      a: 'No minimum requirements. Whether you run 1 tour per week or 50 per day, TravelNest scales with your business.'
+      a: 'No minimum requirements. Whether you run 1 tour per week or 50 per day, Vaitour scales with your business.'
     },
   ];
 
@@ -190,7 +190,7 @@ export default function SupplierPage() {
                 margin: '0 0 16px',
                 letterSpacing: '-0.02em'
               }}>
-                Grow Your Travel Business with TravelNest
+                Grow Your Travel Business with Vaitour
               </h1>
 
               <p style={{
@@ -262,7 +262,7 @@ export default function SupplierPage() {
               >
                 <img
                   src="/supplier-hero.jpg"
-                  alt="Travel tour operator using TravelNest platform"
+                  alt="Travel tour operator using Vaitour platform"
                   style={{
                     width: '100%',
                     height: '420px',
@@ -295,7 +295,7 @@ export default function SupplierPage() {
             PARTNER BENEFITS
           </span>
           <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px' }}>
-            Why Operators Choose TravelNest
+            Why Operators Choose Vaitour
           </h2>
           <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '560px', margin: '0 auto', lineHeight: 1.6 }}>
             Everything you need to list, manage, and scale your travel experiences — all in one platform.
@@ -632,7 +632,7 @@ export default function SupplierPage() {
             Ready to Grow Your Business?
           </h2>
           <p style={{ fontSize: '1.05rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: '0 0 28px' }}>
-            Join 500+ tour operators already earning more with TravelNest. Zero listing fees — pay only when you earn.
+            Join 500+ tour operators already earning more with Vaitour. Zero listing fees — pay only when you earn.
           </p>
           <Link
             href="/supplier/signup"

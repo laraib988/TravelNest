@@ -11,7 +11,14 @@ const SUPPORTED_LOCALES = ['en', 'ja', 'ur', 'fr', 'ar'];
 const DEFAULT_LOCALE = 'en';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, hostname } = request.nextUrl;
+
+  // 0. WWW Redirect (Force www.vaitour.com)
+  if (hostname === 'vaitour.com') {
+    const wwwUrl = new URL(request.url);
+    wwwUrl.hostname = 'www.vaitour.com';
+    return NextResponse.redirect(wwwUrl, 301);
+  }
 
   // 1. Only apply rate limiting to API routes
   if (pathname.startsWith('/api/')) {

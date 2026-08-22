@@ -54,7 +54,7 @@ export default function SupplierLoginPage() {
       >
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div className="badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-            <ShieldCheck size={14} /> TravelNest Partner Portal
+            <ShieldCheck size={14} /> Vaitour Partner Portal
           </div>
           <h2 style={{ fontSize: '1.75rem', color: '#0f172a', fontWeight: 800, marginBottom: '6px' }}>
             Welcome Back!

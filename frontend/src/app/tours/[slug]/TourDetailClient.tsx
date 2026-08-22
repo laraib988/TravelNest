@@ -13,13 +13,13 @@ const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
 const TourReviews = dynamic(() => import('@/components/tours/TourReviews'));
 const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWidget'));
 
-export default function TourDetailPage() {
+export default function TourDetailPage({ initialTour }: { initialTour?: any }) {
   const { formatPrice, t } = useCurrency();
   const params = useParams();
   const slug = params.slug as string;
 
-  const [tour, setTour] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [tour, setTour] = useState<any>(initialTour || null);
+  const [loading, setLoading] = useState(!initialTour);
 
   // SRS 9.14: Contextual AI Q&A State
   const [aiQuestion, setAiQuestion] = useState('');
@@ -31,16 +31,18 @@ export default function TourDetailPage() {
     window.scrollTo(0, 0);
     async function loadTour() {
       try {
-        let res;
-        try {
-          res = await fetchFromAPI(`/listings/${slug}`);
-        } catch (backendErr) {
-          // Fallback to Next.js API for Supabase products
-          const nextRes = await fetch(`/api/public/listings/${slug}`);
-          if (!nextRes.ok) throw new Error('Not found in Supabase');
-          res = await nextRes.json();
+        let res = initialTour;
+        if (!res) {
+          try {
+            res = await fetchFromAPI(`/listings/${slug}`);
+          } catch (backendErr) {
+            // Fallback to Next.js API for Supabase products
+            const nextRes = await fetch(`/api/public/listings/${slug}`);
+            if (!nextRes.ok) throw new Error('Not found in Supabase');
+            res = await nextRes.json();
+          }
+          setTour(res);
         }
-        setTour(res);
         
         // Fetch relevant products
         try {
@@ -170,7 +172,7 @@ export default function TourDetailPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '40px' }}>
               {tour.inclusions?.length > 0 && (
                 <div>
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>{t('whats_included')}</h3>
+                  <h2 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>{t('whats_included')}</h2>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {tour.inclusions.map((item: string, idx: number) => (
                       <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '1rem', color: '#334155' }}>
@@ -182,7 +184,7 @@ export default function TourDetailPage() {
               )}
               {tour.know_before_you_go?.length > 0 && (
                 <div>
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>{t('whats_excluded')}</h3>
+                <h2 style={{ fontSize: '1.4rem', marginBottom: '16px', color: '#0f172a' }}>{t('whats_excluded')}</h2>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', color: 'var(--text-secondary)' }}>
                     {tour.know_before_you_go.map((item: string, idx: number) => (
                       <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>

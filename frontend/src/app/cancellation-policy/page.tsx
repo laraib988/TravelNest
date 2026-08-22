@@ -8,8 +8,8 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Cancellation Policy | TravelNest',
-  description: 'Detailed, real-world cancellation guidelines, grace periods, and tier-based rules for all TravelNest bookings.',
+  title: 'Cancellation Policy | Vaitour',
+  description: 'Detailed, real-world cancellation guidelines, grace periods, and tier-based rules for all Vaitour bookings.',
 };
 
 export default function CancellationPolicyPage() {
@@ -74,7 +74,7 @@ export default function CancellationPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <List size={28} color="#0284c7" /> Cancellation Tiers
             </h2>
-            <p>Every tour, hotel, and experience on TravelNest is assigned a specific "Cancellation Tier" by the local supplier. You will always see this tier clearly badged on the booking page before you pay. The rules of your specific tier are legally binding the moment your booking is confirmed. If you cancel, the system applies the rules of your designated tier automatically.</p>
+            <p>Every tour, hotel, and experience on Vaitour is assigned a specific "Cancellation Tier" by the local supplier. You will always see this tier clearly badged on the booking page before you pay. The rules of your specific tier are legally binding the moment your booking is confirmed. If you cancel, the system applies the rules of your designated tier automatically.</p>
           </section>
 
           <section id="sec-2" style={{ marginBottom: '40px' }}>
@@ -109,7 +109,7 @@ export default function CancellationPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <MousePointer size={28} color="#06b6d4" /> How to Cancel Your Booking
             </h2>
-            <p>Cancellations must be executed through the TravelNest platform to be considered valid. Sending an email to the supplier or calling them does not officially cancel your trip in our system. You must log in, visit the "My Bookings" tab, select your itinerary, and click the red "Cancel" button. The timestamp of that click defines your cancellation window.</p>
+            <p>Cancellations must be executed through the Vaitour platform to be considered valid. Sending an email to the supplier or calling them does not officially cancel your trip in our system. You must log in, visit the "My Bookings" tab, select your itinerary, and click the red "Cancel" button. The timestamp of that click defines your cancellation window.</p>
           </section>
 
           <section id="sec-7" style={{ marginBottom: '40px' }}>
@@ -144,14 +144,14 @@ export default function CancellationPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <MapPin size={28} color="#0ea5e9" /> Flight & Transit Issues
             </h2>
-            <p>TravelNest is not responsible for delayed flights, canceled trains, or heavy traffic. Local guides are paid for their reserved time. If a transit delay causes you to miss a tour, it is treated as a late arrival/no-show. We strongly recommend booking experiences with a safe buffer after your flight lands.</p>
+            <p>Vaitour is not responsible for delayed flights, canceled trains, or heavy traffic. Local guides are paid for their reserved time. If a transit delay causes you to miss a tour, it is treated as a late arrival/no-show. We strongly recommend booking experiences with a safe buffer after your flight lands.</p>
           </section>
 
           <section id="sec-12" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <CreditCard size={28} color="#15803d" /> Account Credits & Vouchers
             </h2>
-            <p>If you opt to cancel a non-refundable booking, a host may occasionally offer you TravelNest Account Credits as a gesture of goodwill instead of a cash refund. Once you accept account credits or a voucher for a future date, your original booking is considered officially canceled and cannot be reinstated or disputed for cash later.</p>
+            <p>If you opt to cancel a non-refundable booking, a host may occasionally offer you Vaitour Account Credits as a gesture of goodwill instead of a cash refund. Once you accept account credits or a voucher for a future date, your original booking is considered officially canceled and cannot be reinstated or disputed for cash later.</p>
           </section>
 
           <section id="sec-13" style={{ marginBottom: '40px' }}>
@@ -165,7 +165,7 @@ export default function CancellationPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Shield size={28} color="#4f46e5" /> Safety & Security Threats
             </h2>
-            <p>If a verified security threat, act of terrorism, severe political unrest, or a sudden Level 4 "Do Not Travel" advisory is issued by the government for your specific destination, TravelNest will immediately activate our emergency cancellation protocol, allowing all guests in the affected region to cancel without penalty.</p>
+            <p>If a verified security threat, act of terrorism, severe political unrest, or a sudden Level 4 "Do Not Travel" advisory is issued by the government for your specific destination, Vaitour will immediately activate our emergency cancellation protocol, allowing all guests in the affected region to cancel without penalty.</p>
           </section>
 
           <section id="sec-15" style={{ marginBottom: '40px' }}>
@@ -179,7 +179,7 @@ export default function CancellationPolicyPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <UserCheck size={28} color="#0284c7" /> Third-Party Agent Bookings
             </h2>
-            <p>If your reservation was made through a third-party affiliate, concierge service, or external travel agent using the TravelNest platform, you must initiate the cancellation through that specific agent. TravelNest support cannot manually override or cancel bookings that are professionally managed by an external B2B partner account.</p>
+            <p>If your reservation was made through a third-party affiliate, concierge service, or external travel agent using the Vaitour platform, you must initiate the cancellation through that specific agent. Vaitour support cannot manually override or cancel bookings that are professionally managed by an external B2B partner account.</p>
           </section>
 
           <section id="sec-17" style={{ marginBottom: '40px' }}>

@@ -1,10 +1,12 @@
 import TourSearchClient from './TourSearchClient';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
-  // In Next.js App Router, to set Cache-Control headers for a page,
-  // we either rely on fetch cache options or route segment config.
-  // We use force-dynamic to ensure SSR per request.
-  return <TourSearchClient />;
+  return (
+    <Suspense fallback={<div style={{ padding: '100px', textAlign: 'center' }}>Loading...</div>}>
+      <TourSearchClient />
+    </Suspense>
+  );
 }

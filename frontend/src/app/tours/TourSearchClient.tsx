@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { MapPin, Clock, Star, ArrowRight, Loader2, Compass, AlertCircle } from 'lucide-react';
-
-
 
 interface Tour {
   id: string;
@@ -21,14 +20,19 @@ interface Tour {
 }
 
 export default function AllExperiencesPage() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams?.get('search') || '';
+
   const [tours, setTours] = useState<Tour[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     async function fetchTours() {
+      setIsLoading(true);
       try {
-        const res = await fetch('/api/public/listings');
+        const url = searchQuery ? `/api/public/listings?search=${encodeURIComponent(searchQuery)}` : '/api/public/listings';
+        const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to load experiences');
         const data = await res.json();
         setTours(data);
@@ -39,7 +43,7 @@ export default function AllExperiencesPage() {
       }
     }
     fetchTours();
-  }, []);
+  }, [searchQuery]);
 
   return (
     <>
@@ -67,7 +71,7 @@ export default function AllExperiencesPage() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-              All Available Tours <span style={{ color: '#64748b', fontSize: '1.2rem', fontWeight: 500 }}>({tours.length})</span>
+              {searchQuery ? `Results for "${searchQuery}"` : 'All Available Tours'} <span style={{ color: '#64748b', fontSize: '1.2rem', fontWeight: 500 }}>({tours.length})</span>
             </h2>
           </div>
 
@@ -168,6 +172,19 @@ export default function AllExperiencesPage() {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
+
+          {/* SEO PAGINATION (Crawl Budget Optimization) */}
+          {!isLoading && !error && tours.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '60px' }}>
+              <Link href="?page=1" style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', textDecoration: 'none', color: '#0f172a', fontWeight: 600, background: '#fff' }}>1</Link>
+              <Link href="?page=2" style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', textDecoration: 'none', color: '#64748b', fontWeight: 600, background: '#f8fafc' }}>2</Link>
+              <Link href="?page=3" style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', textDecoration: 'none', color: '#64748b', fontWeight: 600, background: '#f8fafc' }}>3</Link>
+              <span style={{ padding: '8px' }}>...</span>
+              <Link href="?page=2" style={{ padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', textDecoration: 'none', color: '#0f172a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Next <ArrowRight size={16} />
+              </Link>
             </div>
           )}
 

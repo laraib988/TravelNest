@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import Groq from 'groq-sdk';
 
 // ============================================================================
-// TravelNest · Daily Travel Blog Engine
+// Vaitour · Daily Travel Blog Engine
 // Generates publication-ready, SEO-optimized travel articles via Groq,
 // then persists them to Supabase as DRAFTS (never auto-published).
 // ============================================================================
@@ -251,7 +251,7 @@ function buildArticleSchema(article: BlogArticle) {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'TravelNest',
+      name: 'Vaitour',
       logo: { '@type': 'ImageObject', url: `${APP_URL}/logo.png` },
     },
     mainEntityOfPage: `${APP_URL}/blog/${article.slug}`,
@@ -312,7 +312,7 @@ function buildPrompt(topic: DestinationTopic, author: { name: string; role: stri
     .map((l) => `- ${l}`)
     .join('\n');
 
-  return `You are a senior travel SEO editor writing for TravelNest, a global tour marketplace.
+  return `You are a senior travel SEO editor writing for Vaitour, a global tour marketplace.
 Write a complete, publication-ready travel article about **${topic.name}, ${topic.country}**.
 Byline author: ${author.name} (${author.role}).
 
@@ -334,7 +334,7 @@ STRICT LENGTH: 1,800 to 2,200 words.
 7. ## FAQs — exactly 4 questions with detailed 2-3 sentence answers.
 
 # INTERNAL LINKS
-Weave these TravelNest links naturally into the prose (use markdown links):
+Weave these Vaitour links naturally into the prose (use markdown links):
 ${internalLinks}
 
 # EXTERNAL LINKS

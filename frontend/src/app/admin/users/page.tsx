@@ -86,7 +86,7 @@ export default function UsersManagementPage() {
           {
             id: 'usr-3',
             name: 'Admin Administrator',
-            email: 'admin@travelnest.com',
+            email: 'admin@vaitour.com',
             phone: '+1 800 555 0100',
             role: 'ADMIN',
             avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',

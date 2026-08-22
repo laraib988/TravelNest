@@ -66,9 +66,9 @@ export default function AboutUsPage() {
           {/* Abstract globe/map pattern background overlay could go here */}
           <div style={{ position: 'relative', zIndex: 10, maxWidth: '900px', margin: '0 auto' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '8px 16px', borderRadius: '30px', color: '#38bdf8', fontWeight: 700, fontSize: '0.9rem', marginBottom: '24px' }}>
-              <Globe2 size={16} /> Welcome to TravelNest
+              <Globe2 size={16} /> Welcome to Vaitour
             </div>
-            <h1 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '24px', lineHeight: 1.1, letterSpacing: '-1px' }}>
+            <h1 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '24px', lineHeight: 1.1, letterSpacing: '-1px', color: '#fff' }}>
               Redefining the way the world <span style={{ color: '#38bdf8' }}>explores.</span>
             </h1>
             <p style={{ fontSize: '1.25rem', color: '#cbd5e1', lineHeight: 1.6, maxWidth: '700px', margin: '0 auto' }}>
@@ -112,15 +112,23 @@ export default function AboutUsPage() {
         <div style={{ maxWidth: '1200px', margin: '0 auto 80px', padding: '0 24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
             <div>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px', lineHeight: 1.2 }}>
-                Empowering locals.<br />Inspiring travelers.
-              </h2>
-              <p style={{ fontSize: '1.1rem', color: '#475569', lineHeight: 1.8, marginBottom: '20px' }}>
-                TravelNest was founded on a simple premise: the best travel experiences aren't found in mass-market brochures. They are found in the stories, skills, and passions of local residents. 
-              </p>
-              <p style={{ fontSize: '1.1rem', color: '#475569', lineHeight: 1.8 }}>
-                By providing a powerful, real-time technological platform, we empower local guides, artisans, and small businesses to instantly share their world. In turn, travelers gain unprecedented access to authentic, deeply immersive adventures that leave a positive economic footprint on the communities they visit.
-              </p>
+              <div style={{ marginBottom: '40px' }}>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <TrendingUp size={28} color="#0ea5e9" /> Our Mission
+                </h2>
+                <p style={{ fontSize: '1.1rem', color: '#475569', lineHeight: 1.8 }}>
+                  To democratize global travel by providing a powerful, real-time technological platform that empowers local guides, artisans, and small businesses to seamlessly share their world directly with travelers. We strive to eliminate intermediaries and return value to the communities that host us.
+                </p>
+              </div>
+              
+              <div>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Globe2 size={28} color="#8b5cf6" /> Our Vision
+                </h2>
+                <p style={{ fontSize: '1.1rem', color: '#475569', lineHeight: 1.8 }}>
+                  To become the world's most trusted, sustainable, and authentic marketplace for human connection. We envision a borderless ecosystem where every traveler has unprecedented access to deeply immersive adventures that leave a positive, lasting economic footprint on every corner of the globe.
+                </p>
+              </div>
             </div>
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', inset: '-10px', background: 'linear-gradient(135deg, #38bdf8 0%, #8b5cf6 100%)', borderRadius: '24px', opacity: 0.2, filter: 'blur(20px)' }}></div>
@@ -136,7 +144,7 @@ export default function AboutUsPage() {
         {/* THE TRAVELNEST DIFFERENCE */}
         <div style={{ maxWidth: '1200px', margin: '0 auto 100px', padding: '0 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>The TravelNest Difference</h2>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>The Vaitour Difference</h2>
             <p style={{ fontSize: '1.15rem', color: '#64748b', maxWidth: '700px', margin: '0 auto' }}>What separates us from legacy travel agencies and outdated booking engines.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
@@ -175,7 +183,7 @@ export default function AboutUsPage() {
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '60px' }}>
               <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Our Core Values</h2>
-              <p style={{ fontSize: '1.15rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>The principles that drive every engineering decision and business partnership at TravelNest.</p>
+              <p style={{ fontSize: '1.15rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>The principles that drive every engineering decision and business partnership at Vaitour.</p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
@@ -236,7 +244,7 @@ export default function AboutUsPage() {
         <div style={{ padding: '100px 24px', textAlign: 'center' }}>
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>Ready to explore the world?</h2>
-            <p style={{ fontSize: '1.2rem', color: '#64748b', marginBottom: '40px' }}>Join the millions of travelers discovering the globe with TravelNest.</p>
+            <p style={{ fontSize: '1.2rem', color: '#64748b', marginBottom: '40px' }}>Join the millions of travelers discovering the globe with Vaitour.</p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
               <Link href="/tours" className="btn-primary" style={{ padding: '14px 32px', fontSize: '1.1rem', display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
                 Find an Experience <ArrowRight size={20} />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import DestinationNews from '@/components/DestinationNews';
 import DestinationWeather from '@/components/DestinationWeather';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -39,10 +40,21 @@ interface Destination {
 interface Props {
   destination: Destination;
   relatedProducts: any[];
+  nearbyDestinations?: any[];
   locale: string;
 }
 
-export default function DestinationDetailsClient({ destination, relatedProducts, locale }: Props) {
+export default function DestinationDetailsClient({ destination, relatedProducts, nearbyDestinations = [], locale }: Props) {
+  const cloudinaryLoader = ({ src, width, quality }: any) => {
+    if (src.startsWith('http')) {
+      if (src.includes('cloudinary.com')) {
+        return src.replace('/upload/', `/upload/f_auto,q_${quality || 'auto'},w_${width}/`);
+      }
+      return src;
+    }
+    return `https://res.cloudinary.com/vaitour/image/upload/f_auto,q_${quality || 'auto'},w_${width}/${src}`;
+  };
+
   const { t, formatPrice, wishlist, toggleWishlist } = useCurrency();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
@@ -85,10 +97,13 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
     <div style={{ background: '#ffffff', minHeight: '100vh' }}>
       {/* SECTION 1: HERO SECTION */}
       <section style={{ position: 'relative', height: '75vh', minHeight: '480px', overflow: 'hidden' }}>
-        <img
+        <Image
+          loader={cloudinaryLoader}
           src={destination.hero_image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=80'}
           alt={destination.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          fill
+          priority
+          style={{ objectFit: 'cover' }}
         />
         <div style={{
           position: 'absolute', inset: 0,
@@ -136,7 +151,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
               lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
               fontFamily: 'var(--font-heading)'
             }}>
-              {destination.name}
+              {destination.name} Tours, Activities & Things to Do
             </h1>
           </div>
           <p style={{
@@ -378,8 +393,8 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
           </section>
         )}
 
-        {/* SECTION 6: GALLERY */}
-        {gallery.length > 0 && (
+        {/* SECTION 6: GALLERY (Hidden per user request) */}
+        {false && gallery.length > 0 && (
           <section style={{ padding: '64px 0', borderTop: '1px solid #f1f5f9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <Camera size={22} color="#f43f5e" />
@@ -492,11 +507,11 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                       boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                     }}>
                       {item.image && (
-                        <div style={{ width: '220px', flexShrink: 0, overflow: 'hidden' }}>
+                        <div style={{ width: '260px', flexShrink: 0, overflow: 'hidden' }}>
                           <img
                             src={item.image}
                             alt={item.title}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '160px' }}
+                            style={{ width: '100%', height: '180px', objectFit: 'cover' }}
                           />
                         </div>
                       )}
@@ -767,6 +782,45 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                     </div>
                   )}
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* SECTION 10: NEARBY DESTINATIONS */}
+        {nearbyDestinations.length > 0 && (
+          <section style={{ padding: '64px 0', borderTop: '1px solid #f1f5f9' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <MapPin size={22} color="#059669" />
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+                Nearby Destinations
+              </h2>
+            </div>
+            <p style={{ color: '#64748b', fontSize: '1.05rem', marginBottom: '32px' }}>
+              Explore more top-rated locations and expand your journey.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+              {nearbyDestinations.map((dest, idx) => (
+                <Link key={idx} href={`/destinations/${dest.slug}`} style={{ textDecoration: 'none' }}>
+                  <div style={{
+                    borderRadius: '16px', overflow: 'hidden', position: 'relative', height: '220px',
+                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', transition: 'transform 0.2s',
+                    background: '#000'
+                  }}>
+                    <Image 
+                      loader={cloudinaryLoader}
+                      src={dest.hero_image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=80'}
+                      alt={dest.name}
+                      fill
+                      style={{ objectFit: 'cover', opacity: 0.9, transition: 'opacity 0.2s' }}
+                    />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.4) 50%, transparent 100%)' }} />
+                    <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', color: '#ffffff', zIndex: 2 }}>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '0 0 4px', color: '#ffffff', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{dest.name}</h3>
+                      <p style={{ margin: 0, fontSize: '0.95rem', color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>{dest.country}</p>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </section>

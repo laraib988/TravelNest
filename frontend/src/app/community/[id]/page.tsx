@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   if (!discussion) return { title: 'Discussion Not Found' };
   
   return {
-    title: `${discussion.title} | TravelNest Community`,
+    title: `${discussion.title} | Vaitour Community`,
     description: discussion.content.substring(0, 150) + '...',
   };
 }

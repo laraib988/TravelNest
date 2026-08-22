@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 const apiKey = process.env.RESEND_API_KEY || '';
-const from = process.env.EMAIL_FROM || 'TravelNest <onboarding@resend.dev>';
+const from = process.env.EMAIL_FROM || 'Vaitour <onboarding@resend.dev>';
 const appUrl = process.env.APP_URL || 'http://localhost:3000';
 
 // Singleton Resend client (only create it if an API key is configured)
@@ -37,7 +37,7 @@ function layout(body: string): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TravelNest</title>
+  <title>Vaitour</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:24px 12px;">
@@ -56,14 +56,14 @@ function layout(body: string): string {
           <tr>
             <td style="background:#0f172a;padding:22px 32px;text-align:center;">
               <div style="color:#94a3b8;font-size:12px;line-height:1.7;">
-                <strong style="color:#e2e8f0;">TravelNest</strong> · Crafted experiences around the world<br/>
+                <strong style="color:#e2e8f0;">Vaitour</strong> · Crafted experiences around the world<br/>
                 This is an automated email. Please do not reply directly.<br/>
-                <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">Visit TravelNest</a>
+                <a href="${appUrl}" style="color:#38bdf8;text-decoration:none;">Visit Vaitour</a>
               </div>
             </td>
           </tr>
         </table>
-        <div style="color:#94a3b8;font-size:11px;margin-top:14px;text-align:center;">© ${new Date().getFullYear()} TravelNest. All rights reserved.</div>
+        <div style="color:#94a3b8;font-size:11px;margin-top:14px;text-align:center;">© ${new Date().getFullYear()} Vaitour. All rights reserved.</div>
       </td>
     </tr>
   </table>
@@ -205,7 +205,7 @@ export function customerBookingConfirmationHtml(data: BookingEmailData): string 
               &#128274; <strong>Security tip:</strong> Please change your password after your first login.
             </div>
             <div style="margin-top:16px;text-align:center;">
-              <a href="${appUrl}/login" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:11px 26px;border-radius:10px;">Log in to TravelNest</a>
+              <a href="${appUrl}/login" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:11px 26px;border-radius:10px;">Log in to Vaitour</a>
             </div>
           </td>
         </tr>
@@ -352,7 +352,7 @@ export async function sendOtpEmail(email: string, otp_code: string): Promise<{ s
     await resend.emails.send({
       from,
       to: email,
-      subject: 'Your TravelNest Verification Code',
+      subject: 'Your Vaitour Verification Code',
       html: checkoutOtpHtml({ email, otp_code, appUrl }),
     });
     return { success: true };
@@ -374,7 +374,7 @@ export async function sendBookingEmails(data: BookingEmailData): Promise<{ custo
       await resend.emails.send({
         from,
         to: customerEmail,
-        subject: `Booking Confirmed · ${data.booking_reference} · TravelNest`,
+        subject: `Booking Confirmed · ${data.booking_reference} · Vaitour`,
         html: customerBookingConfirmationHtml(data),
       });
     } catch (e: any) {
@@ -390,7 +390,7 @@ export async function sendBookingEmails(data: BookingEmailData): Promise<{ custo
       await resend.emails.send({
         from,
         to: supplierEmail,
-        subject: `New Order Received · ${data.booking_reference} · TravelNest`,
+        subject: `New Order Received · ${data.booking_reference} · Vaitour`,
         html: supplierNewOrderHtml(data),
       });
     } catch (e: any) {

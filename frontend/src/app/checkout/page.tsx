@@ -461,7 +461,7 @@ useEffect(() => {
           {accountCreated && accountCredentials && (
             <div style={{ background: '#fffbeb', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid #fde68a', marginBottom: '32px' }}>
               <h3 style={{ fontSize: '1.1rem', color: '#92400e', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <KeyRound size={18} /> Your TravelNest Account Credentials
+                <KeyRound size={18} /> Your Vaitour Account Credentials
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', fontSize: '0.9rem' }}>
                 <div>
@@ -616,7 +616,7 @@ useEffect(() => {
 
               {accountCreated && accountCredentials && (
                 <div style={{ marginTop: '12px', padding: '14px', borderRadius: 'var(--radius-sm)', background: '#fffbeb', border: '1px solid #fde68a', fontSize: '0.85rem', color: '#92400e' }}>
-                  <strong>&#127881; Welcome! We created your TravelNest account.</strong>
+                  <strong>&#127881; Welcome! We created your Vaitour account.</strong>
                   <div style={{ marginTop: '6px', lineHeight: 1.7 }}>
                     Email: <strong>{accountCredentials.email}</strong><br/>
                     Temporary Password: <strong>{accountCredentials.temporary_password}</strong>

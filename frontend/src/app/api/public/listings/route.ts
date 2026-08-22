@@ -84,6 +84,23 @@ export async function GET(req: Request) {
       });
     }
 
+    // Fetch real-time reviews for these products
+    const productIds = filteredProducts.map(p => p.id);
+    const { data: reviewsData } = await supabaseAdmin
+      .from('reviews')
+      .select('listing_id, rating')
+      .in('listing_id', productIds)
+      .eq('status', 'APPROVED');
+
+    const reviewsMap: Record<string, { total: number, count: number }> = {};
+    if (reviewsData) {
+      for (const r of reviewsData) {
+        if (!reviewsMap[r.listing_id]) reviewsMap[r.listing_id] = { total: 0, count: 0 };
+        reviewsMap[r.listing_id].total += r.rating || 5;
+        reviewsMap[r.listing_id].count += 1;
+      }
+    }
+
     const mappedListings = filteredProducts.map(p => {
       const title = p.basic_info?.title || 'Untitled Product';
       const slugifiedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -111,6 +128,10 @@ export async function GET(req: Request) {
         durationStr = sorted[0].duration || '2 hours';
       }
 
+      const productReviews = reviewsMap[p.id];
+      const cachedReviewCount = productReviews?.count || 0;
+      const cachedRatingAvg = cachedReviewCount > 0 ? Number((productReviews.total / productReviews.count).toFixed(1)) : 0;
+
       return {
         id: p.id,
         duration: durationStr,
@@ -122,8 +143,8 @@ export async function GET(req: Request) {
         base_price: minPrice,
         pricing_type: minPricingType,
         currency: 'USD',
-        cached_rating_avg: p.cached_rating_avg !== undefined ? p.cached_rating_avg : 5.0,
-        cached_review_count: p.cached_review_count !== undefined ? p.cached_review_count : 0,
+        cached_rating_avg: cachedRatingAvg,
+        cached_review_count: cachedReviewCount,
         duration_minutes: p.basic_info?.durationMinutes || 120,
         merchandising_badges: p.merchandising_badges || ['NEW'],
         slug: p.slug || `${slugifiedTitle}-${p.id}`,

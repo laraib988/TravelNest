@@ -36,8 +36,9 @@ export default function Header() {
   const { t } = useCurrency();
 
   // On admin and supplier pages, hide the public customer header
-  const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '';
-  if (cleanPath.startsWith('/admin') || cleanPath.startsWith('/supplier')) {
+  const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '').replace(/\/$/, '') || '';
+  const isSupplierLanding = cleanPath === '/supplier';
+  if (cleanPath.startsWith('/admin') || (cleanPath.startsWith('/supplier') && !isSupplierLanding)) {
     return null;
   }
   
@@ -77,17 +78,21 @@ export default function Header() {
   }, []);
 
   const [featuredCities, setFeaturedCities] = useState<any[]>([]);
+  const [activeHoverCountry, setActiveHoverCountry] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDestinations = async () => {
       const { data, error } = await supabase
         .from('destinations')
-        .select('name, country, slug')
+        .select('name, country, slug, hero_image')
         .eq('is_published', true)
-        .limit(8);
+        .limit(20);
         
       if (!error && data) {
         setFeaturedCities(data);
+        if (data.length > 0) {
+          setActiveHoverCountry(data[0].country);
+        }
       }
     };
     fetchDestinations();
@@ -126,29 +131,58 @@ export default function Header() {
           
           {/* LEFT: BRAND LOGO */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
-            <div 
-              style={{ 
-                background: 'var(--brand-gradient)', 
-                padding: '9px', 
-                borderRadius: '14px', 
-                display: 'flex', 
-                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' 
-              }}
-            >
-              <Compass size={22} color="#ffffff" />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Vaitour Logo" 
+              style={{ width: '38px', height: '38px', objectFit: 'contain' }} 
+            />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }} className="gradient-text">
-                TravelNest
+                Vaitour
               </span>
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>
+              {/* <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>
                 Marketplace OTA
-              </span>
+              </span> */}
             </div>
           </Link>
 
-          {/* CENTER IS EMPTY */}
-          <div style={{ flex: 1 }} />
+          {/* CENTER: SEARCH BAR (NOT ON HOMEPAGE) */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', paddingLeft: '32px' }}>
+            {cleanPath !== '' && (
+              <form 
+                action="/tours" 
+                method="get" 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  background: '#f1f5f9', 
+                  borderRadius: '100px', 
+                  padding: '6px 16px', 
+                  width: '100%', 
+                  maxWidth: '380px',
+                  border: '1px solid #e2e8f0',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)'
+                }}
+              >
+                <input 
+                  type="text" 
+                  name="search" 
+                  placeholder="Search destinations or activities" 
+                  style={{ 
+                    flex: 1, 
+                    background: 'transparent', 
+                    border: 'none', 
+                    outline: 'none', 
+                    fontSize: '0.95rem', 
+                    color: '#0f172a' 
+                  }} 
+                />
+                <button type="submit" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+              </form>
+            )}
+          </div>
 
           {/* RIGHT: NAVIGATION LINKS, CURRENCY & 2 SEPARATE AUTH BUTTONS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
@@ -292,7 +326,7 @@ export default function Header() {
       </header>
 
       {/* HEADER 2: SECONDARY NAVIGATION STRIP (NON-STICKY, SCROLLS WITH PAGE) */}
-      {!pathname.startsWith('/supplier') && (
+      {(!cleanPath.startsWith('/supplier') || isSupplierLanding) && (
         <div 
           ref={subHeaderRef}
         style={{ 
@@ -357,56 +391,99 @@ export default function Header() {
                       borderRadius: '18px',
                       boxShadow: '0 14px 40px rgba(15,23,42,0.18)',
                       border: '1px solid #e2e8f0',
-                      width: '280px',
-                      padding: '14px 0',
-                      zIndex: 300
+                      width: '740px',
+                      padding: '0',
+                      zIndex: 300,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden'
                     }}
                   >
-                    <div style={{ padding: '4px 16px 8px', fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Featured Global Cities
+                    <div style={{ display: 'flex', minHeight: '320px' }}>
+                      {/* LEFT COLUMN: COUNTRIES */}
+                      <div style={{ width: '220px', background: '#f8fafc', borderRight: '1px solid #e2e8f0', padding: '16px 12px' }}>
+                        <div style={{ padding: '4px 12px 12px', fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Countries
+                        </div>
+                        {Array.from(new Set(featuredCities.map(c => c.country))).map(country => (
+                          <div
+                            key={country}
+                            onMouseEnter={() => setActiveHoverCountry(country)}
+                            style={{
+                              padding: '10px 12px',
+                              borderRadius: '10px',
+                              cursor: 'pointer',
+                              fontWeight: activeHoverCountry === country ? 700 : 600,
+                              color: activeHoverCountry === country ? '#0284c7' : '#475569',
+                              background: activeHoverCountry === country ? '#e0f2fe' : 'transparent',
+                              transition: 'all 0.2s',
+                              marginBottom: '4px',
+                              fontSize: '0.9rem'
+                            }}
+                          >
+                            {country}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* RIGHT COLUMN: CITIES */}
+                      <div style={{ flex: 1, padding: '16px 16px', background: '#ffffff' }}>
+                        <div style={{ padding: '4px 8px 12px', fontSize: '0.75rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Featured Destinations
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          {featuredCities.filter(c => c.country === activeHoverCountry).map((city) => (
+                            <Link
+                              key={city.slug}
+                              href={`/destinations/${city.slug}`}
+                              onClick={() => setIsDestinationsOpen(false)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '8px',
+                                borderRadius: '12px',
+                                textDecoration: 'none',
+                                transition: 'background 0.2s',
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                            >
+                              <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: '#e2e8f0' }}>
+                                {city.hero_image && (
+                                  <img src={city.hero_image} alt={city.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{city.name}</span>
+                                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{city.country}</span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', padding: '0 10px' }}>
-                      {featuredCities.map((city) => (
-                        <Link
-                          key={city.slug}
-                          href={`/destinations/${city.slug}`}
-                          onClick={() => setIsDestinationsOpen(false)}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            padding: '8px 10px',
-                            borderRadius: '10px',
-                            textDecoration: 'none',
-                            transition: 'background 0.2s',
-                            background: '#f8fafc'
-                          }}
-                        >
-                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{city.name}</span>
-                          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{city.country}</span>
-                        </Link>
-                      ))}
+                    <div style={{ borderTop: '1px solid #e2e8f0', padding: '12px 16px', background: '#ffffff' }}>
+                      <Link
+                        href="/destinations"
+                        onClick={() => setIsDestinationsOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          fontSize: '0.85rem',
+                          fontWeight: 700,
+                          color: '#0284c7',
+                          textDecoration: 'none'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+                      >
+                        <span>Explore All Destinations Globally</span>
+                        <span>→</span>
+                      </Link>
                     </div>
-
-                    <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '10px 0' }} />
-
-                    <Link
-                      href="/destinations"
-                      onClick={() => setIsDestinationsOpen(false)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '6px 16px',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        color: '#0284c7',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      <span>View All Destinations</span>
-                      <span>→</span>
-                    </Link>
                   </div>
                 )}
               </div>
@@ -437,7 +514,7 @@ export default function Header() {
                   }}
                 >
                   <Compass size={15} color="#7c3aed" />
-                  <span>Explore TravelNest</span>
+                  <span>Explore Vaitour</span>
                   <ChevronDown size={14} color="#64748b" style={{ transform: isExploreOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                 </button>
 

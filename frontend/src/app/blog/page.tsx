@@ -10,9 +10,9 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const metadata: Metadata = {
-  title: 'TravelNest Blog — Destination Guides & Travel Tips',
+  title: 'Vaitour Blog — Destination Guides & Travel Tips',
   description:
-    'Expert travel guides, 3-day itineraries, cost breakdowns and local etiquette tips for Japan and beyond. Plan smarter with TravelNest.',
+    'Expert travel guides, 3-day itineraries, cost breakdowns and local etiquette tips for Japan and beyond. Plan smarter with Vaitour.',
 };
 
 async function getPublishedBlogs() {
@@ -41,7 +41,7 @@ export default async function BlogIndexPage() {
           <Sparkles size={14} /> Daily Travel Blog Engine
         </div>
         <h1 style={{ fontSize: '2.5rem', color: '#0f172a', fontWeight: 800, marginBottom: '12px' }}>
-          TravelNest Journal & Destination Guides
+          Vaitour Journal & Destination Guides
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '700px', margin: '0 auto' }}>
           Expert insider guides, food tours, and cultural itineraries — refreshed daily by our editorial AI engine.

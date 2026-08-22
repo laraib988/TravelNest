@@ -31,13 +31,20 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: 'TravelNest - Global Tours, Activities & Experiences Marketplace',
+  title: 'Vaitour - Global Tours, Activities & Experiences Marketplace',
   description: 'Book top-rated tours, sunset cruises, food walks, and experiences worldwide with real-time availability and AI trip planning.',
 };
 
+import { headers } from 'next/headers';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = headers();
+  const locale = headersList.get('x-locale') || 'en';
+  const rtlLocales = ['ur', 'ar'];
+  const dir = rtlLocales.includes(locale) ? 'rtl' : 'ltr';
+
   return (
-    <html lang="en" className={`${jakarta.variable} ${outfit.variable} ${notoJP.variable} ${jetbrainsMono.variable}`}>
+    <html lang={locale} dir={dir} className={`${jakarta.variable} ${outfit.variable} ${notoJP.variable} ${jetbrainsMono.variable}`}>
       <body>
         <CurrencyProvider>
           <AuthProvider>

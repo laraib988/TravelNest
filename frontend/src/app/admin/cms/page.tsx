@@ -42,9 +42,9 @@ export default function CMSPage() {
   // Articles State
   const [articles, setArticles] = useState<CMSArticle[]>([
     { id: 'art-1', title: 'Top 10 Hidden Gems in Walled City Lahore', category: 'Culture & Heritage', author: 'Suneel Pirkash', published_at: '2026-08-05', status: 'PUBLISHED', views: 3420, summary: 'Discover ancient havelis, royal bathhouses, and traditional street food in Lahore.' },
-    { id: 'art-2', title: 'Ultimate Bali Catamaran & Snorkeling Guide', category: 'Outdoor Adventures', author: 'TravelNest Team', published_at: '2026-08-02', status: 'PUBLISHED', views: 5890, summary: 'Complete guide for luxury catamaran cruises around Nusa Penida and Lembongan.' },
+    { id: 'art-2', title: 'Ultimate Bali Catamaran & Snorkeling Guide', category: 'Outdoor Adventures', author: 'Vaitour Team', published_at: '2026-08-02', status: 'PUBLISHED', views: 5890, summary: 'Complete guide for luxury catamaran cruises around Nusa Penida and Lembongan.' },
     { id: 'art-3', title: 'Tokyo Neon Night Food Walks: What to Expect', category: 'Food & Dining', author: 'Ayesha Khan', published_at: '2026-07-28', status: 'PUBLISHED', views: 4120, summary: 'Explore Shinjuku and Omoide Yokocho with local culinary experts.' },
-    { id: 'art-4', title: 'Safety Tips for Solo Backpackers in Skardu', category: 'Travel Advice', author: 'TravelNest Team', published_at: '2026-07-20', status: 'DRAFT', views: 0, summary: 'Essential packing list, altitude guide, and trekking permits for Gilgit-Baltistan.' },
+    { id: 'art-4', title: 'Safety Tips for Solo Backpackers in Skardu', category: 'Travel Advice', author: 'Vaitour Team', published_at: '2026-07-20', status: 'DRAFT', views: 0, summary: 'Essential packing list, altitude guide, and trekking permits for Gilgit-Baltistan.' },
   ]);
 
   // Banners State
@@ -63,7 +63,7 @@ export default function CMSPage() {
   // Modal Control States
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<CMSArticle | null>(null);
-  const [articleForm, setArticleForm] = useState({ title: '', category: 'Culture & Heritage', author: 'TravelNest Team', summary: '', status: 'PUBLISHED' as 'PUBLISHED' | 'DRAFT' });
+  const [articleForm, setArticleForm] = useState({ title: '', category: 'Culture & Heritage', author: 'Vaitour Team', summary: '', status: 'PUBLISHED' as 'PUBLISHED' | 'DRAFT' });
 
   const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
   const [bannerForm, setBannerForm] = useState({ title: '', headline: '', cta_text: 'Explore Now', link_url: '/listings' });

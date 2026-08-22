@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Sitemap | TravelNest',
-  description: 'Navigate the entire TravelNest ecosystem with our comprehensive sitemap.',
+  title: 'Sitemap | Vaitour',
+  description: 'Navigate the entire Vaitour ecosystem with our comprehensive sitemap.',
 };
 
 export default function SitemapPage() {
@@ -25,7 +25,7 @@ export default function SitemapPage() {
       >
         <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Platform Sitemap</h1>
         <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
-          Explore the complete architectural layout of the TravelNest ecosystem. From hidden destinations to our exhaustive legal directories, find exactly what you are looking for in seconds.
+          Explore the complete architectural layout of the Vaitour ecosystem. From hidden destinations to our exhaustive legal directories, find exactly what you are looking for in seconds.
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export default function SitemapPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <Link href="/support" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Support Center</Link>
               <Link href="/faq" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Frequently Asked Questions (FAQ)</Link>
-              {/* <Link href="mailto:support@travelnest.com" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Contact Us</Link> */}
+              {/* <Link href="mailto:support@vaitour.com" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Contact Us</Link> */}
               <Link href="/safety" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Trust & Safety Hub</Link>
               <Link href="/accessibility" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Accessibility Features</Link>
             </div>
@@ -107,7 +107,7 @@ export default function SitemapPage() {
               <Building size={28} color="#d97706" /> Company & Brand
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <Link href="/about" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> About TravelNest</Link>
+              <Link href="/about" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> About Vaitour</Link>
               <Link href="/careers" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Careers & Jobs</Link>
               <Link href="/press" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Press & Media Kit</Link>
               <Link href="/investors" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Investor Relations</Link>
@@ -120,7 +120,7 @@ export default function SitemapPage() {
               <Zap size={28} color="#0ea5e9" /> Programs & Offers
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <Link href="/loyalty" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> TravelNest Rewards</Link>
+              <Link href="/loyalty" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Vaitour Rewards</Link>
               <Link href="/affiliates" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Affiliate Network</Link>
               <Link href="/become-a-host" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Become a Host/Supplier</Link>
               <Link href="/gift-cards" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Digital Gift Cards</Link>

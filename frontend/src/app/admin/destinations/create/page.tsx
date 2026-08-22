@@ -503,7 +503,7 @@ function DestinationFormContent() {
             value={formData.meta_title} 
             onChange={handleChange} 
             maxLength={60}
-            placeholder="e.g. 10 Best Things to Do in Tokyo | TravelNest"
+            placeholder="e.g. 10 Best Things to Do in Tokyo | Vaitour"
           />
           {formData.meta_title.length < 50 && (
             <div style={{ fontSize: '0.8rem', color: '#d97706', marginTop: '4px' }}>

@@ -7,6 +7,16 @@ import Image from 'next/image';
 export default function TourGallery({ tour }: { tour: any }) {
   const { t } = useCurrency();
 
+  const cloudinaryLoader = ({ src, width, quality }: any) => {
+    if (src.startsWith('http')) {
+      if (src.includes('cloudinary.com')) {
+        return src.replace('/upload/', `/upload/f_auto,q_${quality || 'auto'},w_${width}/`);
+      }
+      return src;
+    }
+    return `https://res.cloudinary.com/vaitour/image/upload/f_auto,q_${quality || 'auto'},w_${width}/${src}`;
+  };
+
   if (!tour) return null;
 
   return (
@@ -33,8 +43,9 @@ export default function TourGallery({ tour }: { tour: any }) {
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', height: '450px', marginBottom: '40px' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
           <Image 
+            loader={cloudinaryLoader}
             src={tour.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'} 
-            alt={tour.title} 
+            alt={`${tour.title} – ${tour.pickup_location || 'Global'} | Top Rated Tour`} 
             fill
             priority
             sizes="(max-width: 768px) 100vw, 66vw"
@@ -46,8 +57,9 @@ export default function TourGallery({ tour }: { tour: any }) {
             {tour.images.slice(1, 5).map((img: any, i: number) => (
               <div key={i} style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <Image 
+                  loader={cloudinaryLoader}
                   src={img.url} 
-                  alt={`Gallery ${i+1}`} 
+                  alt={`${tour.title} Gallery Image ${i+1} – ${tour.pickup_location || 'Global'} | Vaitour`} 
                   fill
                   sizes="(max-width: 768px) 50vw, 33vw"
                   style={{ objectFit: 'cover', borderRadius: 'var(--radius-md)' }} 
@@ -58,6 +70,7 @@ export default function TourGallery({ tour }: { tour: any }) {
         ) : (
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <Image 
+              loader={cloudinaryLoader}
               src={tour.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5'} 
               alt="Secondary View" 
               fill

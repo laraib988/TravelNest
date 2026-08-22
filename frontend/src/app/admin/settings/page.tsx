@@ -8,7 +8,7 @@ import {
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
-  const [platformName, setPlatformName] = useState('TravelNest Marketplace');
+  const [platformName, setPlatformName] = useState('Vaitour Marketplace');
   const [commissionRate, setCommissionRate] = useState(15);
   const [autoApproveSuppliers, setAutoApproveSuppliers] = useState(false);
 
@@ -171,7 +171,7 @@ function MfaSettings() {
       // Start fresh enrollment
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
-        friendlyName: 'TravelNest Admin'
+        friendlyName: 'Vaitour Admin'
       });
       if (error) throw error;
 

@@ -32,7 +32,7 @@ export default function LiveChatWidget() {
     {
       id: '1',
       sender: 'ai',
-      text: 'Hi there! I am your TravelNest AI Concierge. How can I help you plan your next adventure today?',
+      text: 'Hi there! I am your Vaitour AI Concierge. How can I help you plan your next adventure today?',
       timestamp: new Date()
     }
   ]);
@@ -87,7 +87,7 @@ export default function LiveChatWidget() {
           <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 p-4 border-b border-white/10 flex justify-between items-center">
             <div className="flex items-center gap-2 text-white font-semibold">
               <Sparkles className="w-5 h-5 text-amber-400" />
-              TravelNest Support
+              Vaitour Support
             </div>
             <button 
               onClick={() => setIsOpen(false)}

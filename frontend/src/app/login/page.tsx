@@ -44,7 +44,7 @@ export default function LoginPage() {
       <div className="card-panel" style={{ padding: '36px', borderRadius: '24px' }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div className="badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-            <ShieldCheck size={14} /> TravelNest Secure Sign In
+            <ShieldCheck size={14} /> Vaitour Secure Sign In
           </div>
           <h1 style={{ fontSize: '1.8rem', color: '#0f172a', fontWeight: 800, marginBottom: '6px' }}>
             Welcome Back!
