@@ -281,7 +281,7 @@ export class TravelAgentService {
     const recLine = recommendations.slice(0, 3).map((r) => `${r.name} (${r.price_range})`).join(' | ');
 
     const responseText =
-      `I've planned your **${c.days}-day ${destName} trip** using **live catalog inventory** (no invented data). 🧳\n\n` +
+      `I've planned your **${c.days}-day ${destName} trip** using **live catalog inventory** (no invented data). ` +
       `**Bookable experiences (from Supabase):**\n${chosen.slice(0, 4).map(line).join('\n')}\n\n` +
       `**Weather forecast (Open-Meteo live):** ${weather.length ? weather.slice(0, c.days).map((w) => `${w.date}: ${w.label}, ${w.temp_max}°C`).join(' · ') : 'unavailable'}\n\n` +
       `**Budget check:** Estimated total $${budget.total_cost} — ${budget.within_budget ? `within budget ✅ ($${budget.remaining} spare)` : `over by $${budget.over_by} ⚠️ ${budget.savings_suggestions[0] || ''}`}\n\n` +

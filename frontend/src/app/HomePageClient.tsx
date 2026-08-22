@@ -317,7 +317,7 @@ export default function HomePage() {
               <Search size={20} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
               <input
                 type="text"
-                placeholder={t('search_placeholder')}
+                placeholder="e.g. Best time to visit Japan, Tokyo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ flex: 1, background: 'transparent', border: 'none', color: '#0f172a', fontSize: '1rem', outline: 'none' }}
@@ -404,15 +404,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. AI TRIP PLANNER DYNAMIC HERO FEATURE */}
-      <section style={{ background: '#f0f9ff', padding: '60px 0', borderTop: '1px solid #e0f2fe', borderBottom: '1px solid #e0f2fe', marginBottom: '60px' }}>
+      {/* 4. AI TRIP PLANNER DYNAMIC HERO FEATURE (Temporarily hidden) */}
+      {false && (<section style={{ background: '#f0f9ff', padding: '60px 0', borderTop: '1px solid #e0f2fe', borderBottom: '1px solid #e0f2fe', marginBottom: '60px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px', alignItems: 'center' }}>
           
           {/* PLANNER FORM */}
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0f2fe', color: '#0369a1', padding: '6px 14px', borderRadius: 'var(--radius-pill)', fontSize: '0.82rem', fontWeight: 700, marginBottom: '14px' }}>
+            {/* <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#e0f2fe', color: '#0369a1', padding: '6px 14px', borderRadius: 'var(--radius-pill)', fontSize: '0.82rem', fontWeight: 700, marginBottom: '14px' }}>
               <Sparkles size={14} /> AI ENGINE 2.0
-            </div>
+            </div> */}
             <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>
               {t('planner_title')}
             </h2>
@@ -506,7 +506,7 @@ export default function HomePage() {
           </div>
 
         </div>
-      </section>
+      </section>)}
 
       {/* 5. POPULAR THIS WEEK */}
       <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>

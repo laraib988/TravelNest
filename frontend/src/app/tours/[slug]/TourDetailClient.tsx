@@ -195,8 +195,8 @@ export default function TourDetailPage() {
             </div>
           )}
 
-          {/* SRS 9.14: "ASK AI ABOUT THIS PLACE" CONTEXTUAL Q&A WIDGET */}
-          <div className="card-panel" style={{ padding: '24px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
+          {/* SRS 9.14: "ASK AI ABOUT THIS PLACE" CONTEXTUAL Q&A WIDGET (Temporarily hidden) */}
+            {false && (<div className="card-panel" style={{ padding: '24px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <HelpCircle size={20} color="var(--brand-primary)" />
               <h3 style={{ fontSize: '1.2rem', color: '#0f172a' }}>Ask AI About This Experience</h3>
@@ -219,7 +219,7 @@ export default function TourDetailPage() {
                 <strong>🤖 AI Concierge Answer:</strong> {aiAnswer}
               </div>
             )}
-          </div>
+          </div>)}
 
           {/* ITINERARY SECTION */}
           {tour.itinerary && tour.itinerary.length > 0 && (

@@ -155,13 +155,11 @@ export default function Header() {
             
             {/* PRIMARY NAVIGATION LINKS */}
             <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Link 
-                href="/ai-planner" 
-                className="btn-primary" 
-                style={{ padding: '8px 18px', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}
-              >
-                {t('ai_trip_studio')}
-              </Link>
+              {/* {false && (
+                <Link href="/ai-planner" className="btn-primary" style={{ padding: '8px 18px', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                  {t('ai_trip_studio')}
+                </Link>
+              )} */}
               <Link 
                 href="/blog" 
                 className="btn-secondary" 
