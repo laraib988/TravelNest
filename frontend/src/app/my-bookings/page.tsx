@@ -164,17 +164,26 @@ export default function MyBookingsPage() {
                               ? 'Are you sure you want to cancel this booking? A refund will be processed within 14 days.'
                               : 'Are you sure you want to cancel this reservation?';
                             if (window.confirm(msg)) {
-                              try {
-                                const res = await fetch(`/api/bookings/${booking.id}/status`, {
-                                  method: 'PATCH',
-                                  body: JSON.stringify({ action: 'cancel' })
-                                });
-                                if (res.ok) {
-                                  fetchBookings();
+                              // OPTIMISTIC UPDATE: Update UI instantly before server response
+                                const previousBookings = [...bookings];
+                                setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, status: 'CANCELLED' } : b));
+                                
+                                try {
+                                  const res = await fetch(`/api/bookings/${booking.id}/status`, {
+                                    method: 'PATCH',
+                                    body: JSON.stringify({ action: 'cancel' })
+                                  });
+                                  if (!res.ok) {
+                                    // ROLLBACK on failure
+                                    setBookings(previousBookings);
+                                    alert('Failed to cancel booking. Please try again.');
+                                  }
+                                } catch (e) {
+                                  console.error('Error cancelling', e);
+                                  // ROLLBACK on error
+                                  setBookings(previousBookings);
+                                  alert('An error occurred. Please try again.');
                                 }
-                              } catch (e) {
-                                console.error('Error cancelling', e);
-                              }
                             }
                           }}
                           style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff1f2', color: '#be123c', border: '1px solid #fecdd3', padding: '10px 20px', borderRadius: '16px', fontWeight: 700, cursor: 'pointer' }}
