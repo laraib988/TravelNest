@@ -1,11 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
+const ServiceAreaMap = dynamic(() => import('@/app/supplier/map/ServiceAreaMap').then(m => m.ServiceAreaMap), {
+  ssr: false,
+  loading: () => <div style={{ height: 400, background: '#f8fafc', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>Loading Map...</div>
+});
+
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, Save, Trash2, Plus, ChevronLeft } from 'lucide-react';
 import languagesList from '@/lib/languages.json';
-import { ServiceAreaMap } from '@/app/supplier/map/ServiceAreaMap';
+
 
 const STEPS = ['Basic Info', 'Photos', 'Experience', 'Transport & Pricing', 'Logistics', 'Itinerary', 'FAQs', 'Review'];
 

@@ -1,9 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+const RichTextEditor = dynamic(() => import('@/components/admin/RichTextEditor'), {
+  ssr: false,
+  loading: () => <div style={{ height: 300, background: '#f8fafc', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>Loading Editor...</div>
+});
+
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
-import RichTextEditor from '@/components/admin/RichTextEditor';
+
 import FaqEditor from '@/components/admin/FaqEditor';
 
 export default function AdminBlogNewPage() {
