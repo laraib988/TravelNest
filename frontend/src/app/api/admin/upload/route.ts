@@ -13,35 +13,27 @@ export async function POST(request: Request) {
     let file = formData.get('file') as File;
     const urlString = formData.get('url') as string;
     
-    let buffer: Buffer;
+    let result;
 
     if (urlString) {
-      const response = await fetch(urlString, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-      });
-      if (!response.ok) {
-        return NextResponse.json({ error: `Failed to fetch image: ${response.status} ${response.statusText}` }, { status: 400 });
-      }
-      const arrayBuffer = await response.arrayBuffer();
-      buffer = Buffer.from(arrayBuffer);
+      // 🚀 OPTIMIZATION: Let Cloudinary fetch the URL directly instead of downloading it in Vercel Serverless Function!
+      // This prevents timeout errors and Vercel fetch bandwidth limits.
+      result = await cloudinary.uploader.upload(urlString, { folder: 'vaitour' });
     } else if (file) {
       const arrayBuffer = await file.arrayBuffer();
-      buffer = Buffer.from(arrayBuffer);
+      const buffer = Buffer.from(arrayBuffer);
+      result = await new Promise<any>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: 'vaitour' },
+          (error, uploadResult) => {
+            if (error) reject(error);
+            else resolve(uploadResult);
+          }
+        ).end(buffer);
+      });
     } else {
       return NextResponse.json({ error: 'No file or url provided' }, { status: 400 });
     }
-
-    const result = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: 'vaitour' },
-        (error, uploadResult) => {
-          if (error) reject(error);
-          else resolve(uploadResult);
-        }
-      ).end(buffer);
-    });
 
     return NextResponse.json({ url: result.secure_url });
   } catch (error: any) {
