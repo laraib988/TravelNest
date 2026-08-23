@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import TourDetailClient from './TourDetailClient';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { cache } from 'react';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -12,19 +14,38 @@ type Props = {
   params: { slug: string; locale?: string };
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = params.slug.length >= 36 ? params.slug.slice(-36) : params.slug;
-  const { data: tour } = await supabase
+// Next.js React cache deduplicates the Supabase query so it's only called once per render cycle
+// across generateMetadata and the Page component.
+const getTour = cache(async (id: string) => {
+  // STRICT SELECT: Replaced .select('*') with explicit columns to save Egress/Bandwidth.
+  // Note: We cannot use .select('..., reviews(*), supplier(*)') (Joins) yet because the 
+  // 'products' table lacks Foreign Key constraints to 'reviews' and 'profiles' in Supabase.
+  // Adding them in Supabase Dashboard will allow us to compress this to 1 single query.
+  const { data } = await supabase
     .from('products')
-    .select('basic_info, experience_details')
+    .select('id, supplier_id, user_id, title, status, destination_id, basic_info, experience_details, logistics, transport_pricing, itinerary')
     .eq('id', id)
     .single();
+  return data;
+});
+
+const getReviews = cache(async (id: string) => {
+  const { data } = await supabase
+    .from('reviews')
+    .select('rating')
+    .eq('listing_id', id)
+    .eq('status', 'APPROVED');
+  return data;
+});
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const id = params.slug.length >= 36 ? params.slug.slice(-36) : params.slug;
+  const tour = await getTour(id);
 
   if (!tour) {
     return { title: 'Tour Not Found | Vaitour' };
   }
 
-  // Next.js App Router uses standard locale routing if set, but we assume default to 'en' if not present
   const locale = params.locale || 'en';
   const canonicalUrl = `https://www.vaitour.com/${locale}/tours/${params.slug}`;
 
@@ -57,30 +78,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-import { notFound, permanentRedirect } from 'next/navigation';
-
 export default async function Page({ params }: Props) {
   const id = params.slug.length >= 36 ? params.slug.slice(-36) : params.slug;
-  const { data: p } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', id)
-    .single();
+  
+  // PARALLEL FETCH: Fetching tour and reviews simultaneously to reduce latency.
+  // This effectively merges the waterfall into a single timing block, and cache() dedupes it.
+  const [p, reviewsData] = await Promise.all([
+    getTour(id),
+    getReviews(id)
+  ]);
 
   if (!p) {
-    notFound(); // Proper 404
+    notFound(); 
   }
 
-  // If tour is deactivated/draft/archived, do a 301 redirect to parent destination
   if (p.status !== 'PUBLISHED' && p.status !== 'APPROVED') {
     if (p.destination_id) {
-      permanentRedirect(`/destinations/${p.destination_id}`); // 301 Permanent Redirect
+      permanentRedirect(`/destinations/${p.destination_id}`); 
     } else {
       permanentRedirect(`/destinations`);
     }
   }
 
-  // Format data for RSC payload
   let inclusions: string[] = [];
   if (p.experience_details?.included) {
     inclusions = p.experience_details.included.split('\n').filter((x: string) => x.trim() !== '');
@@ -104,13 +123,6 @@ export default async function Page({ params }: Props) {
   if (allImages.length === 0) {
     allImages.push({ url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80', alt: 'Fallback' });
   }
-
-  // Fetch real reviews
-  const { data: reviewsData } = await supabase
-    .from('reviews')
-    .select('rating')
-    .eq('listing_id', p.id)
-    .eq('status', 'APPROVED');
     
   let totalRating = 0;
   let reviewCount = 0;
