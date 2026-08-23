@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ArrowLeft, Save, Send, Plus, Trash2, 
@@ -478,7 +479,7 @@ function DestinationFormContent() {
           </div>
           {formData.hero_image && (
             <div style={{ borderRadius: '12px', overflow: 'hidden', height: '220px', border: '1px solid #e2e8f0', position: 'relative' }}>
-              <img src={formData.hero_image} alt="Hero Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image src={formData.hero_image} alt="Hero Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
             </div>
           )}
         </div>
@@ -689,7 +690,7 @@ function DestinationFormContent() {
             <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '20px', alignItems: 'start' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {(item as any).image_url ? (
-                  <img src={(item as any).image_url} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image src={(item as any).image_url} alt="Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 ) : (
                   <ImageIcon size={24} color="#94a3b8" />
                 )}

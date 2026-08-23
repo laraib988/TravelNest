@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Globe2, 
@@ -132,11 +133,11 @@ export default function AboutUsPage() {
             </div>
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', inset: '-10px', background: 'linear-gradient(135deg, #38bdf8 0%, #8b5cf6 100%)', borderRadius: '24px', opacity: 0.2, filter: 'blur(20px)' }}></div>
-              <img 
+              <Image 
                 src="https://images.unsplash.com/photo-1528543606781-2f6e6857f318?auto=format&fit=crop&w=800&q=80" 
                 alt="Travelers exploring" 
                 style={{ width: '100%', borderRadius: '24px', position: 'relative', zIndex: 10, border: '4px solid #fff', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}
-              />
+               width={100} height={800} />
             </div>
           </div>
         </div>

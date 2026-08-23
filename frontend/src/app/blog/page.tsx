@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Sparkles, User, Calendar, ArrowRight, BookOpen } from 'lucide-react';
@@ -58,7 +59,7 @@ export default async function BlogIndexPage() {
           {posts.map((post) => (
             <article key={post.slug} className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: '220px', position: 'relative' }}>
-                <img src={post.hero_image} alt={post.hero_image_alt || post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Image src={post.hero_image} alt={post.hero_image_alt || post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-primary)', color: '#fff', padding: '4px 10px', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', fontWeight: 700 }}>
                   Travel Guide
                 </div>
@@ -69,7 +70,7 @@ export default async function BlogIndexPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       {post.author_avatar && (
-                        <img src={post.author_avatar} alt={post.author_name} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }} />
+                        <Image src={post.author_avatar} alt={post.author_name} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }}  width={22} height={22} />
                       )}
                       <User size={13} /> {post.author_name}
                     </span>

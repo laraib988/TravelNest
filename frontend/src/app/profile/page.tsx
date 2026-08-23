@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { Camera, User, Mail, Phone, Globe, Bell, Trash2, Plus, Save, ShieldCheck, Coins, Ticket } from 'lucide-react';
@@ -158,11 +159,11 @@ export default function ProfilePage() {
         {/* Profile Avatar Card */}
         <div className="card-panel" style={{ padding: '30px', borderRadius: '24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '24px' }}>
           <div style={{ position: 'relative' }}>
-            <img 
+            <Image 
               src={profile.avatar || user?.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'} 
               alt="Avatar" 
               style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #2563eb' }} 
-            />
+             width={90} height={90} />
             <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#2563eb', color: '#fff', padding: '6px', borderRadius: '50%', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
               <Camera size={14} />
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
@@ -331,7 +332,7 @@ export default function CreateListingWizardPage() {
                   />
                 </div>
                 <div style={{ height: '220px', borderRadius: '16px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                  <img src={formData.image_url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image src={formData.image_url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 </div>
               </div>
             </div>

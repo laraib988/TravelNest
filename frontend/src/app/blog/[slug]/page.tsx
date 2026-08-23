@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -141,7 +142,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Hero */}
             <div style={{ marginBottom: '28px' }}>
               {blog.hero_image && (
-                <img src={blog.hero_image} alt={blog.hero_image_alt || blog.title} style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '24px' }} />
+                <Image src={blog.hero_image} alt={blog.hero_image_alt || blog.title} style={{ width: '100%', maxHeight: '420px', objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '24px' }}  width={100} height={800} />
               )}
               <h1 style={{ fontSize: '2.4rem', color: '#0f172a', lineHeight: 1.2, marginBottom: '16px', fontWeight: 800 }}>
                 {blog.title}
@@ -149,7 +150,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div style={{ display: 'flex', alignItems: 'center', gap: '18px', paddingBottom: '20px', borderBottom: '1px solid #e2e8f0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {blog.author_avatar && (
-                    <img src={blog.author_avatar} alt={blog.author_name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+                    <Image src={blog.author_avatar} alt={blog.author_name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}  width={32} height={32} />
                   )}
                   <strong>{blog.author_name}</strong>
                   {blog.author_role && <span>· {blog.author_role}</span>}
@@ -252,7 +253,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                 {blog.author_avatar && (
-                  <img src={blog.author_avatar} alt={blog.author_name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover' }} />
+                  <Image src={blog.author_avatar} alt={blog.author_name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover' }}  width={56} height={56} />
                 )}
                 <div>
                   <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>{blog.author_name}</h3>
@@ -277,7 +278,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Link key={d.id} href={`/destinations/${d.slug}`} className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ height: '160px', position: 'relative' }}>
                     {d.hero_image ? (
-                      <img src={d.hero_image} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <Image src={d.hero_image} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                     ) : (
                       <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0f172a, #334155)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <MapPin size={32} color="rgba(255,255,255,0.3)" />

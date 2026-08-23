@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
 import { Calendar, Users, Compass, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
@@ -96,7 +97,7 @@ export default function MyBookingsPage() {
                   <div style={{ padding: '24px', display: 'flex', gap: '24px', flex: 1, minWidth: '300px' }}>
                     <div style={{ width: '120px', height: '120px', borderRadius: '16px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden' }}>
                       {booking.listing_image ? (
-                        <img src={booking.listing_image} alt="Tour" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <Image src={booking.listing_image} alt="Tour" style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                       ) : (
                         <Compass size={40} />
                       )}

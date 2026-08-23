@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Star, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useAuth } from '@/context/AuthContext';
@@ -290,7 +291,7 @@ export default function TourReviews({ tour }: { tour: any }) {
                 <div key={review.id} style={{ padding: '24px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', minHeight: '320px', transition: 'transform 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <img src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0ea5e9&color=fff`} alt={review.user_name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                      <Image src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name)}&background=0ea5e9&color=fff`} alt={review.user_name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}  width={40} height={40} />
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{review.user_name}</div>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{new Date(review.created_at).toLocaleDateString()}</div>
@@ -320,7 +321,7 @@ export default function TourReviews({ tour }: { tour: any }) {
                     {review.photos && review.photos.length > 0 && (
                       <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                         {review.photos.map((p: string, i: number) => (
-                          <img key={i} src={p} alt="Traveler photo" style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} />
+                          <Image key={i} src={p} alt="Traveler photo" style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }}  width={60} height={45} />
                         ))}
                       </div>
                     )}

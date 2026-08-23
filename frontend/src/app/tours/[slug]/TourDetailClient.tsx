@@ -3,6 +3,7 @@
 
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -320,7 +321,7 @@ export default function TourDetailPage({ initialTour }: { initialTour?: any }) {
             {relevantProducts.map(p => (
               <a key={p.id} href={`/tours/${p.slug || p.id}`} style={{ textDecoration: 'none', display: 'block', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', background: '#fff', transition: 'transform 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
                 <div style={{ height: '160px', width: '100%', overflow: 'hidden' }}>
-                  <img src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 </div>
                 <div style={{ padding: '16px' }}>
                   <h3 style={{ fontSize: '1.05rem', color: '#0f172a', marginBottom: '8px', lineHeight: 1.4, height: '44px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.title}</h3>

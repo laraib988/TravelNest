@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { MapPin, Clock, Star, ArrowRight, Loader2, Compass, AlertCircle } from 'lucide-react';
@@ -122,11 +123,11 @@ export default function AllExperiencesPage() {
                   }}>
                     {/* IMAGE SECTION */}
                     <div style={{ position: 'relative', height: '220px', backgroundColor: '#f1f5f9' }}>
-                      <img 
+                      <Image 
                         src={tour.images[0]?.url || 'https://placehold.co/600x400?text=No+Image'} 
                         alt={tour.images[0]?.alt || tour.title}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                       width={100} height={100} />
                       {tour.merchandising_badges && tour.merchandising_badges.length > 0 && (
                         <div style={{ position: 'absolute', top: '16px', left: '16px', background: '#fff', padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                           {tour.merchandising_badges[0]}

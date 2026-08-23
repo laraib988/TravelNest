@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useCurrency } from '@/context/CurrencyContext';
 import { Heart, Star, MapPin, Compass } from 'lucide-react';
 import Link from 'next/link';
@@ -58,7 +59,7 @@ export default function WishlistPage() {
                 >
                   <Heart size={18} color="#e11d48" fill="#e11d48" />
                 </button>
-                <img src={item.images?.[0]?.url} alt={item.title} style={{ width: '100%', height: '220px', objectFit: 'cover' }} />
+                <Image src={item.images?.[0]?.url} alt={item.title} style={{ width: '100%', height: '220px', objectFit: 'cover' }}  width={100} height={220} />
                 <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d97706', fontSize: '0.85rem', fontWeight: 700, marginBottom: '8px' }}>

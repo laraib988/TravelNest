@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import {
@@ -131,11 +132,11 @@ export default function Header() {
           
           {/* LEFT: BRAND LOGO */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Vaitour Logo" 
               style={{ width: '38px', height: '38px', objectFit: 'contain' }} 
-            />
+             width={38} height={38} />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em' }} className="gradient-text">
                 Vaitour
@@ -230,7 +231,7 @@ export default function Header() {
                     boxShadow: 'var(--shadow-sm)'
                   }}
                 >
-                  <img src={user.avatar} alt={user.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <Image src={user.avatar} alt={user.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}  width={32} height={32} />
                   <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>{user.name}</span>
                   <ChevronDown size={14} color="#64748b" />
                 </button>
@@ -451,7 +452,7 @@ export default function Header() {
                             >
                               <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: '#e2e8f0' }}>
                                 {city.hero_image && (
-                                  <img src={city.hero_image} alt={city.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  <Image src={city.hero_image} alt={city.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                                 )}
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column' }}>

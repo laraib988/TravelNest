@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -343,7 +344,7 @@ export default function UsersManagementPage() {
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {u.avatar ? (
-                          <img src={u.avatar} alt={u.name} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }} />
+                          <Image src={u.avatar} alt={u.name} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}  width={42} height={42} />
                         ) : (
                           <div className="admin-user-avatar">
                             {u.name?.charAt(0) || 'U'}

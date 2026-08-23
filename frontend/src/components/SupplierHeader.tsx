@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Compass, Bell, User, ChevronDown, LogOut, Settings, Calendar, ShoppingCart, ShieldAlert, Package, CreditCard, CheckCircle2 } from 'lucide-react';
@@ -287,7 +288,7 @@ export default function SupplierHeader() {
                   transition: 'all 0.2s'
                 }}
               >
-                <img src={user.avatar || 'https://i.pravatar.cc/150?u=supplier'} alt={user.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                <Image src={user.avatar || 'https://i.pravatar.cc/150?u=supplier'} alt={user.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}  width={32} height={32} />
                 <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>{user.name}</span>
                 <ChevronDown size={14} color="#64748b" style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
               </button>

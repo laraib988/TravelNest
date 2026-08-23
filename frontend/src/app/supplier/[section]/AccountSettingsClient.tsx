@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { createClient } from '@supabase/supabase-js';
 import { Edit2, Save, AlertTriangle, User, Building2, MapPin, Phone, Hash, FileText, Lock, Mail, Image as ImageIcon, Upload, Plus } from 'lucide-react';
@@ -222,7 +223,7 @@ export default function AccountSettingsClient() {
         )}
 
         <div style={{ display: 'flex', gap: '32px', marginBottom: '24px', alignItems: 'center' }}>
-          <img src={isEditing ? formData.avatar : (profileData?.avatar || 'https://ui-avatars.com/api/?name=Supplier')} alt="Profile Icon" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }} />
+          <Image src={isEditing ? formData.avatar : (profileData?.avatar || 'https://ui-avatars.com/api/?name=Supplier')} alt="Profile Icon" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }}  width={100} height={100} />
           {isEditing && (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}><ImageIcon size={14} /> Profile Image URL</label>

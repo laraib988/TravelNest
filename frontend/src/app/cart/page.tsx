@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { 
@@ -145,7 +146,7 @@ export default function CartPage() {
 
                 {/* THUMBNAIL */}
                 <div style={{ width: '180px', height: '120px', borderRadius: '16px', overflow: 'hidden', flexShrink: 0 }}>
-                  <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 </div>
 
                 {/* ITEM DETAILS */}

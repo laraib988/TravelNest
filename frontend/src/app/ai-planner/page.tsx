@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { fetchFromAPI } from '@/lib/api-client';
 import { Sparkles, Compass, Calendar, CheckCircle2, ArrowRight, Zap, RefreshCw, Bot, Send, Loader2, Trash2, CloudSun, UtensilsCrossed, Wallet, MapPin, Star, Clock, ThermometerSun } from 'lucide-react';
 
@@ -39,7 +40,7 @@ function ItineraryCard({ itinerary }: { itinerary: any }) {
             )}
             {day.activities.map((act: any, idx: number) => (
               <div key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderTop: idx === 0 ? 'none' : '1px dashed #e2e8f0' }}>
-                {act.image ? <img src={act.image} alt={act.activity_name} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} /> : <div style={{ width: 52, height: 52, borderRadius: 8, background: '#e2e8f0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Compass size={20} className="text-slate-400" /></div>}
+                {act.image ? <Image src={act.image} alt={act.activity_name} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}  width={52} height={52} /> : <div style={{ width: 52, height: 52, borderRadius: 8, background: '#e2e8f0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Compass size={20} className="text-slate-400" /></div>}
                 <div style={{ flex: 1, fontSize: '0.85rem' }}>
                   <div style={{ fontWeight: 600, color: '#0f172a' }}>{act.activity_name}</div>
                   <div style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 2 }}>{TIME_LABEL[act.time_slot] || act.time_slot} · {act.duration_minutes ? `${Math.round(act.duration_minutes / 60)}h ${act.duration_minutes % 60}m` : 'flexible'}{act.travel_time_min ? ` · ${act.travel_time_min} min transfer` : ''}</div>
@@ -92,7 +93,7 @@ function RecommendationsCard({ recommendations }: { recommendations: any[] }) {
       <div style={{ padding: '12px' }}>
         {recommendations.map((r: any, i: number) => (
           <div key={i} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: i < recommendations.length - 1 ? '1px dashed #e2e8f0' : 'none' }}>
-            {r.image ? <img src={r.image} alt={r.name} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} /> : <div style={{ width: 48, height: 48, borderRadius: 8, background: '#f1f5f9', flexShrink: 0 }} />}
+            {r.image ? <Image src={r.image} alt={r.name} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}  width={48} height={48} /> : <div style={{ width: 48, height: 48, borderRadius: 8, background: '#f1f5f9', flexShrink: 0 }} />}
             <div style={{ flex: 1, fontSize: '0.8rem' }}>
               <div style={{ fontWeight: 700, color: '#0f172a' }}>
                 {r.name} <span style={{ fontSize: '0.7rem', color: '#059669' }}>{r.price_range}</span>
@@ -329,7 +330,7 @@ export default function AIPlannerPage() {
                       <div style={{ padding: '16px' }}>
                         {msg.bundle.items.map((item: any, j: number) => (
                           <div key={j} style={{ display: 'flex', gap: 12, marginBottom: 12, paddingBottom: 12, borderBottom: j < msg.bundle.items.length - 1 ? '1px solid #e2e8f0' : 'none' }}>
-                            {item.img ? <img src={item.img} alt={item.title} style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }} /> : <div style={{ width: 60, height: 60, borderRadius: 8, background: '#f1f5f9', flexShrink: 0 }} />}
+                            {item.img ? <Image src={item.img} alt={item.title} style={{ width: 60, height: 60, borderRadius: 8, objectFit: 'cover' }}  width={60} height={60} /> : <div style={{ width: 60, height: 60, borderRadius: 8, background: '#f1f5f9', flexShrink: 0 }} />}
                             <div style={{ flex: 1 }}>
                               <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>{item.title}</div>
                               {item.rating ? <div style={{ fontSize: '0.75rem', color: '#d97706', marginTop: 2 }}><Star size={11} style={{ display: 'inline', marginRight: 3 }} />{item.rating}</div> : null}

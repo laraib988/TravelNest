@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Newspaper, Plus, Edit, Trash2, Eye, EyeOff, RefreshCw, AlertCircle, Sparkles, CheckCircle2, XCircle, PenLine } from 'lucide-react';
 
@@ -252,7 +253,7 @@ export default function AdminBlogsPage() {
               {/* Image Header */}
               <div style={{ height: '190px', position: 'relative', overflow: 'hidden' }}>
                 {blog.hero_image ? (
-                  <img src={blog.hero_image} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <Image src={blog.hero_image} alt={blog.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Newspaper size={40} color="rgba(255,255,255,0.2)" />

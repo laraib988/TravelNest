@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useCurrency } from '@/context/CurrencyContext';
 import { Search, X, Star, Clock, MapPin, ShieldCheck, CreditCard, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -112,7 +113,7 @@ export default function ComparePage() {
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
                   >
-                    <img src={item.images?.[0]?.url} alt={item.title} style={{ width: '48px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
+                    <Image src={item.images?.[0]?.url} alt={item.title} style={{ width: '48px', height: '36px', objectFit: 'cover', borderRadius: '4px' }}  width={48} height={36} />
                     <div>
                       <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem' }}>{item.title}</div>
                       <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{item.pickup_location} • {formatPrice(item.base_price)}</div>
@@ -149,7 +150,7 @@ export default function ComparePage() {
                   >
                     <X size={15} />
                   </button>
-                  <img src={item.images?.[0]?.url} alt={item.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '12px', marginBottom: '14px' }} />
+                  <Image src={item.images?.[0]?.url} alt={item.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '12px', marginBottom: '14px' }}  width={100} height={140} />
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.35, marginBottom: '12px', flex: 1 }}>{item.title}</h3>
                   <Link href={`/tours/${item.slug}`} className="btn-primary" style={{ padding: '10px 16px', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center' }}>
                     View Experience

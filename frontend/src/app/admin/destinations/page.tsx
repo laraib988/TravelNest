@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { MapPin, Plus, Edit, Trash2, Eye, EyeOff, Globe, RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -210,7 +211,7 @@ export default function AdminDestinationsPage() {
               {/* Image Header */}
               <div style={{ height: '200px', position: 'relative', overflow: 'hidden' }}>
                 {dest.hero_image ? (
-                  <img className="hero-img" src={dest.hero_image} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
+                  <Image className="hero-img" src={dest.hero_image} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}  width={100} height={100} />
                 ) : (
                   <div className="hero-img" style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.5s ease' }}>
                     <MapPin size={40} color="rgba(255,255,255,0.2)" />

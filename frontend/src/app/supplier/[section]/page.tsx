@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import useSWR from 'swr';
 import { useAuth } from '@/context/AuthContext';
 import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -863,11 +864,11 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                               flexDirection: 'column'
                             }}
                           >
-                            <img
+                            <Image 
                               src={item.image}
                               alt={item.title}
                               style={{ width: '100%', height: '160px', borderRadius: '12px', objectFit: 'cover', marginBottom: '16px' }}
-                            />
+                             width={100} height={160} />
 
                             <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px', lineHeight: 1.35 }}>{item.title}</div>
                             <div style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '12px' }}>ID: {item.id.startsWith('TN') ? item.id : 'TN' + item.id.replace(/-/g, '').substring(0, 8).toUpperCase()}</div>
@@ -988,7 +989,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
               {listings.map((item, index) => (
                 <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '20px 24px', borderBottom: index < listings.length - 1 ? '1px solid #e2e8f0' : 'none', transition: 'background 0.2s', cursor: 'default' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                   {/* Image */}
-                  <img src={item.image} alt={item.title} style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
+                  <Image src={item.image} alt={item.title} style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }}  width={80} height={60} />
                   
                   {/* Details */}
                   <div style={{ flex: 1, marginLeft: '20px' }}>
