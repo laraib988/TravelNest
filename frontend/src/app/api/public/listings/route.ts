@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
     let query = supabaseAdmin
       .from('products')
-      .select('id, supplier_id, status, updated_at, logistics, basic_info, transport_pricing, reviews ( rating ), profiles ( name, avatar_url )')
+      .select('id, supplier_id, status, updated_at, logistics, basic_info, transport_pricing, reviews ( rating )')
       .range(0, 49)
       .in('status', ['PUBLISHED', 'APPROVED'])
       .order('updated_at', { ascending: false });
