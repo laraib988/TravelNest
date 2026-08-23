@@ -822,7 +822,7 @@ export default function HomePage() {
 
       {/* 13. NEWSLETTER */}
       <section style={{ maxWidth: '1100px', margin: '0 auto 60px', padding: '0 24px' }}>
-        <div style={{ background: 'var(--brand-gradient)', padding: '50px 30px', borderRadius: 'var(--radius-lg)', color: '#ffffff', textAlign: 'left', boxShadow: '0 12px 36px rgba(2, 132, 199, 0.25)' }}>
+        <div style={{ background: 'var(--brand-gradient)', padding: '50px 30px', borderRadius: 'var(--radius-lg)', color: '#ffffff', textAlign: 'center', boxShadow: '0 12px 36px rgba(2, 132, 199, 0.25)' }}>
           <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '12px' }}>{t('newsletter_title')}</h2>
           <p style={{ fontSize: '1rem', color: '#e0f2fe', marginBottom: '28px', maxWidth: '600px', margin: '0 auto 28px' }}>
             Subscribe to our weekly dispatch and receive 15% discount code for your first verified experience booking!
