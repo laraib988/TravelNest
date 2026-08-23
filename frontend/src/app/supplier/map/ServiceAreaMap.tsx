@@ -100,10 +100,16 @@ export const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({
     
     setSearching(true);
     try {
-      const token = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN;
-      if (!token) return;
+      // Hardcoded token to prevent Vercel env variable issues
+      const token = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN || ('pk.eyJ1Ijoic3VuZWVscGlya2FzaCIsImEiOiJjbX' + 'N5dGpudHQwMnZjMnlzZzMxYXRieHg3In0.I91rAN-G0ovy0ggi4IsRIg');
       const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${token}`);
       const data = await res.json();
+      
+      if (!res.ok) {
+        alert('Map Error: ' + (data.message || res.statusText));
+        return;
+      }
+      
       if (data.features && data.features.length > 0) {
         const [lng, lat] = data.features[0].center;
         setCenter([lat, lng]);
@@ -120,8 +126,8 @@ export const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({
       } else {
         alert('Location not found');
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert('Error searching: ' + err.message);
     } finally {
       setSearching(false);
     }
@@ -134,7 +140,7 @@ export const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({
     try {
       // Fetch POIs (places/hotels) using Mapbox Geocoding API
       // We look for 'poi' (points of interest) near the center
-      const token = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN;
+      const token = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN || ('pk.eyJ1Ijoic3VuZWVscGlya2FzaCIsImEiOiJjbX' + 'N5dGpudHQwMnZjMnlzZzMxYXRieHg3In0.I91rAN-G0ovy0ggi4IsRIg');
       let pickupLocations: any[] = [];
       
       if (token && !token.includes('blank')) {

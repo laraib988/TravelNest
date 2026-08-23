@@ -635,7 +635,7 @@ export default function CreateListingPage() {
                   <div>
                     <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Language <span style={{color: 'red'}}>*</span> {errors.language && <span style={{color: '#ef4444', fontSize: '0.8rem', marginLeft: '8px'}}>{errors.language}</span>}</label>
                     <div style={{ position: 'relative' }}>
-  <details style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '14px', cursor: 'pointer' }}>
+  <details style={{ width: '100%', padding: '14px 18px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', background: '#f8fafc', outline: 'none', transition: 'border 0.2s', cursor: 'pointer', boxSizing: 'border-box' }}>
     <summary style={{ listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 600, color: '#334155' }}>
       {Array.isArray(experienceDetails.language) && experienceDetails.language.length > 0 ? experienceDetails.language.join(', ') : 'Select Languages...'}
       <ChevronRight size={18} style={{ transform: 'rotate(90deg)' }} />
