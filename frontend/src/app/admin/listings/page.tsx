@@ -1,6 +1,7 @@
 'use client';
+import useSWR from 'swr';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
@@ -31,13 +32,34 @@ interface Listing {
   raw_data?: any;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function ListingsManagementPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const filterParam = searchParams.get('filter');
 
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawListings, isLoading: loading, mutate: refreshListings } = useSWR<any[]>(
+    '/api/admin/listings',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
+    }
+  );
+
+  const listings = useMemo(() => {
+    if (!Array.isArray(rawListings)) return [];
+    return rawListings.map((l: any) => ({
+      ...l,
+      status: l.status,
+      duration_minutes: l.duration_minutes || 180,
+    }));
+  }, [rawListings]);
+  
+  const setListings = (updater: any) => {
+    refreshListings(updater, false);
+  };
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [actionModal, setActionModal] = useState<{ type: 'FIX' | 'REJECT'; productId: string; title: string } | null>(null);
   const [actionReason, setActionReason] = useState('');
@@ -69,37 +91,11 @@ export default function ListingsManagementPage() {
     }
   }, [filterParam]);
 
-  useEffect(() => {
-    loadListings();
-  }, []);
+  
 
-  const loadListings = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/listings');
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setListings(
-          data.map((l: any, idx: number) => ({
-            ...l,
-            status: l.status || (idx % 3 === 0 ? 'PENDING_APPROVAL' : 'PUBLISHED'),
-            duration_minutes: l.duration_minutes || 180,
-          }))
-        );
-      } else {
-        setListings([]);
-      }
-    } catch (err) {
-      console.error(err);
-      setListings([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRefresh = async () => {
+    const handleRefresh = async () => {
     setRefreshing(true);
-    await loadListings();
+    await refreshListings();
     setRefreshing(false);
     triggerAction('Product catalog refreshed successfully!');
   };

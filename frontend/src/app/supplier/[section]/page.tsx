@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import { useAuth } from '@/context/AuthContext';
 import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
@@ -50,6 +51,8 @@ const DUMMY_LISTINGS = [
 ];
 
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function SupplierDashboard() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
@@ -66,8 +69,25 @@ const section = (params?.section as string) || 'dashboard';
 
   
   const activeTab = section === 'listings' ? 'LISTINGS' : section === 'bookings' ? 'BOOKINGS' : section === 'finance' ? 'FINANCE' : section === 'account-settings' ? 'ACCOUNT' : section === 'availability' ? 'AVAILABILITY' : 'DASHBOARD';
-  const [listings, setListings] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawListings, isLoading: loading, mutate: refreshListings } = useSWR(
+    user?.id ? `/api/supplier/listings?userId=${user.id}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
+    }
+  );
+
+  const listings = rawListings || [];
+
+  const setListings = (updater: any) => {
+    refreshListings(updater, false);
+  };
+  
+  const setLoading = (val: boolean) => {
+    // SWR handles loading, so we can ignore manual setLoading for listings.
+    // If it's used for other tabs, we just mock it here.
+  };
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>(section === 'account-settings' ? 'SETTINGS' : 'PAYOUTS');
   const [availabilityTab, setAvailabilityTab] = useState<'PRODUCTS' | 'SETTINGS'>('PRODUCTS');
@@ -188,17 +208,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
   const [supplierBookings, setSupplierBookings] = useState<any[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetch(`/api/supplier/listings?userId=${user.id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) setListings(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
-  }, [user]);
+  
 
   useEffect(() => {
     if (user) {

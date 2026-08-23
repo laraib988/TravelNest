@@ -785,10 +785,10 @@ export default function HomePage() {
       {/* 7. HOW IT WORKS */}
       <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'left' }}>
             {t('how_works_title')}
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'left', marginBottom: '40px' }}>
             Book premium local experiences in 4 simple steps
           </p>
 

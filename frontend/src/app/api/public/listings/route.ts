@@ -30,54 +30,45 @@ export async function GET(req: Request) {
       return NextResponse.json([], { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });
     }
 
-    // Handle temporary availability blocks: auto-reactivate expired blocks and
-    // exclude products that are currently inside a blocked date range.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Filter active products and effective availability without writing to DB
     const activeProducts: any[] = [];
-    const reactivatePromises: any[] = [];
     
     for (const p of products) {
       const block = p.logistics?.availability_block;
+      let effectiveLogistics = p.logistics;
+      
       if (block && block.from && block.to) {
         const blockTo = new Date(block.to);
         blockTo.setHours(23, 59, 59, 999);
+        
         if (blockTo < today) {
-          // Block expired -> auto-reactivate in parallel
-          reactivatePromises.push(
-            supabaseAdmin
-              .from('products')
-              .update({
-                logistics: { ...p.logistics, availability_block: null },
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', p.id)
-              .then(({ error }) => {
-                if (error) console.error('Auto-reactivate failed:', error);
-              })
-          );
-          activeProducts.push(p);
-          continue;
-        }
-        const blockFrom = new Date(block.from);
-        blockFrom.setHours(0, 0, 0, 0);
-        if (blockFrom <= today && blockTo >= today) {
-          // Currently inside the blocked window -> hide from customers
-          continue;
+          // Block expired -> just nullify it in-memory for the response
+          effectiveLogistics = {
+            ...p.logistics,
+            availability_block: null
+          };
+        } else {
+          const blockFrom = new Date(block.from);
+          blockFrom.setHours(0, 0, 0, 0);
+          if (blockFrom <= today && blockTo >= today) {
+            // Currently inside the blocked window -> hide from customers
+            continue;
+          }
         }
       }
-      activeProducts.push(p);
-    }
-    
-    if (reactivatePromises.length > 0) {
-      await Promise.all(reactivatePromises);
+      activeProducts.push({
+        ...p,
+        logistics: effectiveLogistics
+      });
     }
 
     let filteredProducts = activeProducts;
     if (search) {
       const lowerSearch = search.toLowerCase();
-      filteredProducts = products.filter(p => {
+      filteredProducts = activeProducts.filter(p => {
         const titleMatch = p.basic_info?.title?.toLowerCase().includes(lowerSearch);
         const descMatch = p.basic_info?.shortDescription?.toLowerCase().includes(lowerSearch);
         return titleMatch || descMatch;

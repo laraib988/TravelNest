@@ -23,10 +23,10 @@ const getTour = cache(async (id: string) => {
   // Adding them in Supabase Dashboard will allow us to compress this to 1 single query.
   const { data } = await supabase
     .from('products')
-    .select('id, supplier_id, user_id, title, status, destination_id, basic_info, experience_details, logistics, transport_pricing, itinerary')
+    .select('id, supplier_id, status, basic_info, experience_details, logistics, transport_pricing, itinerary')
     .eq('id', id)
     .single();
-  return data;
+  return data as any;
 });
 
 const getReviews = cache(async (id: string) => {

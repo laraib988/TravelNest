@@ -26,7 +26,6 @@ export async function POST(request: Request) {
     }
 
     const parentId = draftData.logistics?.parent_id;
-    let finalProduct = draftData;
 
     if (parentId) {
       // It's an edit clone. Update the original parent product with draft's data and delete the clone.
@@ -39,40 +38,35 @@ export async function POST(request: Request) {
         delete updateFields.logistics.parent_id;
       }
 
-      const { data: updatedParent, error: updateErr } = await supabaseAdmin
+      const { error: updateErr } = await supabaseAdmin
         .from('products')
         .update(updateFields)
-        .eq('id', parentId)
-        .select()
-        .single();
+        .eq('id', parentId);
       
       if (updateErr) throw updateErr;
-      finalProduct = updatedParent;
 
       // Delete the temporary clone
       await supabaseAdmin.from('products').delete().eq('id', productId);
     } else {
       // It's a brand new product. Just publish it directly.
-      const { data: publishedDraft, error: pubErr } = await supabaseAdmin
+      const { error: pubErr } = await supabaseAdmin
         .from('products')
         .update({ status: 'PUBLISHED', updated_at: new Date().toISOString() })
-        .eq('id', productId)
-        .select()
-        .single();
+        .eq('id', productId);
         
       if (pubErr) throw pubErr;
-      finalProduct = publishedDraft;
     }
 
-    // Notify Supplier
+    // Notify Supplier using data we already fetched
     await supabaseAdmin.from('notifications').insert({
-      user_id: finalProduct.supplier_id,
+      user_id: draftData.supplier_id,
       type: 'SUCCESS',
       title: 'Listing Approved!',
-      message: `Congratulations! Your listing "${finalProduct.basic_info?.title || 'Draft'}" has been approved and is now live.`
+      message: `Congratulations! Your listing "${draftData.basic_info?.title || 'Draft'}" has been approved and is now live.`
     });
 
-    return NextResponse.json({ success: true, data: finalProduct }, { status: 200 });
+    // Return minimal response instead of the heavy final product object
+    return NextResponse.json({ success: true, data: { id: parentId || productId } }, { status: 200 });
   } catch (error: any) {
     console.error('Approve error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

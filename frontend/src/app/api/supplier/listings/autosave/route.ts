@@ -48,7 +48,7 @@ export async function POST(request: Request) {
             logistics: updatedLogistics,
             itinerary: itinerary || []
           })
-          .select()
+          .select('id') // ONLY select ID to minimize egress
           .single();
 
         if (error) throw error;
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
         updatedLogistics.parent_id = currentProduct.logistics.parent_id;
       }
 
-      const { data, error } = await supabaseAdmin
+      const { error } = await supabaseAdmin
         .from('products')
         .update({
           current_step: step,
@@ -73,12 +73,13 @@ export async function POST(request: Request) {
           updated_at: new Date().toISOString()
         })
         .eq('id', productId)
-        .eq('supplier_id', userId)
-        .select()
-        .single();
+        .eq('supplier_id', userId);
+        // REMOVED .select() to prevent heavy RETURNING * egress
 
       if (error) throw error;
-      return NextResponse.json({ success: true, data }, { status: 200 });
+      
+      // Return a minimal data object with just the ID to keep frontend compatible
+      return NextResponse.json({ success: true, data: { id: productId } }, { status: 200 });
     }
 
     // Create new draft
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
           logistics: logistics || {},
           itinerary: itinerary || []
         })
-        .select()
+        .select('id') // ONLY select ID to minimize egress
         .single();
 
       if (error) throw error;
