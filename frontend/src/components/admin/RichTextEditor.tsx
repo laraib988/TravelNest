@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -62,7 +62,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
       StarterKit.configure({
         heading: { levels: [2, 3, 4] },
       }),
-      Image.configure({ allowBase64: true, HTMLAttributes: { class: 'rte-image' } }),
+      Image.configure({ allowBase64: false, HTMLAttributes: { class: 'rte-image' } }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -74,10 +74,53 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     ],
     content: initialHtml,
     immediatelyRender: false,
+    
     editorProps: {
       attributes: {
         class: 'rte-prose',
       },
+      handleDrop: (view, event, slice, moved) => {
+        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
+          const file = event.dataTransfer.files[0];
+          if (file.type.startsWith('image/')) {
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch('/api/admin/upload', { method: 'POST', body: formData })
+              .then(res => res.json())
+              .then(data => {
+                if (data.url) {
+                  const { schema } = view.state;
+                  const node = schema.nodes.image.create({ src: data.url });
+                  const transaction = view.state.tr.replaceSelectionWith(node);
+                  view.dispatch(transaction);
+                }
+              }).catch(console.error);
+            return true;
+          }
+        }
+        return false;
+      },
+      handlePaste: (view, event, slice) => {
+        if (event.clipboardData && event.clipboardData.files && event.clipboardData.files[0]) {
+          const file = event.clipboardData.files[0];
+          if (file.type.startsWith('image/')) {
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch('/api/admin/upload', { method: 'POST', body: formData })
+              .then(res => res.json())
+              .then(data => {
+                if (data.url) {
+                  const { schema } = view.state;
+                  const node = schema.nodes.image.create({ src: data.url });
+                  const transaction = view.state.tr.replaceSelectionWith(node);
+                  view.dispatch(transaction);
+                }
+              }).catch(console.error);
+            return true;
+          }
+        }
+        return false;
+      }
     },
     onUpdate: ({ editor: e }) => {
       const md = turndown.turndown(e.getHTML());
@@ -116,6 +159,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
   return (
     <div className="rte-wrap" style={{ border: '1px solid #cbd5e1', borderRadius: 12, overflow: 'hidden', background: '#fff' }}>
       {/* Toolbar */}
+      <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '10px 12px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', alignItems: 'center' }}>
         <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} disabled={!editor.can().chain().focus().toggleBold().run()} style={{ ...toolBtn, background: editor.isActive('bold') ? '#7c3aed' : '#fff', color: editor.isActive('bold') ? '#fff' : '#475569' }}>
           <Bold size={16} />
