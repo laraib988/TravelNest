@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
     let query = supabaseAdmin
       .from('products')
-      .select('id, supplier_id, status, updated_at, logistics, basic_info, transport_pricing')
+      .select('id, supplier_id, status, updated_at, logistics, basic_info, transport_pricing, reviews ( rating ), profiles ( name, avatar_url )')
       .range(0, 49)
       .in('status', ['PUBLISHED', 'APPROVED'])
       .order('updated_at', { ascending: false });
@@ -75,23 +75,6 @@ export async function GET(req: Request) {
       });
     }
 
-    // Fetch real-time reviews for these products
-    const productIds = filteredProducts.map(p => p.id);
-    const { data: reviewsData } = await supabaseAdmin
-      .from('reviews')
-      .select('listing_id, rating')
-      .in('listing_id', productIds)
-      .eq('status', 'APPROVED');
-
-    const reviewsMap: Record<string, { total: number, count: number }> = {};
-    if (reviewsData) {
-      for (const r of reviewsData) {
-        if (!reviewsMap[r.listing_id]) reviewsMap[r.listing_id] = { total: 0, count: 0 };
-        reviewsMap[r.listing_id].total += r.rating || 5;
-        reviewsMap[r.listing_id].count += 1;
-      }
-    }
-
     const mappedListings = filteredProducts.map(p => {
       const title = p.basic_info?.title || 'Untitled Product';
       const slugifiedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -119,9 +102,10 @@ export async function GET(req: Request) {
         durationStr = sorted[0].duration || '2 hours';
       }
 
-      const productReviews = reviewsMap[p.id];
-      const cachedReviewCount = productReviews?.count || 0;
-      const cachedRatingAvg = cachedReviewCount > 0 ? Number((productReviews.total / productReviews.count).toFixed(1)) : 0;
+      const productReviews = p.reviews || [];
+      const cachedReviewCount = productReviews.length || 0;
+      const totalRating = productReviews.reduce((sum, r) => sum + (r.rating || 5), 0);
+      const cachedRatingAvg = cachedReviewCount > 0 ? Number((totalRating / cachedReviewCount).toFixed(1)) : 0;
 
       return {
         id: p.id,
