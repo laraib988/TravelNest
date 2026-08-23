@@ -1012,6 +1012,7 @@ export default function CreateListingPage() {
                         <option value="Shopping">Shopping</option>
                         <option value="Food">Food / Dining</option>
                           <option value="Culture">Culture</option>
+                          <option value="Adventure">Adventure</option>
                         </select>
                     </div>
                   </div>
