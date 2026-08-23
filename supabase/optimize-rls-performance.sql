@@ -1,5 +1,5 @@
 -- RLS Performance Optimization
--- This script replaces common RLS policies to use (select auth.uid()) instead of auth.uid()
+-- This script replaces common RLS policies to use (select auth.uid()) instead of (select auth.uid())
 -- This allows the Postgres Query Planner to cache the user ID instead of calling the function per row.
 
 -- 1. Optimize Bookings Table

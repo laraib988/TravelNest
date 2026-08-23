@@ -13,17 +13,17 @@ DROP POLICY IF EXISTS "Suppliers can view their bookings" ON public.bookings;
 -- Customer Rule: Can only see their own bookings
 CREATE POLICY "Customers can view own bookings" 
 ON public.bookings FOR SELECT 
-USING (auth.uid()::text = customer_id);
+USING ((select auth.uid())::text = customer_id);
 
 -- Customer Rule: Can only insert a booking for themselves
 CREATE POLICY "Customers can insert own bookings" 
 ON public.bookings FOR INSERT 
-WITH CHECK (auth.uid()::text = customer_id);
+WITH CHECK ((select auth.uid())::text = customer_id);
 
 -- Supplier Rule: Can only see bookings made for their own products
 CREATE POLICY "Suppliers can view their bookings" 
 ON public.bookings FOR SELECT 
-USING (auth.uid()::text = supplier_id);
+USING ((select auth.uid())::text = supplier_id);
 
 
 -- ==========================================
@@ -42,8 +42,8 @@ USING (status = 'PUBLISHED');
 -- Supplier Rule: Suppliers can view, insert, update, delete ONLY their own products
 CREATE POLICY "Suppliers can manage own products" 
 ON public.products FOR ALL 
-USING (auth.uid()::text = supplier_id) 
-WITH CHECK (auth.uid()::text = supplier_id);
+USING ((select auth.uid())::text = supplier_id) 
+WITH CHECK ((select auth.uid())::text = supplier_id);
 
 
 -- ==========================================

@@ -15,13 +15,13 @@ CREATE TABLE IF NOT EXISTS public.supplier_bank_accounts (
 ALTER TABLE public.supplier_bank_accounts ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Suppliers can view their own bank accounts" ON public.supplier_bank_accounts;
-CREATE POLICY "Suppliers can view their own bank accounts" ON public.supplier_bank_accounts FOR SELECT USING (supplier_id = auth.uid());
+CREATE POLICY "Suppliers can view their own bank accounts" ON public.supplier_bank_accounts FOR SELECT USING (supplier_id = (select auth.uid()));
 
 DROP POLICY IF EXISTS "Suppliers can insert their own bank accounts" ON public.supplier_bank_accounts;
-CREATE POLICY "Suppliers can insert their own bank accounts" ON public.supplier_bank_accounts FOR INSERT WITH CHECK (supplier_id = auth.uid());
+CREATE POLICY "Suppliers can insert their own bank accounts" ON public.supplier_bank_accounts FOR INSERT WITH CHECK (supplier_id = (select auth.uid()));
 
 DROP POLICY IF EXISTS "Suppliers can update their own bank accounts" ON public.supplier_bank_accounts;
-CREATE POLICY "Suppliers can update their own bank accounts" ON public.supplier_bank_accounts FOR UPDATE USING (supplier_id = auth.uid());
+CREATE POLICY "Suppliers can update their own bank accounts" ON public.supplier_bank_accounts FOR UPDATE USING (supplier_id = (select auth.uid()));
 
 DROP POLICY IF EXISTS "Suppliers can delete their own bank accounts" ON public.supplier_bank_accounts;
-CREATE POLICY "Suppliers can delete their own bank accounts" ON public.supplier_bank_accounts FOR DELETE USING (supplier_id = auth.uid());
+CREATE POLICY "Suppliers can delete their own bank accounts" ON public.supplier_bank_accounts FOR DELETE USING (supplier_id = (select auth.uid()));
