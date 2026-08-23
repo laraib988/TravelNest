@@ -313,7 +313,7 @@ export default function HomePage() {
               <span>{t('free_cancellation')}</span>
             </div>
 
-            <form onSubmit={handleSearch} style={{ borderRadius: 'var(--radius-pill)', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '600px', background: '#ffffff', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)' }}>
+            <form onSubmit={handleSearch} style={{ marginTop: '20px', borderRadius: 'var(--radius-pill)', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '600px', background: '#ffffff', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)' }}>
               <Search size={20} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
               <input
                 type="text"
