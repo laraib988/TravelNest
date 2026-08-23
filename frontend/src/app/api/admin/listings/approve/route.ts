@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const supabaseAdmin = createClient(supabaseUrl!, supabaseServiceKey!);
 
     const { data: draftData, error: draftErr } = await supabaseAdmin
-      .from('products').select('id, supplier_id, status, logistics, basic_info, transport_pricing')
+      .from('products').select('id, supplier_id, status, logistics, basic_info, transport_pricing, created_at, updated_at')
       .eq('id', productId)
       .single();
 
