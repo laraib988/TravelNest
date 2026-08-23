@@ -10,8 +10,7 @@ export async function GET() {
     const supabaseAdmin = createClient(supabaseUrl!, supabaseServiceKey!);
 
     const { data: products, error } = await supabaseAdmin
-      .from('products')
-      .select('*')
+      .from('products').select('id, supplier_id, status, updated_at, logistics, basic_info, transport_pricing')
       .order('updated_at', { ascending: false });
 
     if (error) throw error;

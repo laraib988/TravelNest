@@ -9,7 +9,7 @@ export async function GET() {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseAdmin = createClient(supabaseUrl!, supabaseServiceKey!);
 
-    const { data, error } = await supabaseAdmin.from('products').select('*');
+    const { data, error } = await supabaseAdmin.from('products').select('id, supplier_id, status, logistics');
     if (error) throw error;
 
     const live = data.find(p => (p.status === 'LIVE' || p.status === 'PUBLISHED') && p.basic_info?.title?.includes('Mount Fuji'));
