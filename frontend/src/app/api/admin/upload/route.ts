@@ -10,25 +10,35 @@ cloudinary.config({
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    let file = formData.get('file') as File;
+    const urlString = formData.get('url') as string;
     
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    let buffer: Buffer;
+
+    if (urlString) {
+      const response = await fetch(urlString, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      });
+      if (!response.ok) {
+        return NextResponse.json({ error: `Failed to fetch image: ${response.status} ${response.statusText}` }, { status: 400 });
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+    } else if (file) {
+      const arrayBuffer = await file.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+    } else {
+      return NextResponse.json({ error: 'No file or url provided' }, { status: 400 });
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         { folder: 'vaitour' },
         (error, uploadResult) => {
-          if (error) {
-            console.error('Cloudinary stream upload error:', error);
-            reject(error);
-          } else {
-            resolve(uploadResult);
-          }
+          if (error) reject(error);
+          else resolve(uploadResult);
         }
       ).end(buffer);
     });

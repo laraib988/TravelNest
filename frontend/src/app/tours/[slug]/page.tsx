@@ -13,10 +13,11 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const id = params.slug.length >= 36 ? params.slug.slice(-36) : params.slug;
   const { data: tour } = await supabase
     .from('products')
-    .select('title, short_desc, cover_image_cloudinary_url, meta_description')
-    .eq('slug', params.slug)
+    .select('basic_info, experience_details')
+    .eq('id', id)
     .single();
 
   if (!tour) {
@@ -27,10 +28,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = params.locale || 'en';
   const canonicalUrl = `https://www.vaitour.com/${locale}/tours/${params.slug}`;
 
-  const rawTitle = tour.title || 'Tour Experience';
+  const rawTitle = tour.basic_info?.title || 'Tour Experience';
   const seoTitle = `${rawTitle.slice(0, 45)} – Book Tickets | Vaitour`;
   
-  const rawDesc = tour.meta_description || tour.short_desc || `Book the incredible ${rawTitle} today with instant confirmation and free cancellation on Vaitour.`;
+  const rawDesc = tour.basic_info?.summary || tour.experience_details?.short_desc || `Book the incredible ${rawTitle} today with instant confirmation and free cancellation on Vaitour.`;
   const seoDesc = rawDesc.slice(0, 150) + (rawDesc.length > 150 ? '...' : '');
 
   return {
@@ -48,9 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: tour.title,
-      description: tour.short_desc,
-      images: tour.cover_image_cloudinary_url ? [tour.cover_image_cloudinary_url] : [],
+      title: rawTitle,
+      description: rawDesc,
+      images: tour.basic_info?.photos?.heroImage ? [tour.basic_info.photos.heroImage] : [],
       locale: locale,
     },
   };
@@ -59,10 +60,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 import { notFound, permanentRedirect } from 'next/navigation';
 
 export default async function Page({ params }: Props) {
+  const id = params.slug.length >= 36 ? params.slug.slice(-36) : params.slug;
   const { data: p } = await supabase
     .from('products')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('id', id)
     .single();
 
   if (!p) {

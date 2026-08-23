@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import AccountSettingsClient from './AccountSettingsClient';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -64,7 +65,7 @@ const section = (params?.section as string) || 'dashboard';
 
 
   
-  const activeTab = section === 'listings' ? 'LISTINGS' : section === 'bookings' ? 'BOOKINGS' : (section === 'finance' || section === 'account-settings') ? 'FINANCE' : section === 'availability' ? 'AVAILABILITY' : 'DASHBOARD';
+  const activeTab = section === 'listings' ? 'LISTINGS' : section === 'bookings' ? 'BOOKINGS' : section === 'finance' ? 'FINANCE' : section === 'account-settings' ? 'ACCOUNT' : section === 'availability' ? 'AVAILABILITY' : 'DASHBOARD';
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -362,6 +363,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
         {/* =========================================================================
             FINANCE & PAYOUTS TAB
            ========================================================================= */}
+        {activeTab === 'ACCOUNT' && <AccountSettingsClient />}
         {activeTab === 'FINANCE' && (
           <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>Finance & Payouts</h1>
@@ -784,162 +786,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
             )}
 
 
-            {financeTab === 'SETTINGS' && (
-              <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                  <div>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Payment Settings</h2>
-                    <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.9rem' }}>Manage your bank accounts for international payouts.</p>
-                  </div>
-                  {!showBankForm && (
-                    <button 
-                      onClick={() => setShowBankForm(true)}
-                      style={{ padding: '10px 16px', borderRadius: '8px', background: '#0f172a', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-                    >
-                      <Plus size={16} /> Add Another Payment Method
-                    </button>
-                  )}
-                </div>
-
-                {!showBankForm && bankAccounts.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {bankAccounts.map((account) => (
-                      <div key={account.id} style={{ background: '#fff', borderRadius: '16px', border: account.is_primary ? '2px solid #10b981' : '1px solid #e2e8f0', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: account.is_primary ? '0 4px 12px rgba(16, 185, 129, 0.1)' : 'none' }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{account.bank_name}</h3>
-                            {account.is_primary && (
-                              <span style={{ background: '#ecfdf5', color: '#047857', padding: '4px 10px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 800, border: '1px solid #a7f3d0' }}>PRIMARY</span>
-                            )}
-                          </div>
-                          <div style={{ color: '#475569', fontSize: '0.9rem', marginBottom: '4px' }}>{account.bank_account_holder} • {account.bank_account_number}</div>
-                          <div style={{ color: '#64748b', fontSize: '0.8rem' }}>{account.bank_country} • {account.bank_currency} • Routing: {account.bank_routing_number}</div>
-                        </div>
-                        {!account.is_primary && (
-                          <button 
-                            onClick={async () => {
-                              try {
-                                const res = await fetch('/api/supplier/bank-details/set-primary', {
-                                  method: 'PATCH',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ supplierId: user?.id, accountId: account.id })
-                                });
-                                if (res.ok) {
-                                  setBankAccounts(prev => prev.map(a => ({ ...a, is_primary: a.id === account.id })));
-                                  triggerToast('Primary Updated', 'Successfully changed your primary payout account.');
-                                }
-                              } catch (err) {}
-                            }}
-                            style={{ padding: '8px 16px', borderRadius: '8px', background: '#f8fafc', color: '#475569', fontWeight: 700, border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                          >
-                            Set as Primary
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {showBankForm && (
-                  <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '32px' }}>
-                    <form onSubmit={async (e: any) => {
-                      e.preventDefault();
-                      const btn = document.getElementById('save_bank_btn');
-                      if (btn) btn.innerText = 'Saving...';
-                      
-                      try {
-                        const formData = new FormData(e.target);
-                        const bankDetails = {
-                          account_holder: formData.get('bank_account_name'),
-                          bank_name: formData.get('bank_name'),
-                          account_number: formData.get('bank_account_number'),
-                          routing_number: formData.get('bank_routing'),
-                          country: formData.get('bank_country'),
-                          currency: formData.get('bank_currency')
-                        };
-                        const isPrimary = formData.get('is_primary') === 'on';
-
-                        const res = await fetch('/api/supplier/bank-details/update', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ supplierId: user?.id, bankDetails, isPrimary })
-                        });
-                        if (res.ok) {
-                          // Fetch latest accounts
-                          const fetchRes = await fetch(`/api/supplier/bank-details?supplierId=${user?.id}`);
-                          const data = await fetchRes.json();
-                          setBankAccounts(data);
-                          setShowBankForm(false);
-                          triggerToast('Awesome!', 'Your new payment method has been added successfully.');
-                        } else {
-                          const data = await res.json();
-                          triggerToast('Error', data.error, 'error');
-                        }
-                      } catch (err) {
-                        triggerToast('Error', 'Network error saving bank details.', 'error');
-                      }
-                      if (btn) btn.innerText = 'Save Payment Settings';
-                    }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Account Holder Name</label>
-                          <input name="bank_account_name" id="bank_account_name" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="John Doe" required />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Bank Name</label>
-                          <input name="bank_name" id="bank_name" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="Chase Bank" required />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Account Number / IBAN</label>
-                          <input name="bank_account_number" id="bank_account_number" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="GB0000..." required />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Routing / SWIFT / BIC</label>
-                          <input name="bank_routing" id="bank_routing" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="CHASUS..." required />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Bank Country</label>
-                          <select name="bank_country" id="bank_country" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', background: '#fff' }} required>
-                            <option value="US">United States</option>
-                            <option value="GB">United Kingdom</option>
-                            <option value="EU">European Union</option>
-                            <option value="AE">United Arab Emirates</option>
-                            <option value="AU">Australia</option>
-                            <option value="SG">Singapore</option>
-                            <option value="JP">Japan</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Payout Currency</label>
-                          <select name="bank_currency" id="bank_currency" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', background: '#fff' }} required>
-                            <option value="USD">USD ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="GBP">GBP (£)</option>
-                            <option value="AED">AED (د.إ)</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <input name="is_primary" type="checkbox" id="is_primary" defaultChecked={bankAccounts.length === 0} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
-                        <label htmlFor="is_primary" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>Make this my primary payout method</label>
-                      </div>
-                      
-                      <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
-                        {bankAccounts.length > 0 && (
-                          <button type="button" onClick={() => setShowBankForm(false)} style={{ padding: '12px 24px', borderRadius: '8px', background: '#fff', color: '#64748b', fontWeight: 700, border: '1px solid #cbd5e1', cursor: 'pointer' }}>
-                            Cancel
-                          </button>
-                        )}
-                        <button type="submit" id="save_bank_btn" style={{ padding: '12px 24px', borderRadius: '8px', background: '#0f172a', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
-                          Save Payment Settings
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                )}
-              </div>
-            )}
+            {}
           </div>
 )}
         
@@ -1065,7 +912,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
                                 <input
                                   type="date"
-                                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                                  style={{ flex: 1, minWidth: 0, padding: '10px 4px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%' }}
                                   min={new Date().toISOString().split('T')[0]}
                                   onChange={(e) => setDateRanges(prev => ({ ...prev, [item.id]: { from: e.target.value, to: dateRanges[item.id]?.to || blockTo } }))}
                                   value={(dateRanges[item.id]?.from ?? blockFrom) || ''}
@@ -1073,7 +920,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                                 <span style={{ color: '#64748b', fontSize: '1rem' }}>→</span>
                                 <input
                                   type="date"
-                                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                                  style={{ flex: 1, minWidth: 0, padding: '10px 4px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%' }}
                                   min={(dateRanges[item.id]?.from || blockFrom) || new Date().toISOString().split('T')[0]}
                                   onChange={(e) => setDateRanges(prev => ({ ...prev, [item.id]: { from: (dateRanges[item.id]?.from ?? blockFrom) || '', to: e.target.value } }))}
                                   value={(dateRanges[item.id]?.to ?? blockTo) || ''}

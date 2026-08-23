@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, Save, Trash2, Plus, ChevronLeft } from 'lucide-react';
+import languagesList from '@/lib/languages.json';
 import { ServiceAreaMap } from '@/app/supplier/map/ServiceAreaMap';
 
 const STEPS = ['Basic Info', 'Photos', 'Experience', 'Transport & Pricing', 'Logistics', 'Itinerary', 'FAQs', 'Review'];
@@ -93,8 +94,7 @@ export default function CreateListingPage() {
     timeToSpend: '',
     hasEntryFee: false,
     entryFeeAmount: '',
-    images: []
-  });
+    images: [], dayNumber: 1 });
 
   // State to prevent autosave before initial fetch completes
   const [isInitialLoad, setIsInitialLoad] = useState(() => {
@@ -316,14 +316,43 @@ export default function CreateListingPage() {
   const saveItineraryItem = () => {
     if (!currentItinerary.locationName) return;
     setItinerary([...itinerary, { ...currentItinerary, id: Date.now().toString() }]);
-    setCurrentItinerary({ locationName: '', description: '', attractionType: '', timeToSpend: '', hasEntryFee: false, entryFeeAmount: '', images: [] });
+    setCurrentItinerary({ locationName: '', description: '', attractionType: '', timeToSpend: '', hasEntryFee: false, entryFeeAmount: '', images: [], dayNumber: currentItinerary.dayNumber || 1 });
   };
 
   const removeItineraryItem = (id: string) => {
     setItinerary(itinerary.filter(i => i.id !== id));
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, isHero: boolean) => {
+
+  const uploadImageToCloudinary = async (fileOrUrl: File | string) => {
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      if (typeof fileOrUrl === 'string') {
+        formData.append('url', fileOrUrl);
+      } else {
+        formData.append('file', fileOrUrl);
+      }
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        return data.url;
+      } else {
+        throw new Error(data.error || 'Upload failed');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to upload image to Cloudinary. Please try again.');
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, isHero: boolean) => {
     const files = e.target.files;
     if (!files) return;
     
@@ -336,27 +365,14 @@ export default function CreateListingPage() {
     }
 
     if (isHero) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotos(prev => ({ ...prev, heroImage: reader.result as string }));
-      };
-      reader.readAsDataURL(files[0]);
+      const url = await uploadImageToCloudinary(files[0]);
+      if (url) setPhotos(prev => ({ ...prev, heroImage: url }));
     } else {
-      const promises = Array.from(files).map(f => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(f);
-        });
-      });
-      Promise.all(promises).then(results => {
-        setPhotos(prev => {
-          const spaceLeft = 4 - prev.gallery.length;
-          if (spaceLeft <= 0) return prev;
-          const allowedResults = results.slice(0, spaceLeft);
-          return { ...prev, gallery: [...prev.gallery, ...allowedResults] };
-        });
-      });
+      for (const f of Array.from(files)) {
+        if (photos.gallery.filter(Boolean).length >= 4) break;
+        const url = await uploadImageToCloudinary(f);
+        if (url) setPhotos(prev => ({ ...prev, gallery: [...prev.gallery.filter(Boolean), url].slice(0, 4) }));
+      }
     }
   };
 
@@ -517,6 +533,29 @@ export default function CreateListingPage() {
                     {uploadingImage ? <div style={{ color: '#0284c7', fontWeight: 600 }}>Uploading to Cloudinary...</div> : (!photos.heroImage && <div style={{ color: '#94a3b8', fontWeight: 600 }}>Click to upload Hero Image</div>)}
                     <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, true)} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
                   </div>
+                  
+                  <div style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
+                    <input type="text" placeholder="Or paste image URL here (e.g. Unsplash) and press Enter" style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} onKeyDown={async (e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = e.currentTarget.value.trim();
+                        if (val) {
+                          e.currentTarget.value = '';
+                          const url = await uploadImageToCloudinary(val);
+                          if (url) setPhotos(prev => ({ ...prev, heroImage: url }));
+                        }
+                      }
+                    }} />
+                    <button style={{ padding: '0 20px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }} onClick={async (e) => {
+                      const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                      if (input && input.value.trim()) {
+                        const val = input.value.trim();
+                        input.value = '';
+                        const url = await uploadImageToCloudinary(val);
+                        if (url) setPhotos(prev => ({ ...prev, heroImage: url }));
+                      }
+                    }}>Add URL</button>
+                  </div>
                 </div>
 
                 <div style={{ background: '#f8fafc', padding: '30px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
@@ -524,7 +563,7 @@ export default function CreateListingPage() {
                   <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>Upload additional images to show off your tour. (Max 4 images, 2MB per file).</p>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-                    {photos.gallery.map((src, i) => (
+                    {photos.gallery.filter(Boolean).map((src, i) => (
                       <div key={i} style={{ height: '120px', borderRadius: '12px', background: `url(${src}) center/cover`, position: 'relative' }}>
                         <button 
                           onClick={() => setPhotos(prev => ({...prev, gallery: prev.gallery.filter((_, idx) => idx !== i)}))}
@@ -532,7 +571,7 @@ export default function CreateListingPage() {
                         >✕</button>
                       </div>
                     ))}
-                    {photos.gallery.length < 4 && (
+                    {photos.gallery.filter(Boolean).length < 4 && (
                       <div style={{ position: 'relative', height: '120px', border: '2px dashed #cbd5e1', borderRadius: '12px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#64748b' }}>
                         <Plus size={24} />
                         <span style={{ fontSize: '0.8rem', fontWeight: 600, marginTop: '8px' }}>Add Photos</span>
@@ -540,6 +579,30 @@ export default function CreateListingPage() {
                       </div>
                     )}
                   </div>
+                  {photos.gallery.filter(Boolean).length < 4 && (
+                      <div style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
+                        <input type="text" placeholder="Or paste image URL here and press Enter" style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} onKeyDown={async (e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const val = e.currentTarget.value.trim();
+                            if (val) {
+                              e.currentTarget.value = '';
+                              const url = await uploadImageToCloudinary(val);
+                              if (url) setPhotos(prev => ({ ...prev, gallery: [...prev.gallery.filter(Boolean), url].slice(0, 4) }));
+                            }
+                          }
+                        }} />
+                        <button style={{ padding: '0 20px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }} onClick={async (e) => {
+                          const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                          if (input && input.value.trim()) {
+                            const val = input.value.trim();
+                            input.value = '';
+                            const url = await uploadImageToCloudinary(val);
+                            if (url) setPhotos(prev => ({ ...prev, gallery: [...prev.gallery.filter(Boolean), url].slice(0, 4) }));
+                          }
+                        }}>Add URL</button>
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
@@ -578,7 +641,7 @@ export default function CreateListingPage() {
       <ChevronRight size={18} style={{ transform: 'rotate(90deg)' }} />
     </summary>
     <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', marginTop: '4px', zIndex: 100, maxHeight: '200px', overflowY: 'auto', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-      {['English', 'Japanese', 'Spanish', 'French', 'German', 'Chinese', 'Arabic', 'Italian'].map(lang => (
+      {languagesList.map(lang => (
         <label key={lang} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', background: Array.isArray(experienceDetails.language) && experienceDetails.language.includes(lang) ? '#eff6ff' : 'transparent', width: '100%' }}>
           <input type="checkbox" checked={Array.isArray(experienceDetails.language) && experienceDetails.language.includes(lang)} onChange={(e) => {
             if (e.target.checked) {
@@ -735,7 +798,7 @@ export default function CreateListingPage() {
                       <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Customer Price (USD)</label>
                       <div style={{ position: 'relative' }}>
                         <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: 700, color: '#64748b' }}>$</span>
-                        <input type="number" value={currentTransport.amount} onChange={e => setCurrentTransport({...currentTransport, amount: e.target.value})} placeholder="0.00" style={{...inputStyle, paddingLeft: '32px'}} />
+                        <input type="number" min="1" value={currentTransport.amount} onChange={e => { const val = e.target.value.replace(/-/g, ''); setCurrentTransport({...currentTransport, amount: val}); }} placeholder="0.00" style={{...inputStyle, paddingLeft: '32px'}} />
                       </div>
                     </div>
                     <div>
@@ -773,8 +836,8 @@ export default function CreateListingPage() {
                   <div style={{ marginTop: '24px', textAlign: 'right' }}>
                     <button 
                       onClick={saveTransportOption}
-                      disabled={!currentTransport.title || !currentTransport.amount}
-                      style={{ background: '#0f172a', color: '#ffffff', padding: '12px 24px', borderRadius: '8px', fontWeight: 700, border: 'none', cursor: (!currentTransport.title || !currentTransport.amount) ? 'not-allowed' : 'pointer', opacity: (!currentTransport.title || !currentTransport.amount) ? 0.5 : 1 }}
+                      disabled={!currentTransport.title || !currentTransport.amount || parseFloat(currentTransport.amount) <= 0}
+                      style={{ background: '#0f172a', color: '#ffffff', padding: '12px 24px', borderRadius: '8px', fontWeight: 700, border: 'none', cursor: (!currentTransport.title || !currentTransport.amount || parseFloat(currentTransport.amount) <= 0) ? 'not-allowed' : 'pointer', opacity: (!currentTransport.title || !currentTransport.amount || parseFloat(currentTransport.amount) <= 0) ? 0.5 : 1 }}
                     >
                       Save Option
                     </button>
@@ -912,7 +975,7 @@ export default function CreateListingPage() {
                       <label style={{ display: 'block', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>Payment Option</label>
                       <select value={logistics.paymentOption} onChange={e => setLogistics({...logistics, paymentOption: e.target.value})} style={inputStyle}>
                         <option value="Pay Now">Pay Now</option>
-                        <option value="Reserve Now Pay Later">Reserve Now Pay Later</option>
+                        <option value="Pay After Tour">Pay After Tour</option>
                       </select>
                     </div>
                   </div>
@@ -942,7 +1005,8 @@ export default function CreateListingPage() {
                         <option value="Nature">Nature</option>
                         <option value="Shopping">Shopping</option>
                         <option value="Food">Food / Dining</option>
-                      </select>
+                          <option value="Culture">Culture</option>
+                        </select>
                     </div>
                   </div>
 

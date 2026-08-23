@@ -1366,7 +1366,7 @@ export default function ListingsManagementPage() {
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px 0' }}>Permanently Delete?</h3>
             <p style={{ color: '#475569', fontSize: '0.95rem', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-              Are you sure you want to approve this deletion? This action cannot be undone and the product will be permanently removed from the database.
+              Are you sure you want to delete this product? This action cannot be undone and the product will be permanently removed from the database.
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button 

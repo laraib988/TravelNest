@@ -283,9 +283,9 @@ export default function HomePage() {
       <section
         style={{
           position: 'relative',
-          minHeight: '520px',
+          minHeight: '400px',
           display: 'flex',
-          alignItems: 'flex-end',
+          alignItems: 'center',
           justifyContent: 'flex-start',
           textAlign: 'left',
           overflow: 'hidden',
@@ -295,14 +295,14 @@ export default function HomePage() {
           <img
             src="/images/travelers_hero.jpg"
             alt="Professional Travelers"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
           />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.55) 60%, rgba(15, 23, 42, 0.25) 100%)' }} />
         </div>
 
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '80px 32px 60px' }}>
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '0 32px' }}>
           <div style={{ maxWidth: '780px' }}>
-            <h1 style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)', lineHeight: 1.1, marginBottom: '16px', color: '#ffffff', fontWeight: 800, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', lineHeight: 1.15, marginBottom: '16px', color: '#ffffff', fontWeight: 800, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
               {t('hero_title_1')}<br />
               <span style={{ color: '#38bdf8' }}>{t('hero_title_2')}</span>
             </h1>
