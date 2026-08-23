@@ -150,10 +150,29 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   };
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
   const addImage = () => {
-    const url = window.prompt('Enter image URL:');
-    if (!url) return;
-    editor.chain().focus().setImage({ src: url }).run();
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.url) {
+        editor.chain().focus().setImage({ src: data.url }).run();
+      }
+    } catch (err) {
+      console.error('Image upload failed', err);
+    }
+    e.target.value = '';
   };
 
   return (
