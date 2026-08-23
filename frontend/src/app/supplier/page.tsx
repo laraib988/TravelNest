@@ -26,6 +26,8 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 export default function SupplierPage() {
+  const { user, profile } = useAuth();
+  const isSupplier = user && profile?.role === 'SUPPLIER';
   // removed openAuthModal
 
   const platformStats = [
@@ -204,27 +206,51 @@ export default function SupplierPage() {
               </p>
 
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Link
-                  href="/supplier/signup"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '14px 28px',
-                    borderRadius: '14px',
-                    background: '#ffffff',
-                    color: '#0284c7',
-                    fontWeight: 700,
-                    fontSize: '1rem',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textDecoration: 'none',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  Apply Now <ArrowRight size={18} />
-                </Link>
+                {isSupplier ? (
+                  <Link
+                    href="/supplier/listings"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '14px 28px',
+                      borderRadius: '14px',
+                      background: '#ffffff',
+                      color: '#0284c7',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Go to Dashboard <ArrowRight size={18} />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/supplier/signup"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '14px 28px',
+                      borderRadius: '14px',
+                      background: '#ffffff',
+                      color: '#0284c7',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Apply Now <ArrowRight size={18} />
+                  </Link>
+                )}
                 <a
                   href="#how-it-works"
                   style={{
@@ -634,27 +660,51 @@ export default function SupplierPage() {
           <p style={{ fontSize: '1.05rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, margin: '0 0 28px' }}>
             Join 500+ tour operators already earning more with Vaitour. Zero listing fees — pay only when you earn.
           </p>
-          <Link
-            href="/supplier/signup"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '14px 32px',
-              borderRadius: '14px',
-              background: '#ffffff',
-              color: '#0284c7',
-              fontWeight: 700,
-              fontSize: '1rem',
-              border: 'none',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-              transition: 'all 0.2s'
-            }}
-          >
-            Get Started Now <ArrowRight size={18} />
-          </Link>
+          {isSupplier ? (
+            <Link
+              href="/supplier/listings"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 32px',
+                borderRadius: '14px',
+                background: '#ffffff',
+                color: '#0284c7',
+                fontWeight: 700,
+                fontSize: '1rem',
+                border: 'none',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                transition: 'all 0.2s'
+              }}
+            >
+              Go to Dashboard <ArrowRight size={18} />
+            </Link>
+          ) : (
+            <Link
+              href="/supplier/signup"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 32px',
+                borderRadius: '14px',
+                background: '#ffffff',
+                color: '#0284c7',
+                fontWeight: 700,
+                fontSize: '1rem',
+                border: 'none',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                transition: 'all 0.2s'
+              }}
+            >
+              Get Started Now <ArrowRight size={18} />
+            </Link>
+          )}
         </div>
       </section>
 
