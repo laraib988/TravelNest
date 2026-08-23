@@ -26,8 +26,8 @@ import {
 import { useAuth } from '@/context/AuthContext';
 
 export default function SupplierPage() {
-  const { user, profile } = useAuth();
-  const isSupplier = user && profile?.role === 'SUPPLIER';
+  const { user } = useAuth();
+  const isSupplier = user && user.role === 'SUPPLIER';
   // removed openAuthModal
 
   const platformStats = [
