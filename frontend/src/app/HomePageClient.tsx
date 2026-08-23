@@ -785,33 +785,33 @@ export default function HomePage() {
       {/* 7. HOW IT WORKS */}
       <section style={{ background: '#f8fafc', padding: '60px 0', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginBottom: '60px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'left' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'center' }}>
             {t('how_works_title')}
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'left', marginBottom: '40px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', textAlign: 'center', marginBottom: '40px' }}>
             Book premium local experiences in 4 simple steps
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
-            <div style={{ textAlign: 'left' }}>
+            <div style={{ textAlign: 'center' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>1</div>
               <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Choose Experience</h3>
               <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Explore 5,000+ verified sightseeing tours, food walks, and cruises.</p>
             </div>
 
-            <div style={{ textAlign: 'left' }}>
+            <div style={{ textAlign: 'center' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>2</div>
               <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Customize with AI</h3>
               <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Let our AI engine build your customized destination itinerary instantly.</p>
             </div>
 
-            <div style={{ textAlign: 'left' }}>
+            <div style={{ textAlign: 'center' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>3</div>
               <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Secure QR Booking</h3>
               <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Lock slots securely. Receive printable QR e-vouchers instantly.</p>
             </div>
 
-            <div style={{ textAlign: 'left' }}>
+            <div style={{ textAlign: 'center' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--brand-primary)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontWeight: 800 }}>4</div>
               <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Present & Enjoy</h3>
               <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Show voucher QR to verified local operators at arrival and explore.</p>
