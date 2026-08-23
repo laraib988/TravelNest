@@ -370,7 +370,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+        <div className="hide-scrollbar" style={{ display: 'flex', gap: '24px', overflowX: 'auto', scrollBehavior: 'smooth', paddingBottom: '16px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {(() => {
             const filteredDests = activeSearchTerm.trim()
               ? destinations.filter((d) => d.name.toLowerCase().includes(activeSearchTerm.toLowerCase()) || d.country.toLowerCase().includes(activeSearchTerm.toLowerCase()))
@@ -381,7 +381,7 @@ export default function HomePage() {
             }
 
             return filteredDests.map((dest) => (
-              <Link key={dest.id} href={`/destinations/${dest.slug}`}>
+              <Link key={dest.id} href={`/destinations/${dest.slug}`} style={{ flex: '0 0 280px', textDecoration: 'none', color: 'inherit' }}>
                 <div className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', height: '220px', position: 'relative' }}>
                   <Image 
                     src={dest.hero_image} 
