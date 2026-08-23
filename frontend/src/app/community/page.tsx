@@ -14,7 +14,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default async function CommunityDirectoryPage() {
   const { data: discussions } = await supabase
     .from('forum_discussions')
-    .select('*')
+    .select('id, title, author_id, category, upvotes, view_count, created_at, is_pinned')
     .order('created_at', { ascending: false })
     .limit(50);
 

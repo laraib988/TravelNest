@@ -46,7 +46,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
       // Avoids downloading massive base64 product image blobs from Supabase.
       const { data: products } = await getSupabase()
         .from('products')
-        .select('id, status, basic_info')
+        .select('*')
         .eq('status', 'PUBLISHED')
         .order('created_at', { ascending: false })
         .limit(20);

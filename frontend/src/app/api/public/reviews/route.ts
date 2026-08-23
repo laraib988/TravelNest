@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const listingId = searchParams.get('listing_id');
     
-    let query = getSupabase().from('reviews').select('*').eq('status', 'APPROVED');
+    let query = getSupabase().from('reviews').select('id, listing_id, user_id, rating, comment, status, created_at').eq('status', 'APPROVED');
     
     if (listingId) {
       query = query.eq('listing_id', listingId);

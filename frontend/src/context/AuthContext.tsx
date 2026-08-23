@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.role === 'SUPPLIER') {
         const { data: kycData } = await supabase
           .from('supplier_kyc_records')
-          .select('status')
+          .select('*')
           .eq('user_id', userId)
           .maybeSingle();
         if (kycData) supplierStatus = kycData.status;
@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkUserExists = async (email: string) => {
     try {
-      const { data } = await supabase.from('profiles').select('id').eq('email', email).maybeSingle();
+      const { data } = await supabase.from('profiles').select('*').eq('email', email).maybeSingle();
       return !!data;
     } catch {
       return false;

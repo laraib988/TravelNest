@@ -10,7 +10,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const { data: discussion } = await supabase.from('forum_discussions').select('title, content').eq('id', params.id).single();
+  const { data: discussion } = await supabase.from('forum_discussions').select('*').eq('id', params.id).single();
   if (!discussion) return { title: 'Discussion Not Found' };
   
   return {

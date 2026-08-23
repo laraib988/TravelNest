@@ -15,7 +15,7 @@ export async function GET() {
   try {
     const { data: bookings, error } = await getSupabase()
       .from('bookings')
-      .select('*')
+      .select('id, customer_id, supplier_id, product_id, status, total_price, booking_date, created_at, tour_date, payment_status')
       // Assuming 'cust-current-user' since there's no real auth yet
       .eq('customer_id', 'cust-current-user')
       .order('created_at', { ascending: false });

@@ -46,7 +46,7 @@ export async function PUT(request: Request, { params }: Params) {
     const body = await request.json();
 
     // Normalize published_at: set on publish transition, clear on unpublish.
-    const current = await getSupabase().from('blogs').select('status').eq('id', id).maybeSingle();
+    const current = await getSupabase().from('blogs').select('*').eq('id', id).maybeSingle();
     const currentStatus = current.data?.status;
 
     let published_at: string | null = undefined;
@@ -92,7 +92,7 @@ export async function PUT(request: Request, { params }: Params) {
     // Ensure unique slug (exclude self).
     const { data: existing } = await getSupabase()
       .from('blogs')
-      .select('id')
+      .select('*')
       .eq('slug', updatePayload.slug)
       .neq('id', id)
       .maybeSingle();

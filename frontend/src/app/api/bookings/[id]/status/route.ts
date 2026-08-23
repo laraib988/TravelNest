@@ -18,7 +18,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const supabaseAdmin = getSupabaseAdmin();
     const { data: booking, error: fetchError } = await supabaseAdmin
       .from('bookings')
-      .select('*')
+      .select('id, customer_id, supplier_id, product_id, status, total_price, booking_date, created_at, updated_at, tour_date, payment_status, traveler_details')
       .eq('id', id)
       .single();
 

@@ -17,7 +17,7 @@ type Props = {
 // Next.js React cache deduplicates the Supabase query so it's only called once per render cycle
 // across generateMetadata and the Page component.
 const getTour = cache(async (id: string) => {
-  // STRICT SELECT: Replaced .select('*') with explicit columns to save Egress/Bandwidth.
+  // STRICT SELECT: Replaced .select('id, created_at') /* fallback */ with explicit columns to save Egress/Bandwidth.
   // Note: We cannot use .select('..., reviews(*), supplier(*)') (Joins) yet because the 
   // 'products' table lacks Foreign Key constraints to 'reviews' and 'profiles' in Supabase.
   // Adding them in Supabase Dashboard will allow us to compress this to 1 single query.

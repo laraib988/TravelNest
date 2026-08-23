@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from('notifications')
-      .select('*')
+      .select('id, user_id, title, message, is_read, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 

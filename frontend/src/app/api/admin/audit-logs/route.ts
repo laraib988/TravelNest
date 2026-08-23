@@ -11,7 +11,7 @@ export async function GET() {
 
     const { data, error } = await supabaseAdmin
       .from('audit_logs')
-      .select('*')
+      .select('id, admin_id, action, target_type, target_id, created_at')
       .order('created_at', { ascending: false })
       .limit(50);
 

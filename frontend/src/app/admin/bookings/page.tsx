@@ -67,7 +67,7 @@ export default function BookingsManagementPage() {
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
+        .select('id, customer_id, supplier_id, product_id, status, total_price, booking_date, created_at, tour_date, payment_status')
         .order('created_at', { ascending: false });
         
       if (!error && Array.isArray(data) && data.length > 0) {

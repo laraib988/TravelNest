@@ -8,7 +8,7 @@ export async function generateStaticParams() {
 
   const { data: destinations } = await supabase
     .from('destinations')
-    .select('slug')
+    .select('*')
     .eq('is_published', true);
 
   return (destinations || []).map((d) => ({
@@ -125,7 +125,7 @@ export default async function DestinationTemplatePage({ params }: { params: { sl
   // Fetch listings (optimized columns to reduce payload under Next.js cache limit)
   const { data: rawProducts } = await supabase
     .from('products')
-    .select('id, basic_info, transport_pricing, pricing, base_price, cached_rating_avg, cached_review_count, slug, destination_id, category_name, merchandising_badges, logistics')
+    .select('*')
     .in('status', ['PUBLISHED', 'APPROVED']);
 
   const listings = (rawProducts || []).map(mapProductToListing);
@@ -155,7 +155,7 @@ export default async function DestinationTemplatePage({ params }: { params: { sl
   // Fetch 3 nearby destinations for SEO interlinking
   let { data: nearbyDestinations } = await supabase
     .from('destinations')
-    .select('name, slug, hero_image, country')
+    .select('*')
     .neq('slug', params.slug)
     .limit(3);
 

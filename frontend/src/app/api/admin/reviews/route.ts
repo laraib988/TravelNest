@@ -16,7 +16,7 @@ function getSupabase() {
 // GET all reviews (Admin can see PENDING, APPROVED, REJECTED)
 export async function GET() {
   try {
-    const { data, error } = await getSupabase().from('reviews').select('*').order('created_at', { ascending: false });
+    const { data, error } = await getSupabase().from('reviews').select('id, listing_id, user_id, rating, comment, status, created_at').order('created_at', { ascending: false });
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error: any) {

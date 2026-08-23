@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     
     const { data, error } = await supabase
       .from('supplier_bank_accounts')
-      .select('*')
+      .select('id, created_at')
       .eq('supplier_id', supplierId)
       .order('created_at', { ascending: false });
 

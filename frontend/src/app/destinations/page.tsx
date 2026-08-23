@@ -12,7 +12,7 @@ export default async function DestinationsIndexPage() {
 
   const { data: destinations } = await supabase
     .from('destinations')
-    .select('*')
+    .select('id, name, slug, country, hero_image, popular_activities_count, is_published, created_at, description')
     .eq('is_published', true)
     .order('name');
 

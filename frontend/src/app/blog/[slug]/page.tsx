@@ -32,7 +32,7 @@ async function getBlog(slug: string) {
 export async function generateStaticParams() {
   const { data } = await supabase
     .from('blogs')
-    .select('slug')
+    .select('*')
     .eq('status', 'published')
     .limit(50);
   return (data || []).map((b) => ({ slug: b.slug }));
@@ -89,7 +89,7 @@ function extractFaqs(markdown: string) {
 async function getRelatedDestinations() {
   const { data } = await supabase
     .from('destinations')
-    .select('id,name,slug,hero_image,country,description')
+    .select('*')
     .eq('is_published', true)
     .limit(3);
   return data || [];
