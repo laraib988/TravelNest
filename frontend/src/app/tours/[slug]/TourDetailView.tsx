@@ -10,13 +10,15 @@ import { Sparkles, MapPin, CheckCircle2, HelpCircle, Star, XCircle } from 'lucid
 import dynamic from 'next/dynamic';
 import TourAskAIWidget from '@/components/tours/TourAskAIWidget';
 const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
+import TourAskAIWidget from '@/components/tours/TourAskAIWidget';
+const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
 const TourReviews = dynamic(() => import('@/components/tours/TourReviews'));
 const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWidget'));
 
 export default function TourDetailPage({ initialTour: tour, relevantProducts = [] }: { initialTour: any, relevantProducts?: any[] }) {
   if (!tour) return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--brand-accent)' }}>Experience not found.</div>;
   
-  const t = (key) => <ClientText tKey={key} />;
+  const t = (key: string) => <ClientText tKey={key} />;
   const formatPrice = (price: number) => <ClientPrice price={price} />;
 
   // SRS 8.3: JSON-LD Structured Data (Product + AggregateRating + FAQ Schema)
@@ -28,11 +30,28 @@ export default function TourDetailPage({ initialTour: tour, relevantProducts = [
     name: tour.title,
     description: tour.description,
     image: tour.images?.map((img: any) => img.url),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: tour.cached_rating_avg,
-      reviewCount: tour.cached_review_count,
-    },
+    ...(tour.cached_review_count > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: tour.cached_rating_avg,
+        reviewCount: tour.cached_review_count,
+      }
+    } : {}),
+    ...(tour.reviews && tour.reviews.length > 0 ? {
+      review: tour.reviews.map((r: any) => ({
+        '@type': 'Review',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: r.rating || 5,
+        },
+        author: {
+          '@type': 'Person',
+          name: r.profiles?.name || 'Traveler',
+        },
+        reviewBody: r.comment || '',
+        datePublished: r.created_at ? new Date(r.created_at).toISOString() : new Date().toISOString(),
+      }))
+    } : {}),
     offers: {
       '@type': 'Offer',
       price: tour.base_price,

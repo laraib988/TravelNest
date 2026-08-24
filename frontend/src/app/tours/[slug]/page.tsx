@@ -191,7 +191,7 @@ export default async function Page({ params }: Props) {
     ],
     raw_data: p,
     ai_review_summary: null,
-    highlights: p.basic_info?.highlights || [],
+    highlights: p.basic_info?.highlights || [],\n    reviews: reviewsData,
     itinerary: p.itinerary || [],
     faqs: p.experience_details?.faqs || [],
     reviews: reviewsData
