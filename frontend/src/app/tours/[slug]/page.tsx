@@ -41,7 +41,7 @@ const getRelevantProducts = cache(async (excludeId: string) => {
 const getReviews = cache(async (id: string) => {
   const { data } = await supabase
     .from('reviews')
-    .select('rating')
+    .select('id, rating, title, comment, created_at, user_id, profiles(name, avatar_url)')
     .eq('listing_id', id)
     .eq('status', 'APPROVED');
   return data;
@@ -93,7 +93,7 @@ export default async function Page({ params }: Props) {
   // PARALLEL FETCH: Fetching tour and reviews simultaneously to reduce latency.
   // This effectively merges the waterfall into a single timing block, and cache() dedupes it.
   const p = await getTour(id);
-  const reviewsData = p?.reviews || [];
+  const reviewsData = await getReviews(id) || [];
   const rawRelevant = await getRelevantProducts(id);
   const relevantProducts = rawRelevant.map((rp: any) => ({
     id: rp.id,
@@ -193,7 +193,8 @@ export default async function Page({ params }: Props) {
     ai_review_summary: null,
     highlights: p.basic_info?.highlights || [],
     itinerary: p.itinerary || [],
-    faqs: p.experience_details?.faqs || []
+    faqs: p.experience_details?.faqs || [],
+    reviews: reviewsData
   };
 
   return <TourDetailView initialTour={mappedListing} relevantProducts={relevantProducts} />;

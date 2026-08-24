@@ -14,7 +14,7 @@ export default function TourReviews({ tour }: { tour: any }) {
   const router = useRouter();
   const pathname = usePathname();
   
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>(tour.reviews || []);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
