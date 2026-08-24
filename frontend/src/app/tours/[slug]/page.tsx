@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
-import TourDetailClient from './TourDetailClient';
+import TourDetailView from './TourDetailView';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { cache } from 'react';
 
@@ -29,6 +29,15 @@ const getTour = cache(async (id: string) => {
   return data as any;
 });
 
+
+const getRelevantProducts = cache(async (excludeId: string) => {
+  const { data } = await supabase
+    .from('products')
+    .select('id, basic_info, transport_pricing')
+    .neq('id', excludeId)
+    .limit(4);
+  return data || [];
+});
 const getReviews = cache(async (id: string) => {
   const { data } = await supabase
     .from('reviews')
@@ -85,6 +94,16 @@ export default async function Page({ params }: Props) {
   // This effectively merges the waterfall into a single timing block, and cache() dedupes it.
   const p = await getTour(id);
   const reviewsData = p?.reviews || [];
+  const rawRelevant = await getRelevantProducts(id);
+  const relevantProducts = rawRelevant.map((rp: any) => ({
+    id: rp.id,
+    slug: rp.id,
+    title: rp.basic_info?.title || 'Tour',
+    images: rp.basic_info?.photos?.heroImage ? [{ url: rp.basic_info.photos.heroImage, alt: 'Cover' }] : [],
+    price: rp.transport_pricing?.[0]?.amount || 150,
+    cached_rating_avg: 5.0,
+    cached_review_count: 0
+  }));
 
   if (!p) {
     notFound(); 
@@ -177,5 +196,5 @@ export default async function Page({ params }: Props) {
     faqs: p.experience_details?.faqs || []
   };
 
-  return <TourDetailClient initialTour={mappedListing} />;
+  return <TourDetailView initialTour={mappedListing} relevantProducts={relevantProducts} />;
 }

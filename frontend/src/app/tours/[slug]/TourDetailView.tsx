@@ -1,91 +1,21 @@
-'use client';
-
-
-
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
-import { useCurrency } from '@/context/CurrencyContext';
+import { ClientText, ClientPrice } from '@/components/ClientI18n';
 import { Sparkles, MapPin, CheckCircle2, HelpCircle, Star, XCircle } from 'lucide-react';
 
 import dynamic from 'next/dynamic';
+import TourAskAIWidget from '@/components/tours/TourAskAIWidget';
 const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
 const TourReviews = dynamic(() => import('@/components/tours/TourReviews'));
 const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWidget'));
 
-export default function TourDetailPage({ initialTour }: { initialTour?: any }) {
-  const { formatPrice, t } = useCurrency();
-  const params = useParams();
-  const slug = params.slug as string;
-
-  const [tour, setTour] = useState<any>(initialTour || null);
-  const [loading, setLoading] = useState(!initialTour);
-
-  // SRS 9.14: Contextual AI Q&A State
-  const [aiQuestion, setAiQuestion] = useState('');
-  const [aiAnswer, setAiAnswer] = useState('');
-  const [askingAi, setAskingAi] = useState(false);
-  const [relevantProducts, setRelevantProducts] = useState<any[]>([]);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    async function loadTour() {
-      try {
-        let res = initialTour;
-        if (!res) {
-          try {
-            res = await fetchFromAPI(`/listings/${slug}`);
-          } catch (backendErr) {
-            // Fallback to Next.js API for Supabase products
-            const nextRes = await fetch(`/api/public/listings/${slug}`);
-            if (!nextRes.ok) throw new Error('Not found in Supabase');
-            res = await nextRes.json();
-          }
-          setTour(res);
-        }
-        
-        // Fetch relevant products
-        try {
-          const allListings = await fetch('/api/public/listings').then(r => r.json());
-          if (Array.isArray(allListings)) {
-            const others = allListings.filter(item => item.id !== res.id).slice(0, 4);
-            setRelevantProducts(others);
-          }
-        } catch { setRelevantProducts([]); }
-      } catch (err: any) {
-        console.error('Error loading listing:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadTour();
-  }, [slug]);
-
-  const handleAskAI = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!aiQuestion.trim()) return;
-    setAskingAi(true);
-    try {
-      const res = await fetchFromAPI('/ai/contextual-qa', {
-        method: 'POST',
-        body: JSON.stringify({ listing_id: tour.id, question: aiQuestion }),
-      });
-      setAiAnswer(res.answer);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setAskingAi(false);
-    }
-  };
-
-  if (loading) {
-    return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading experience details...</div>;
-  }
-
-  if (!tour) {
-    return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--brand-accent)' }}>Experience not found.</div>;
-  }
+export default function TourDetailPage({ initialTour: tour, relevantProducts = [] }: { initialTour: any, relevantProducts?: any[] }) {
+  if (!tour) return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--brand-accent)' }}>Experience not found.</div>;
+  
+  const t = (key) => <ClientText tKey={key} />;
+  const formatPrice = (price: number) => <ClientPrice price={price} />;
 
   // SRS 8.3: JSON-LD Structured Data (Product + AggregateRating + FAQ Schema)
   const jsonLd = {
@@ -199,30 +129,7 @@ export default function TourDetailPage({ initialTour }: { initialTour?: any }) {
           )}
 
           {/* SRS 9.14: "ASK AI ABOUT THIS PLACE" CONTEXTUAL Q&A WIDGET (Temporarily hidden) */}
-            {false && (<div className="card-panel" style={{ padding: '24px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <HelpCircle size={20} color="var(--brand-primary)" />
-              <h3 style={{ fontSize: '1.2rem', color: '#0f172a' }}>Ask AI About This Experience</h3>
-            </div>
-            <form onSubmit={handleAskAI} style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-              <input
-                type="text"
-                placeholder="Ask anything (e.g. 'Is this suitable for kids?', 'What is the refund policy?')"
-                value={aiQuestion}
-                onChange={(e) => setAiQuestion(e.target.value)}
-                style={{ flex: 1, padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
-              />
-              <button type="submit" disabled={askingAi} className="btn-primary" style={{ padding: '12px 20px' }}>
-                {askingAi ? 'Asking...' : 'Ask AI'}
-              </button>
-            </form>
-
-            {aiAnswer && (
-              <div style={{ padding: '14px', borderRadius: 'var(--radius-sm)', background: '#f0f9ff', border: '1px solid #7dd3fc', fontSize: '0.95rem', color: '#0369a1' }}>
-                <strong>🤖 AI Concierge Answer:</strong> {aiAnswer}
-              </div>
-            )}
-          </div>)}
+          {false && <TourAskAIWidget tourId={tour.id} />}
 
           {/* ITINERARY SECTION */}
           {tour.itinerary && tour.itinerary.length > 0 && (
