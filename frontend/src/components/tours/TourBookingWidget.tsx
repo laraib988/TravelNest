@@ -208,7 +208,7 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
               }}
             >
               <div>
-                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>{date.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#0f172a' }}>{date.toLocaleString(language.code === 'ja' ? 'ja-JP' : language.code, { weekday: 'short', month: 'short', day: 'numeric', timeZone: language.code === 'ja' ? 'Asia/Tokyo' : undefined })}</div>
               </div>
             </div>
           );
