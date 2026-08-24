@@ -1,3 +1,9 @@
+import { getAlternates } from '@/lib/seo';
+export const metadata = {
+  title: 'Destinations | Vaitour',
+  description: 'Explore the world.',
+  alternates: getAlternates('/destinations')
+};
 export const revalidate = 3600;
 
 import { createClient } from '@supabase/supabase-js';

@@ -10,10 +10,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+import { getAlternates } from '@/lib/seo';
 export const metadata: Metadata = {
   title: 'Vaitour Blog — Destination Guides & Travel Tips',
   description:
     'Expert travel guides, 3-day itineraries, cost breakdowns and local etiquette tips for Japan and beyond. Plan smarter with Vaitour.',
+  alternates: getAlternates('/blog')
 };
 
 async function getPublishedBlogs() {
