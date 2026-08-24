@@ -1,28 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Compass, Search, MapPin, ArrowRight } from 'lucide-react';
 
 export default function NotFound() {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(5);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => prev - 1);
-    }, 1000);
-
-    const redirectTimer = setTimeout(() => {
-      router.push('/');
-    }, 5000);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(redirectTimer);
-    };
-  }, [router]);
+  
 
   return (
     <div style={{
@@ -93,10 +78,7 @@ export default function NotFound() {
           </div>
         </div>
 
-        {/* Auto Redirect Info */}
-        <div style={{ marginTop: '40px', fontSize: '0.9rem', color: '#94a3b8' }}>
-          Navigating back to the homepage in <strong>{countdown}</strong> seconds...
-        </div>
+        
       </div>
     </div>
   );
