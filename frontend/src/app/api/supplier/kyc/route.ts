@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabaseAdmin
       .from('supplier_kyc_records')
-      .select('id, user_id, company_name, status, created_at, document_url')
+      .select('id, user_id, company_name, status, created_at, documents, audit_reasons, location, phone, business_reg, tax_id')
       .eq('user_id', userId)
       .maybeSingle();
 
