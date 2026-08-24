@@ -26,7 +26,10 @@ export async function GET() {
       throw error;
     }
 
-    return NextResponse.json(data || []);
+    return NextResponse.json(data || [], { 
+      status: 200, 
+      headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } 
+    });
   } catch (error: any) {
     console.error('Error fetching public destinations:', error);
     return NextResponse.json([], { status: 200, headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } });

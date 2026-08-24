@@ -1,6 +1,7 @@
 'use client';
 import useSWR from 'swr';
 
+import Image from 'next/image';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
@@ -421,7 +422,7 @@ export default function ListingsManagementPage() {
                 style={{ position: 'relative', height: '190px', background: '#0f172a', cursor: 'pointer' }}
                 onClick={() => setPreviewListing(l)}
               >
-                <img
+                <Image width={800} height={600} 
                   src={l.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'}
                   alt={l.title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -572,7 +573,7 @@ export default function ListingsManagementPage() {
               {filteredListings.map((l) => (
                 <tr key={l.id}>
                   <td>
-                    <img
+                    <Image width={800} height={600} 
                       src={l.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'}
                       alt={l.title}
                       style={{ width: '56px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0' }}

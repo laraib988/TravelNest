@@ -341,7 +341,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                         background: '#ffffff', transition: 'all 0.3s'
                       }}>
                         <div style={{ height: '200px', overflow: 'hidden' }}>
-                          <img
+                          <Image width={800} height={600} 
                             src={place.image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&q=80'}
                             alt={place.name}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s' }}
@@ -417,7 +417,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                   height: '260px',
                   border: '1px solid #e2e8f0'
                 }}>
-                  <img
+                  <Image width={800} height={600} 
                     src={item.image_url}
                     alt={item.caption}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s' }}
@@ -508,7 +508,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                     }}>
                       {item.image && (
                         <div style={{ width: '260px', flexShrink: 0, overflow: 'hidden' }}>
-                          <img
+                          <Image width={800} height={600} 
                             src={item.image}
                             alt={item.title}
                             style={{ width: '100%', height: '180px', objectFit: 'cover' }}
@@ -629,7 +629,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                       <Link key={product.id} href={`/tours/${product.slug || product.id}`} style={{ textDecoration: 'none', display: 'flex' }}>
                         <div className="card-panel" style={{ borderRadius: '16px', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
                           <div style={{ height: '200px', position: 'relative' }}>
-                            <img
+                            <Image width={800} height={600} 
                               src={product.images?.[0]?.url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&q=80'}
                               alt={product.title}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}

@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import { supabase } from '@/lib/supabase';
 
 interface ServiceAreaMapProps {
@@ -34,15 +35,40 @@ export const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({
   useEffect(() => {
     if (typeof window === 'undefined' || !mapContainer.current) return;
 
-    (async () => {
-      const L = (await import('leaflet')).default;
+    // Fix Leaflet's default icon path issues
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
+
+    if (!mapRef.current) {
+      // Create map
+      mapRef.current = L.map(mapContainer.current).setView(initialCenter, 8);
+
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(mapRef.current);
+
+      // Add Draggable Marker
+      markerRef.current = L.marker(initialCenter, { draggable: true }).addTo(mapRef.current);
       
-      // Fix Leaflet's default icon path issues
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      // Add Circle
+      circleRef.current = L.circle(initialCenter, {
+        color: '#3b82f6',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.2,
+        radius: initialRadiusKm * 1000,
+      }).addTo(mapRef.current);
+
+      // Listen for marker drag
+      markerRef.current.on('dragend', (e: any) => {
+        const marker = e.target;
+        const position = marker.getLatLng();
+        setCenter([position.lat, position.lng]);
+        circleRef.current?.setLatLng(position);
       });
 
       if (!mapRef.current) {
