@@ -10,8 +10,6 @@ import { Sparkles, MapPin, CheckCircle2, HelpCircle, Star, XCircle } from 'lucid
 import dynamic from 'next/dynamic';
 import TourAskAIWidget from '@/components/tours/TourAskAIWidget';
 const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
-import TourAskAIWidget from '@/components/tours/TourAskAIWidget';
-const TourGallery = dynamic(() => import('@/components/tours/TourGallery'));
 const TourReviews = dynamic(() => import('@/components/tours/TourReviews'));
 const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWidget'));
 
