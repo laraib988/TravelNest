@@ -292,7 +292,7 @@ export default function HomePage() {
         }}
       >
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <img
+          <Image width={800} height={600} 
             src="/images/travelers_hero.jpg"
             alt="Professional Travelers"
             style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}

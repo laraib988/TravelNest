@@ -1,3 +1,4 @@
+import Image from 'next/image';
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -96,7 +97,7 @@ export default function DestinationNews({ slug, name }: DestinationNewsProps) {
               }}>
                 <div style={{ height: '180px', position: 'relative', background: '#f1f5f9', flexShrink: 0 }}>
                   {article.image ? (
-                    <img
+                    <Image width={800} height={600} 
                       src={article.image}
                       alt={article.title}
                       loading="lazy"

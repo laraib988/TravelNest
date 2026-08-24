@@ -1,3 +1,4 @@
+import Image from 'next/image';
 'use client';
 
 import { useState } from 'react';
@@ -286,7 +287,7 @@ export default function SupplierPage() {
                   border: '4px solid rgba(255,255,255,0.2)'
                 }}
               >
-                <img
+                <Image width={800} height={600} 
                   src="/supplier-hero.jpg"
                   alt="Travel tour operator using Vaitour platform"
                   style={{

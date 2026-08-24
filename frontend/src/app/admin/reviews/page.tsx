@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
@@ -316,7 +317,7 @@ export default function AdminReviewsPage() {
                 {/* Review Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img
+                    <Image width={800} height={600} 
                       src={review.user_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user_name || 'Anonymous')}&background=0ea5e9&color=fff`}
                       alt={review.user_name}
                       style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
@@ -380,7 +381,7 @@ export default function AdminReviewsPage() {
                 {review.photos && review.photos.length > 0 && (
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
                     {review.photos.map((photo, idx) => (
-                      <img
+                      <Image width={800} height={600} 
                         key={idx}
                         src={photo}
                         alt="Customer Photo"
