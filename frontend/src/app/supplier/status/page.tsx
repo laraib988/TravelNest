@@ -41,6 +41,8 @@ export default function SupplierStatusPage() {
         setEditTaxId(data.tax_id || '');
         setLoading(false);
       }
+    } else if (res.status === 404) {
+      router.push('/supplier/kyc');
     } else {
       logout();
       router.push('/supplier/login');
