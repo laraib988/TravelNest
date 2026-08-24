@@ -1,5 +1,5 @@
-import Image from 'next/image';
 'use client';
+import Image from 'next/image';
 
 import { useState, useEffect } from 'react';
 import { Newspaper, ExternalLink, CalendarDays, Building2 } from 'lucide-react';
