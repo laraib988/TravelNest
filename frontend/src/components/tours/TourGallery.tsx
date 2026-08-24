@@ -35,7 +35,7 @@ function WeatherWidget({ location }: { location: string }) {
       }).catch(() => {});
   }, [location]);
 
-  if (!weather) return null;
+  if (!weather) return <span style={{ display: 'inline-flex', alignItems: 'center', width: '110px', height: '20px', background: '#e2e8f0', borderRadius: '4px', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></span>;
   return <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>{weather.icon} {weather.temp}°C {weather.condition}</span>;
 }
 
