@@ -48,7 +48,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: blog.meta_title || blog.title,
     description: blog.meta_description || blog.summary,
     keywords: blog.focus_keywords || [],
-    alternates: { canonical: `${APP_URL}/blog/${blog.slug}` },
+    alternates: { 
+      canonical: `${APP_URL}/en/blog/${blog.slug}`,
+      languages: {
+        en: `${APP_URL}/en/blog/${blog.slug}`,
+        ja: `${APP_URL}/ja/blog/${blog.slug}`,
+        ur: `${APP_URL}/ur/blog/${blog.slug}`,
+        fr: `${APP_URL}/fr/blog/${blog.slug}`,
+        ar: `${APP_URL}/ar/blog/${blog.slug}`,
+        'x-default': `${APP_URL}/en/blog/${blog.slug}`
+      }
+    },
     openGraph: {
       title: blog.meta_title || blog.title,
       description: blog.meta_description || blog.summary,

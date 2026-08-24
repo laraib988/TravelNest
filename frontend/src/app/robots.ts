@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const isProd = process.env.NEXT_PUBLIC_SITE_ENV === 'production';
+  const isProd = true; // Always allow crawling for production audit
   return {
     rules: isProd
       ? [

@@ -6,9 +6,6 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function generateSitemaps() {
-  // id: 0 -> Static Pages & Destinations
-  // id: 1 -> Blog Posts
-  // id: 2 -> Tours (Segmented if needed, we'll just use 2 for all tours for now)
   return [{ id: 0 }, { id: 1 }, { id: 2 }];
 }
 
@@ -23,15 +20,24 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     ];
     
     const destinations = ['bali', 'tokyo', 'paris', 'lahore', 'dubai', 'rome', 'karachi', 'islamabad'];
-    
     const pages = [...staticPages, ...destinations.map(d => `/destinations/${d}`)];
     
-    return pages.map(page => ({
-      url: `${baseUrl}${page}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: page === '' ? 1.0 : 0.8,
-    }));
+    return pages.flatMap((page) => 
+      locales.map((locale) => {
+        const url = `${baseUrl}/${locale}${page}`;
+        return {
+          url,
+          lastModified: new Date(),
+          changeFrequency: 'daily',
+          priority: page === '' ? 1.0 : 0.8,
+          alternates: {
+            languages: Object.fromEntries(
+              locales.map((l) => [l, `${baseUrl}/${l}${page}`])
+            ),
+          },
+        };
+      })
+    );
   }
 
   if (id === 1) {
@@ -41,16 +47,22 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
-    return (blogs || []).map(blog => ({
-      url: `${baseUrl}/blog/${blog.slug}`,
-      lastModified: new Date(blog.published_at || new Date()),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    }));
+    return (blogs || []).flatMap(blog => 
+      locales.map((locale) => ({
+        url: `${baseUrl}/${locale}/blog/${blog.slug}`,
+        lastModified: new Date(blog.published_at || new Date()),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${baseUrl}/${l}/blog/${blog.slug}`])
+          ),
+        },
+      }))
+    );
   }
 
   if (id === 2) {
-    // Fetch verified suppliers first
     const { data: verifiedKyc } = await supabase
       .from('supplier_kyc_records')
       .select('user_id')
@@ -68,7 +80,6 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
       tours = data || [];
     }
 
-    // Multi-locale tours mapping
     return tours.flatMap((tour) =>
       locales.map((locale) => ({
         url: `${baseUrl}/${locale}/tours/${tour.slug}`,
