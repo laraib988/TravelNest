@@ -3,12 +3,17 @@
 > Multi-locale OTA marketplace for booking tours, activities, and travel experiences worldwide, with a strong focus on Japan.
 
 ## Key Sections
-- /destinations/ : City and country travel guides
-- /tours/ : Bookable tours and activities with KYC-verified suppliers
-- /blog/ : Travel guides and planning content
+
+- [Destinations](https://www.vaitour.com/destinations): City and country travel guides
+- [Tours](https://www.vaitour.com/tours): Bookable tours and activities with KYC-verified suppliers
+- [Blog](https://www.vaitour.com/blog): Travel guides and planning content
+- [Sitemap](https://www.vaitour.com/sitemap.xml): Complete site structure for search engines and AI agents
+- [About Us](https://www.vaitour.com/contact): Contact and company information
 
 ## About Vaitour
+
 Vaitour connects travelers with KYC-verified local tour operators across Japan and globally, offering instant booking, free cancellation on most tours, and multilingual support (EN, JA, UR, FR, AR). Our platform prioritizes authentic local experiences, structured travel data, and trust-verified operator networks.
 
 ## Customer Trust & E-E-A-T
+
 All tour operators on Vaitour pass a rigorous KYC (Know Your Customer) and business verification process. Vaitour displays verified customer reviews and transparent cancellation policies to ensure maximum trust and safety.
