@@ -89,8 +89,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const canonicalUrl = `https://www.vaitour.com/en/destinations/${params.slug}`;
   
   return {
-    title: destination.meta_title || `${destination.name} | Vaitour`,
-    description: destination.meta_description || destination.description,
+    title: destination.meta_title || `Things to Do in ${destination.name} 2026 | Tours & Activities – TravelNest`.substring(0, 60),
+    description: destination.meta_description || `Discover the best things to do in ${destination.name} with TravelNest. Book top-rated tours, local activities, and tickets with instant confirmation.`.substring(0, 155),
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -103,8 +103,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       },
     },
     openGraph: {
-      title: destination.meta_title || `${destination.name} | Vaitour`,
-      description: destination.meta_description || destination.description,
+      title: destination.meta_title || `Things to Do in ${destination.name} 2026 | Tours & Activities – TravelNest`.substring(0, 60),
+      description: destination.meta_description || `Discover the best things to do in ${destination.name} with TravelNest. Book top-rated tours, local activities, and tickets with instant confirmation.`.substring(0, 155),
       images: destination.hero_image ? [destination.hero_image] : [],
       locale: 'en',
     }
