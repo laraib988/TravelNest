@@ -88,7 +88,7 @@ const NAV_SECTIONS = [
   }
 ];
 
-export const metadata = { robots: { index: false, follow: false } };
+
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
