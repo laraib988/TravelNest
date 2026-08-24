@@ -55,7 +55,7 @@ export default function TourDetailPage({ initialTour: tour, relevantProducts = [
             <div className="card-panel" style={{ padding: '24px', marginBottom: '32px', background: '#f0f9ff', border: '1px solid #7dd3fc' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                 <Sparkles size={20} color="var(--brand-primary)" />
-                <h3 style={{ fontSize: '1.15rem', color: '#0f172a' }}>AI Review Intelligence Summary</h3>
+                <h2 style={{ fontSize: '1.15rem', color: '#0f172a', margin: 0 }}>AI Review Intelligence Summary</h2>
                 <span className="badge-emerald" style={{ marginLeft: 'auto' }}>
                   {Math.round(tour.ai_review_summary.sentiment_score * 100)}% Positive Sentiment
                 </span>

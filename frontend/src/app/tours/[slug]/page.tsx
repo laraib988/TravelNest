@@ -59,10 +59,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const canonicalUrl = `https://www.vaitour.com/${locale}/tours/${params.slug}`;
 
   const rawTitle = tour.basic_info?.title || 'Tour Experience';
-  const seoTitle = `${rawTitle.slice(0, 45)} – Book Tickets | Vaitour`;
+  const seoTitle = `${rawTitle} – Book Tickets & Tours | Vaitour`.substring(0, 60);
   
   const rawDesc = tour.basic_info?.summary || tour.experience_details?.short_desc || `Book the incredible ${rawTitle} today with instant confirmation and free cancellation on Vaitour.`;
-  const seoDesc = rawDesc.slice(0, 150) + (rawDesc.length > 150 ? '...' : '');
+  const seoDesc = rawDesc.substring(0, 155);
 
   return {
     title: seoTitle,
