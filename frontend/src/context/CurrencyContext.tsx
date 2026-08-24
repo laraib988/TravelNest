@@ -169,7 +169,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const t = (key: string): string => {
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
-      if (pathname.startsWith('/admin') || pathname.startsWith('/supplier')) {
+      if (pathname.startsWith('/admin-portal') || pathname.startsWith('/supplier')) {
         return getTranslation('en', key);
       }
     }

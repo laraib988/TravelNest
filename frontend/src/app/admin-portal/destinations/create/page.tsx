@@ -213,7 +213,7 @@ function DestinationFormContent() {
 
       if (response.ok) {
         setSaveMessage({ type: 'success', text: "Destination saved successfully! Redirecting..." });
-        setTimeout(() => router.push('/admin/destinations'), 800);
+        setTimeout(() => router.push('/admin-portal/destinations'), 800);
       } else {
         const errData = await response.json().catch(() => ({}));
         const errorMsg = errData.error || "Failed to save destination.";
@@ -382,7 +382,7 @@ function DestinationFormContent() {
     <div style={pageStyle}>
       <div style={headerStyle}>
         <button 
-          onClick={() => router.push('/admin/destinations')}
+          onClick={() => router.push('/admin-portal/destinations')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: '8px', display: 'flex', alignItems: 'center' }}
         >
           <ArrowLeft size={24} />
@@ -1050,7 +1050,7 @@ function DestinationFormContent() {
         <button 
           type="button"
           style={btnSecondaryStyle}
-          onClick={() => router.push('/admin/destinations')}
+          onClick={() => router.push('/admin-portal/destinations')}
           disabled={loading}
         >
           Cancel

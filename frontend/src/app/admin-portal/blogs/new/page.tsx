@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function AdminBlogNewRedirect() {
   const router = useRouter();
   useEffect(() => {
-    router.replace('/admin/blogs/new/edit');
+    router.replace('/admin-portal/blogs/new/edit');
   }, [router]);
   return null;
 }

@@ -67,7 +67,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next') || 
     pathname.startsWith('/images/') || 
     pathname === '/favicon.ico' ||
-    pathname.startsWith('/admin') ||
+    pathname.startsWith('/admin-portal') ||
     pathname.startsWith('/supplier')
   ) {
     return NextResponse.next();

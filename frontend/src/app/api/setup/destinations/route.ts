@@ -65,7 +65,7 @@ END $$;
     );
 
     if (mgmtResponse.ok) {
-      return NextResponse.redirect(new URL('/admin/destinations', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'));
+      return NextResponse.redirect(new URL('/admin-portal/destinations', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'));
     }
 
     // Fallback: redirect to Supabase SQL Editor with pre-filled query

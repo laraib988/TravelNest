@@ -57,7 +57,7 @@ export default function AdminBlogNewPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       showToast('success', status === 'published' ? 'Blog published' : 'Blog created as draft');
-      router.push('/admin/blogs');
+      router.push('/admin-portal/blogs');
     } catch (err: any) {
       showToast('error', err.message || 'Create failed');
     } finally {
@@ -90,7 +90,7 @@ export default function AdminBlogNewPage() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button onClick={() => router.push('/admin/blogs')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center' }}>
+          <button onClick={() => router.push('/admin-portal/blogs')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center' }}>
             <ArrowLeft size={22} />
           </button>
           <div>

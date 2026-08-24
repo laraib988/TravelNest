@@ -28,62 +28,62 @@ import {
 } from 'lucide-react';
 
 const PAGE_TITLES: Record<string, string> = {
-  '/admin': 'Dashboard',
-  '/admin/users': 'Customer Portal',
-  '/admin/suppliers': 'Suppliers Management',
-  '/admin/suppliers?filter=REJECTED': 'Rejected Suppliers',
-  '/admin/listings': 'Products Catalog',
-  '/admin/listings?filter=PENDING': 'Pending Product Reviews',
-  '/admin/bookings': 'Bookings & Orders',
-  '/admin/destinations': 'Destinations Management',
-  '/admin/reviews': 'Reviews & Feedback',
-  '/admin/cms': 'Content Management System (CMS)',
-  '/admin/blogs': 'Blog Management',
-  '/admin/promotions': 'Promotions & Coupons',
-  '/admin/payouts': 'Payouts Ledger',
-  '/admin/security': 'Security & Audit Center',
-  '/admin/settings': 'System Settings',
+  '/admin-portal': 'Dashboard',
+  '/admin-portal/users': 'Customer Portal',
+  '/admin-portal/suppliers': 'Suppliers Management',
+  '/admin-portal/suppliers?filter=REJECTED': 'Rejected Suppliers',
+  '/admin-portal/listings': 'Products Catalog',
+  '/admin-portal/listings?filter=PENDING': 'Pending Product Reviews',
+  '/admin-portal/bookings': 'Bookings & Orders',
+  '/admin-portal/destinations': 'Destinations Management',
+  '/admin-portal/reviews': 'Reviews & Feedback',
+  '/admin-portal/cms': 'Content Management System (CMS)',
+  '/admin-portal/blogs': 'Blog Management',
+  '/admin-portal/promotions': 'Promotions & Coupons',
+  '/admin-portal/payouts': 'Payouts Ledger',
+  '/admin-portal/security': 'Security & Audit Center',
+  '/admin-portal/settings': 'System Settings',
 };
 
 const NAV_SECTIONS = [
   {
     label: 'MAIN',
     items: [
-      { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-      { href: '/admin/users', icon: Users, label: 'Customer Portal' },
+      { href: '/admin-portal', icon: LayoutDashboard, label: 'Dashboard' },
+      { href: '/admin-portal/users', icon: Users, label: 'Customer Portal' },
     ],
   },
   {
     label: 'SUPPLIER MANAGEMENT',
     items: [
-      { href: '/admin/suppliers', icon: Building2, label: 'Suppliers' },
-      { href: '/admin/suppliers?filter=REJECTED', icon: UserX, label: 'Reject Supplier Profile' },
+      { href: '/admin-portal/suppliers', icon: Building2, label: 'Suppliers' },
+      { href: '/admin-portal/suppliers?filter=REJECTED', icon: UserX, label: 'Reject Supplier Profile' },
     ],
   },
   {
     label: 'PRODUCTS & ORDERS',
     items: [
-      { href: '/admin/listings', icon: Package, label: 'Products' },
-      { href: '/admin/listings?filter=PENDING', icon: Clock, label: 'Pending Product Reviews' },
-      { href: '/admin/bookings', icon: CalendarCheck, label: 'Bookings & Orders' },
+      { href: '/admin-portal/listings', icon: Package, label: 'Products' },
+      { href: '/admin-portal/listings?filter=PENDING', icon: Clock, label: 'Pending Product Reviews' },
+      { href: '/admin-portal/bookings', icon: CalendarCheck, label: 'Bookings & Orders' },
     ],
   },
   {
     label: 'MARKETING & CONTENT',
     items: [
-      { href: '/admin/destinations', icon: MapPin, label: 'Destinations' },
-      { href: '/admin/reviews', icon: Star, label: 'Review and Feedback' },
-      { href: '/admin/cms', icon: FileText, label: 'CMS' },
-      { href: '/admin/blogs', icon: Newspaper, label: 'Blogs' },
-      { href: '/admin/promotions', icon: Tag, label: 'Promotions' },
-      { href: '/admin/payouts', icon: Wallet, label: 'Payouts' },
+      { href: '/admin-portal/destinations', icon: MapPin, label: 'Destinations' },
+      { href: '/admin-portal/reviews', icon: Star, label: 'Review and Feedback' },
+      { href: '/admin-portal/cms', icon: FileText, label: 'CMS' },
+      { href: '/admin-portal/blogs', icon: Newspaper, label: 'Blogs' },
+      { href: '/admin-portal/promotions', icon: Tag, label: 'Promotions' },
+      { href: '/admin-portal/payouts', icon: Wallet, label: 'Payouts' },
     ],
   },
   {
     label: 'SYSTEM & SECURITY',
     items: [
-      { href: '/admin/security', icon: ShieldAlert, label: 'Security & Audit' },
-      { href: '/admin/settings', icon: Settings, label: 'Platform Settings' },
+      { href: '/admin-portal/security', icon: ShieldAlert, label: 'Security & Audit' },
+      { href: '/admin-portal/settings', icon: Settings, label: 'Platform Settings' },
     ],
   }
 ];
@@ -115,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
         if (!error && data?.nextLevel === 'aal2' && data?.currentLevel === 'aal1') {
           // MFA is enrolled but not verified yet. Kick them back to login.
-          router.replace('/admin/login');
+          router.replace('/admin-portal/login');
         } else {
           setMfaPending(false);
         }
@@ -124,7 +124,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
     };
     
-    if (isMounted && pathname !== '/admin/login' && pathname !== '/admin/signup') {
+    if (isMounted && pathname !== '/admin-portal/login' && pathname !== '/admin-portal/signup') {
       checkSecurity();
     } else {
       setMfaPending(false);
@@ -139,7 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!isMounted || mfaPending) return null;
 
   // Allow access to login and signup pages without layout restrictions
-  if (pathname === '/admin/login' || pathname === '/admin/signup') {
+  if (pathname === '/admin-portal/login' || pathname === '/admin-portal/signup') {
     return <>{children}</>;
   }
 
@@ -154,7 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <Link 
-              href="/admin/login" 
+              href="/admin-portal/login" 
               className="btn-primary" 
               style={{ width: '100%', justifyContent: 'center', textDecoration: 'none', padding: '12px', fontSize: '0.9rem' }}
             >
@@ -180,7 +180,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className={`admin-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
-          <Link href="/admin" className="admin-sidebar-logo" style={{ textDecoration: 'none' }}>
+          <Link href="/admin-portal" className="admin-sidebar-logo" style={{ textDecoration: 'none' }}>
             <span className="admin-sidebar-logo-text">Vaitour</span>
             <span className="admin-sidebar-logo-badge">Admin</span>
           </Link>
@@ -211,8 +211,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="admin-sidebar-footer">
           <div className="admin-sidebar-footer-links">
             <Link 
-              href="/admin/settings" 
-              className={`admin-nav-item ${pathname === '/admin/settings' ? 'active' : ''}`}
+              href="/admin-portal/settings" 
+              className={`admin-nav-item ${pathname === '/admin-portal/settings' ? 'active' : ''}`}
               style={{ padding: '8px 12px' }}
             >
               <Settings size={18} />

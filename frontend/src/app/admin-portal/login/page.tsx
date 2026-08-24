@@ -10,8 +10,8 @@ import TurnstileWidget from '@/components/TurnstileWidget';
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login, signup } = useAuth();
-  const [email, setEmail] = useState('admin@vaitour.com');
-  const [password, setPassword] = useState('admin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -24,15 +24,15 @@ export default function AdminLoginPage() {
     setLoading(true);
     setErrorMsg('');
 
-    const safeEmail = email.toLowerCase() === 'admin' ? 'admin@vaitour.com' : email;
-    const safePassword = password === 'admin' ? 'password123' : password;
+    const safeEmail = email;
+    const safePassword = password;
 
     try {
       const result = await login(safeEmail, safePassword);
       if (result && result.needsMFA) {
         setShowMfa(true);
       } else {
-        router.push('/admin');
+        router.push('/admin-portal');
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Login failed. Please check your credentials.');
@@ -66,7 +66,7 @@ export default function AdminLoginPage() {
       if (verify.error) throw verify.error;
 
       // Successfully verified AAL2
-      router.push('/admin');
+      router.push('/admin-portal');
     } catch (err: any) {
       setErrorMsg(err.message || 'Invalid authenticator code. Please try again.');
     } finally {

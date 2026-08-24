@@ -89,7 +89,7 @@ export default function AdminBlogEditPage() {
         showToast('success', 'Draft saved successfully');
       }
       if (id === 'new') {
-        router.push('/admin/blogs');
+        router.push('/admin-portal/blogs');
       }
     } catch (err: any) {
       showToast('error', err.message || 'Save failed');
@@ -133,7 +133,7 @@ export default function AdminBlogEditPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button onClick={() => router.push('/admin/blogs')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center' }}>
+          <button onClick={() => router.push('/admin-portal/blogs')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center' }}>
             <ArrowLeft size={22} />
           </button>
           <div>

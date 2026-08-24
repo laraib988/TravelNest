@@ -50,7 +50,7 @@ export default function AdminDashboard() {
         
         let statsData;
         try {
-          const raw = await fetchFromAPI('/admin/dashboard');
+          const raw = await fetchFromAPI('/admin-portal/dashboard');
           statsData = {
             revenue: raw.totalRevenue ?? raw.revenue ?? 124500,
             activeBookings: raw.activeBookings ?? raw.totalBookings ?? 842,
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
               <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>Recent Booking Pipeline</h2>
               <p style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '2px' }}>Latest customer transactions and voucher codes</p>
             </div>
-            <Link href="/admin/bookings" className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.82rem', borderRadius: '9999px', textDecoration: 'none' }}>
+            <Link href="/admin-portal/bookings" className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.82rem', borderRadius: '9999px', textDecoration: 'none' }}>
               View All <ArrowUpRight size={14} />
             </Link>
           </div>
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
                       </span>
                     </td>
                     <td>
-                      <Link href="/admin/bookings" className="admin-filter-tab" style={{ padding: '4px 10px', fontSize: '0.78rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Link href="/admin-portal/bookings" className="admin-filter-tab" style={{ padding: '4px 10px', fontSize: '0.78rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <Eye size={13} /> View
                       </Link>
                     </td>
@@ -390,7 +390,7 @@ export default function AdminDashboard() {
         <div>
           <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>Quick Operations & Shortcuts</h3>
           <div className="admin-quick-actions">
-            <Link href="/admin/suppliers" className="admin-quick-action-card">
+            <Link href="/admin-portal/suppliers" className="admin-quick-action-card">
               <div style={{ background: '#ecfdf5', color: '#059669', width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
                 <ShieldCheck size={22} />
               </div>
@@ -398,7 +398,7 @@ export default function AdminDashboard() {
               <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>Review pending KYC documents</p>
             </Link>
             
-            <Link href="/admin/promotions" className="admin-quick-action-card">
+            <Link href="/admin-portal/promotions" className="admin-quick-action-card">
               <div style={{ background: '#f3e8ff', color: '#7c3aed', width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
                 <Tag size={22} />
               </div>
@@ -406,7 +406,7 @@ export default function AdminDashboard() {
               <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>Create discount coupons</p>
             </Link>
             
-            <Link href="/admin/reviews" className="admin-quick-action-card">
+            <Link href="/admin-portal/reviews" className="admin-quick-action-card">
               <div style={{ background: '#fffbe6', color: '#b45309', width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
                 <MessageSquare size={22} />
               </div>
@@ -414,7 +414,7 @@ export default function AdminDashboard() {
               <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: 1.4 }}>Inspect flagged reviews</p>
             </Link>
             
-            <Link href="/admin/payouts" className="admin-quick-action-card">
+            <Link href="/admin-portal/payouts" className="admin-quick-action-card">
               <div style={{ background: '#eff6ff', color: '#1d4ed8', width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
                 <Wallet size={22} />
               </div>

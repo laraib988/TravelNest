@@ -21,7 +21,7 @@ export default function Footer() {
   // On admin and supplier pages, hide the public footer
   const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '';
   const isSupplierLanding = cleanPath === '/supplier';
-  if (cleanPath.startsWith('/admin') || (cleanPath.startsWith('/supplier') && !isSupplierLanding)) {
+  if (cleanPath.startsWith('/admin-portal') || (cleanPath.startsWith('/supplier') && !isSupplierLanding)) {
     return null;
   }
 

@@ -281,7 +281,7 @@ export default function KYCUploadPage() {
               
               <div style={{ marginTop: '16px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <Link
-                  href="/admin/suppliers"
+                  href="/admin-portal/suppliers"
                   style={{
                     padding: '10px 18px',
                     fontSize: '0.88rem',

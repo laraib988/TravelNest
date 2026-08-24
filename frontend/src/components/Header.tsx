@@ -39,7 +39,7 @@ export default function Header() {
   // On admin and supplier pages, hide the public customer header
   const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '').replace(/\/$/, '') || '';
   const isSupplierLanding = cleanPath === '/supplier';
-  if (cleanPath.startsWith('/admin') || (cleanPath.startsWith('/supplier') && !isSupplierLanding)) {
+  if (cleanPath.startsWith('/admin-portal') || (cleanPath.startsWith('/supplier') && !isSupplierLanding)) {
     return null;
   }
   
@@ -282,7 +282,7 @@ export default function Header() {
                     </Link>
                     {user?.role === 'ADMIN' && (
                     <Link
-                      href="/admin"
+                      href="/admin-portal"
                       onClick={() => setIsUserMenuOpen(false)}
                       style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '0.88rem', color: '#7c3aed', textDecoration: 'none', fontWeight: 700, background: '#f5f3ff' }}
                     >

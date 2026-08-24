@@ -45,7 +45,7 @@ export default function UsersManagementPage() {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const data = await fetchFromAPI('/admin/users').catch(() => null);
+      const data = await fetchFromAPI('/admin-portal/users').catch(() => null);
       if (Array.isArray(data) && data.length > 0) {
         setUsersList(data.map((u: any) => ({ ...u, status: u.status || 'ACTIVE' })));
       } else {
@@ -121,7 +121,7 @@ export default function UsersManagementPage() {
 
   const handleRoleUpdate = async (targetUserId: string, newRole: User['role']) => {
     try {
-      await fetchFromAPI(`/admin/users/${targetUserId}/role`, {
+      await fetchFromAPI(`/admin-portal/users/${targetUserId}/role`, {
         method: 'PATCH',
         body: JSON.stringify({ role: newRole }),
       }).catch(() => null);

@@ -7,7 +7,7 @@ export default function FooterClient() {
   // Hide footer on login and signup pages
   
   const cleanPath = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, '').replace(/\/$/, '') || '';
-  const isAuthPage = cleanPath === '/login' || cleanPath === '/signup' || cleanPath === '/supplier/login' || cleanPath === '/admin/login' || cleanPath === '/supplier/signup';
+  const isAuthPage = cleanPath === '/login' || cleanPath === '/signup' || cleanPath === '/supplier/login' || cleanPath === '/admin-portal/login' || cleanPath === '/supplier/signup';
   
   
   if (isAuthPage) return null;

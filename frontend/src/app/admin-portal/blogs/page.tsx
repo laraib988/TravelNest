@@ -172,7 +172,7 @@ export default function AdminBlogsPage() {
             {generating ? 'Generating...' : 'Generate with AI'}
           </button>
           <button
-            onClick={() => router.push('/admin/blogs/new')}
+            onClick={() => router.push('/admin-portal/blogs/new')}
             className="btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '9999px', fontWeight: 700 }}
           >
@@ -316,7 +316,7 @@ export default function AdminBlogsPage() {
                 {/* Action Buttons */}
                 <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
                   <button
-                    onClick={() => router.push('/admin/blogs/' + blog.id + '/edit')}
+                    onClick={() => router.push('/admin-portal/blogs/' + blog.id + '/edit')}
                     style={{
                       flex: 1, padding: '10px', borderRadius: '12px', border: '1px solid #e2e8f0',
                       background: '#f8fafc', color: '#334155', cursor: 'pointer', display: 'flex',

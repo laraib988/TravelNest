@@ -120,7 +120,7 @@ export default function AdminDestinationsPage() {
           </p>
         </div>
         <button
-          onClick={() => router.push('/admin/destinations/create')}
+          onClick={() => router.push('/admin-portal/destinations/create')}
           className="btn-primary"
           style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '9999px', fontWeight: 700 }}
         >
@@ -174,7 +174,7 @@ export default function AdminDestinationsPage() {
             Start building your destinations catalog. Add cities, countries, and travel hotspots for your customers to explore.
           </p>
           <button
-            onClick={() => router.push('/admin/destinations/create')}
+            onClick={() => router.push('/admin-portal/destinations/create')}
             className="btn-primary"
             style={{ padding: '12px 32px', borderRadius: '9999px', fontWeight: 700 }}
           >
@@ -261,7 +261,7 @@ export default function AdminDestinationsPage() {
                 {/* Action Buttons */}
                 <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
                   <button
-                    onClick={() => router.push('/admin/destinations/create?id=' + dest.id)}
+                    onClick={() => router.push('/admin-portal/destinations/create?id=' + dest.id)}
                     style={{
                       flex: 1, padding: '10px', borderRadius: '12px', border: '1px solid #e2e8f0',
                       background: '#f8fafc', color: '#334155', cursor: 'pointer', display: 'flex',
