@@ -20,7 +20,9 @@ export default function TourDetailPage({ initialTour: tour, relevantProducts = [
   // SRS 8.3: JSON-LD Structured Data (Product + AggregateRating + FAQ Schema)
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
+    '@type': 'TouristTrip',
+    touristType: 'All Travelers',
+    provider: { '@type': 'Organization', name: 'Vaitour' },
     name: tour.title,
     description: tour.description,
     image: tour.images?.map((img: any) => img.url),

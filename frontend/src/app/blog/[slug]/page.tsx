@@ -119,7 +119,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     faqSchema = blog.faq_schema_json ? JSON.parse(blog.faq_schema_json) : null;
   } catch (e) {}
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.vaitour.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.vaitour.com/blog' },
+      { '@type': 'ListItem', position: 3, name: blog.title, item: `https://www.vaitour.com/blog/${blog.slug}` }
+    ]
+  };
+
   const jsonLd = [
+    breadcrumbSchema,
     articleSchema && { ...articleSchema, '@context': 'https://schema.org' },
     faqSchema && { ...faqSchema, '@context': 'https://schema.org' },
   ].filter(Boolean);

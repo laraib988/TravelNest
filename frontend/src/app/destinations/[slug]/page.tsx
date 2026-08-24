@@ -196,12 +196,48 @@ export default async function DestinationTemplatePage({ params }: { params: { sl
     nearbyDestinations = [...(nearbyDestinations || []), ...fillers];
   }
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.vaitour.com/' },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Destinations', 'item': 'https://www.vaitour.com/destinations' },
+      { '@type': 'ListItem', 'position': 3, 'name': destination.name, 'item': `https://www.vaitour.com/destinations/${destination.slug}` }
+    ]
+  };
+
+  const destSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristDestination',
+    name: destination.name,
+    description: destination.meta_description || `Discover the best things to do in ${destination.name} with Vaitour. Book top-rated tours, local activities, and tickets with instant confirmation.`.substring(0, 155),
+    image: destination.hero_image ? [destination.hero_image] : []
+  };
+
+  const faqSchema = destination.faqs && destination.faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: destination.faqs.map((faq: any) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer
+      }
+    }))
+  } : null;
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(destSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
     <DestinationDetailsClient 
       destination={destination} 
       relatedProducts={relatedProducts} 
       nearbyDestinations={nearbyDestinations}
       locale={locale} 
     />
+    </>
   );
 }
