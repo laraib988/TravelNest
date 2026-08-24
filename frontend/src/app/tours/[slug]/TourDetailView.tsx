@@ -37,6 +37,23 @@ export default function TourDetailPage({ initialTour: tour, relevantProducts = [
     },
   };
 
+  const faqSchema = tour.faqs && tour.faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: tour.faqs.map((faq: any) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer
+      }
+    }))
+  } : null;
+
+  // dummy block for regex safety
+    },
+  };
+
   return (
     <div style={{ maxWidth: '1280px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
       <script
