@@ -144,26 +144,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   if (!user || user.role !== 'ADMIN') {
-    return (
-      <div className="admin-layout" style={{ justifyContent: 'center', alignItems: 'center', background: '#f8fafc', minHeight: '100vh', padding: '24px' }}>
-        <div className="admin-empty-state" style={{ maxWidth: '440px', background: '#ffffff', padding: '40px', borderRadius: '24px', boxShadow: '0 12px 32px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0' }}>
-          <ShieldAlert size={48} style={{ color: '#e11d48', margin: '0 auto 16px' }} />
-          <h1 className="admin-empty-title" style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '8px' }}>Access Denied</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', marginBottom: '24px', lineHeight: 1.5 }}>
-            You are currently logged in as <strong>{user ? `${user.name} (${user.role})` : 'Guest'}</strong>. An Administrator account is required to access the Admin Panel.
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Link 
-              href="/admin-portal/login" 
-              className="btn-primary" 
-              style={{ width: '100%', justifyContent: 'center', textDecoration: 'none', padding: '12px', fontSize: '0.9rem' }}
-            >
-              Login to Admin Portal
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    if (typeof window !== 'undefined') {
+      window.location.href = '/admin-portal/login';
+    }
+    return null;
   }
 
   const currentTitle = PAGE_TITLES[pathname] || 'Admin Portal';

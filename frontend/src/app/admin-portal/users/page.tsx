@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { fetchFromAPI } from '@/lib/api-client';
+import { getAdminUsers } from '../actions';
 import { useAuth } from '@/context/AuthContext';
 import {
   Search, Edit2, Ban, Mail, Phone, MapPin, Heart, Key, Star,
@@ -45,65 +46,8 @@ export default function UsersManagementPage() {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const data = await fetchFromAPI('/admin-portal/users').catch(() => null);
-      if (Array.isArray(data) && data.length > 0) {
-        setUsersList(data.map((u: any) => ({ ...u, status: u.status || 'ACTIVE' })));
-      } else {
-        const fallbackUsers: User[] = [
-          {
-            id: 'usr-1',
-            name: 'Suneel Pirkash',
-            email: 'sunnypirkash@gmail.com',
-            phone: '+92 300 1234567',
-            role: 'CUSTOMER',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-            home_country: 'Pakistan',
-            preferred_currency: 'USD',
-            preferred_language: 'EN',
-            saved_travelers: [{ name: 'Suneel Pirkash', age_type: 'Adult' }],
-            wishlist_listing_ids: ['list-bali-sunset', 'list-lahore-walled-city'],
-            loyalty_points: 1450,
-            membership_tier: 'GOLD',
-            status: 'ACTIVE',
-            created_at: new Date().toISOString(),
-          },
-          {
-            id: 'usr-2',
-            name: 'Alice Ocean',
-            email: 'alice@oceanic.com',
-            phone: '+1 415 555 0199',
-            role: 'SUPPLIER',
-            avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
-            home_country: 'United States',
-            preferred_currency: 'USD',
-            preferred_language: 'EN',
-            saved_travelers: [],
-            wishlist_listing_ids: [],
-            loyalty_points: 3200,
-            membership_tier: 'GOLD',
-            status: 'ACTIVE',
-            created_at: new Date(Date.now() - 864000000).toISOString(),
-          },
-          {
-            id: 'usr-3',
-            name: 'Admin Administrator',
-            email: 'admin@vaitour.com',
-            phone: '+1 800 555 0100',
-            role: 'ADMIN',
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-            home_country: 'Global',
-            preferred_currency: 'USD',
-            preferred_language: 'EN',
-            saved_travelers: [],
-            wishlist_listing_ids: [],
-            loyalty_points: 9999,
-            membership_tier: 'GOLD',
-            status: 'ACTIVE',
-            created_at: new Date(Date.now() - 2592000000).toISOString(),
-          },
-        ];
-        setUsersList(fallbackUsers);
-      }
+      const data = await getAdminUsers();
+      setUsersList(data.map((u: any) => ({ ...u, status: u.status || 'ACTIVE' })));
     } catch (err) {
       console.error(err);
       setUsersList([]);

@@ -44,57 +44,16 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function loadDashboardData(showLoading = true) {
       try {
-        if (showLoading) {
-          setLoading(true);
-        }
-        
-        let statsData;
-        try {
-          const raw = await fetchFromAPI('/admin-portal/dashboard');
-          statsData = {
-            revenue: raw.totalRevenue ?? raw.revenue ?? 124500,
-            activeBookings: raw.activeBookings ?? raw.totalBookings ?? 842,
-            registeredUsers: raw.totalUsers ?? raw.registeredUsers ?? 14592,
-            pendingVerifications: raw.pendingKYC ?? raw.pendingVerifications ?? 28,
-            revenueChange: raw.revenueChange ?? 12.5,
-            bookingsChange: raw.bookingsChange ?? 8.2,
-            usersChange: raw.usersChange ?? 15.3,
-          };
-        } catch (e) {
-          statsData = {
-            revenue: 124500,
-            activeBookings: 842,
-            registeredUsers: 14592,
-            pendingVerifications: 28,
-            revenueChange: 12.5,
-            bookingsChange: 8.2,
-            usersChange: 15.3,
-          };
-        }
-        
-        let bookingsData;
-        try {
-          const res = await fetchFromAPI('/bookings');
-          bookingsData = Array.isArray(res) ? res : (res.data || []);
-        } catch (e) {
-          bookingsData = [
-            { id: '1', booking_reference: 'BKG-7829-XL', traveler_details: { lead_name: 'Sarah Jenkins' }, option_name: 'Grand Canyon Helicopter Tour', created_at: new Date().toISOString(), gross_amount: 450, currency: 'USD', status: 'CONFIRMED' },
-            { id: '2', booking_reference: 'BKG-3491-YZ', traveler_details: { lead_name: 'Michael Chen' }, option_name: 'Eiffel Tower Summit Access', created_at: new Date(Date.now() - 86400000).toISOString(), gross_amount: 120, currency: 'EUR', status: 'PENDING_PAYMENT' },
-            { id: '3', booking_reference: 'BKG-9921-AB', traveler_details: { lead_name: 'Emma Watson' }, option_name: 'Kyoto Tea Ceremony', created_at: new Date(Date.now() - 172800000).toISOString(), gross_amount: 85, currency: 'JPY', status: 'CONFIRMED' },
-            { id: '4', booking_reference: 'BKG-5510-QR', traveler_details: { lead_name: 'David Smith' }, option_name: 'Safari Adventure Kenya', created_at: new Date(Date.now() - 259200000).toISOString(), gross_amount: 1250, currency: 'USD', status: 'CANCELLED' },
-            { id: '5', booking_reference: 'BKG-1120-MN', traveler_details: { lead_name: 'Olivia Brown' }, option_name: 'Rome Colosseum Guided Tour', created_at: new Date(Date.now() - 345600000).toISOString(), gross_amount: 65, currency: 'EUR', status: 'CONFIRMED' },
-            { id: '6', booking_reference: 'BKG-8834-ST', traveler_details: { lead_name: 'James Wilson' }, option_name: 'Northern Lights Safari', created_at: new Date(Date.now() - 432000000).toISOString(), gross_amount: 210, currency: 'NOK', status: 'CONFIRMED' },
-          ];
-        }
-
+        if (showLoading) setLoading(true);
+        const statsData = await getAdminDashboardStats();
         setStats(statsData);
-        setRecentBookings(bookingsData.slice(0, 6));
+        
+        const bData = await getAdminBookings();
+        setRecentBookings(bData.slice(0, 6));
       } catch (err) {
         console.error('Error loading dashboard:', err);
       } finally {
-        if (showLoading) {
-          setLoading(false);
-        }
+        if (showLoading) setLoading(false);
       }
     }
 

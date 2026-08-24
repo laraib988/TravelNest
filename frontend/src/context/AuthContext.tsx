@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: authData.user.id,
             email: authData.user.email || email,
             name: authData.user.user_metadata?.name || email.split('@')[0],
-            role: authData.user.user_metadata?.role || 'CUSTOMER',
+            role: (authData.user.user_metadata?.role || 'CUSTOMER').toUpperCase(),
             avatar: authData.user.user_metadata?.avatar,
           });
         }
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: data.name || email.split('@')[0],
         email: data.email,
         avatar: data.avatar,
-        role: data.role as 'CUSTOMER' | 'SUPPLIER' | 'ADMIN',
+        role: (data.role || 'CUSTOMER').toUpperCase() as 'CUSTOMER' | 'SUPPLIER' | 'ADMIN',
         supplierStatus
       });
     } catch (e) {

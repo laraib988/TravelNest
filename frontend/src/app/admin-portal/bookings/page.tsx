@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { getAdminBookings } from '../actions';
 import { useAuth } from '@/context/AuthContext';
 import {
   Search, Download, Eye, CheckCircle2, XCircle,
@@ -65,97 +66,8 @@ export default function BookingsManagementPage() {
   const loadBookings = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('id, customer_id, supplier_id, product_id, status, total_price, booking_date, created_at, tour_date, payment_status')
-        .order('created_at', { ascending: false });
-        
-      if (!error && Array.isArray(data) && data.length > 0) {
-        setBookings(data as any);
-      } else {
-        const fallbackBookings: BookingRecord[] = [
-          {
-            id: 'bk-101',
-            booking_reference: 'TN-2026-8891',
-            customer_id: 'cust-1',
-            listing_id: 'list-bali-sunset',
-            option_id: 'opt-vip',
-            option_name: 'Bali Sunset Catamaran Dinner Cruise & Live Music',
-            slot_id: 'slot-1',
-            slot_start_time: new Date(Date.now() + 172800000).toISOString(),
-            total_travelers: 2,
-            gross_amount: 240,
-            platform_fee: 24,
-            supplier_payout: 216,
-            currency: 'USD',
-            status: 'CONFIRMED',
-            confirmation_type: 'INSTANT',
-            qr_voucher_code: 'TN-VOUCH-8891-BALI',
-            traveler_details: {
-              lead_name: 'Suneel Pirkash',
-              lead_email: 'sunnypirkash@gmail.com',
-              lead_phone: '+92 300 1234567',
-              special_requirements: 'Vegetarian seafood meal preference for 1 guest.',
-              guest_names: ['Suneel Pirkash', 'Anita Pirkash']
-            },
-            payment_intent_id: 'pi_3Mtw2eLkdOWWy',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 'bk-102',
-            booking_reference: 'TN-2026-4412',
-            customer_id: 'cust-2',
-            listing_id: 'list-lahore-walled-city',
-            option_id: 'opt-standard',
-            option_name: 'Walled City Lahore Heritage Walking Tour & Royal Kitchens',
-            slot_id: 'slot-2',
-            slot_start_time: new Date(Date.now() + 86400000).toISOString(),
-            total_travelers: 4,
-            gross_amount: 180,
-            platform_fee: 18,
-            supplier_payout: 162,
-            currency: 'USD',
-            status: 'AWAITING_SUPPLIER_CONFIRMATION',
-            confirmation_type: 'REQUEST_BASED_24H_SLA',
-            qr_voucher_code: 'TN-VOUCH-4412-LHR',
-            traveler_details: {
-              lead_name: 'Ayesha Malik',
-              lead_email: 'ayesha.m@vaitour.com',
-              lead_phone: '+92 321 9876543',
-              special_requirements: 'Wheelchair access required for senior guest.',
-              guest_names: ['Ayesha Malik', 'Tariq Malik', 'Fatima Malik', 'Zainab Malik']
-            },
-            payment_intent_id: 'pi_3Mtw89LkdOWWz',
-            created_at: new Date(Date.now() - 43200000).toISOString()
-          },
-          {
-            id: 'bk-103',
-            booking_reference: 'TN-2026-9905',
-            customer_id: 'cust-3',
-            listing_id: 'list-dubai-desert-safari',
-            option_id: 'opt-quad',
-            option_name: 'Red Dune Desert Safari, Quad Biking & BBQ Starry Night',
-            slot_id: 'slot-3',
-            slot_start_time: new Date(Date.now() - 86400000).toISOString(),
-            total_travelers: 3,
-            gross_amount: 255,
-            platform_fee: 25.5,
-            supplier_payout: 229.5,
-            currency: 'USD',
-            status: 'COMPLETED',
-            confirmation_type: 'INSTANT',
-            qr_voucher_code: 'TN-VOUCH-9905-DXB',
-            traveler_details: {
-              lead_name: 'John Doe',
-              lead_email: 'john.d@example.com',
-              lead_phone: '+1 415 555 0199'
-            },
-            payment_intent_id: 'pi_3Mtw99LkdOWWx',
-            created_at: new Date(Date.now() - 172800000).toISOString()
-          }
-        ];
-        setBookings(fallbackBookings);
-      }
+      const data = await getAdminBookings();
+      setBookings(data as any);
     } catch (err) {
       console.error(err);
       setBookings([]);
