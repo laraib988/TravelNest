@@ -50,11 +50,8 @@ export default function TourDetailPage({ initialTour: tour, relevantProducts = [
     }))
   } : null;
 
-  // dummy block for regex safety
-    },
-  };
-
-  return (
+  
+return (
     <div style={{ maxWidth: '1280px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
       <script
         type="application/ld+json"
