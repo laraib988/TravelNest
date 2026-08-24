@@ -85,9 +85,29 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     .single();
 
   if (!destination) return {};
+  
+  const canonicalUrl = `https://www.vaitour.com/en/destinations/${params.slug}`;
+  
   return {
     title: destination.meta_title || `${destination.name} | Vaitour`,
-    description: destination.meta_description || destination.description
+    description: destination.meta_description || destination.description,
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        en: `https://www.vaitour.com/en/destinations/${params.slug}`,
+        ja: `https://www.vaitour.com/ja/destinations/${params.slug}`,
+        ur: `https://www.vaitour.com/ur/destinations/${params.slug}`,
+        fr: `https://www.vaitour.com/fr/destinations/${params.slug}`,
+        ar: `https://www.vaitour.com/ar/destinations/${params.slug}`,
+        'x-default': `https://www.vaitour.com/en/destinations/${params.slug}`,
+      },
+    },
+    openGraph: {
+      title: destination.meta_title || `${destination.name} | Vaitour`,
+      description: destination.meta_description || destination.description,
+      images: destination.hero_image ? [destination.hero_image] : [],
+      locale: 'en',
+    }
   };
 }
 

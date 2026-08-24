@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
+import MapboxAutocomplete from '@/components/MapboxAutocomplete';
 import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, Download, Smartphone, Tag, Coins, Mail, KeyRound } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';

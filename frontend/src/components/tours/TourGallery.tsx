@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 'use client';
+import { useState, useEffect } from 'react';
 
 import { Star, Clock, MapPin, ShieldCheck } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
