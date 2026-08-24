@@ -586,7 +586,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. WHY CHOOSE TRAVELNEST (NO YELLOW COLORS & COHESIVE ICONS) */}
+      {/* 6. WHY CHOOSE VAITOUR (NO YELLOW COLORS & COHESIVE ICONS) */}
       <section style={{ maxWidth: '1280px', margin: '0 auto 60px', padding: '0 24px' }}>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', textAlign: 'left' }}>
           {t('why_choose_title')}

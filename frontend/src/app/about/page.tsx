@@ -142,7 +142,7 @@ export default function AboutUsPage() {
           </div>
         </div>
 
-        {/* THE TRAVELNEST DIFFERENCE */}
+        {/* THE VAITOUR DIFFERENCE */}
         <div style={{ maxWidth: '1200px', margin: '0 auto 100px', padding: '0 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px' }}>The Vaitour Difference</h2>

@@ -49,7 +49,7 @@ export default function CMSPage() {
 
   // Banners State
   const [banners, setBanners] = useState<Banner[]>([
-    { id: 'ban-1', title: 'Summer Flash Sale', headline: '⚡ Flash Sale: Get 15% off Bali & Tokyo Experiences with code TRAVELNEST2026', cta_text: 'Claim Offer', link_url: '/listings?promo=TRAVELNEST2026', status: 'ACTIVE', target_page: 'Global Header Bar' },
+    { id: 'ban-1', title: 'Summer Flash Sale', headline: '⚡ Flash Sale: Get 15% off Bali & Tokyo Experiences with code VAITOUR2026', cta_text: 'Claim Offer', link_url: '/listings?promo=VAITOUR2026', status: 'ACTIVE', target_page: 'Global Header Bar' },
     { id: 'ban-2', title: 'Lahore Heritage Special', headline: '🕌 Explore Walled City Lahore Tours with Certified Historian Guides', cta_text: 'Book Heritage Tour', link_url: '/listings?cat=heritage', status: 'ACTIVE', target_page: 'Homepage Hero Section' },
   ]);
 

@@ -114,7 +114,7 @@ export default function Header() {
       >
         {/* TOP ANNOUNCEMENT BAR */}
         <div style={{ background: 'var(--brand-gradient)', color: '#ffffff', padding: '6px 24px', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          <Sparkles size={14} /> ⚡ Flash Sale: Get 15% off Bali & Tokyo Experiences with code <strong>TRAVELNEST2026</strong>
+          <Sparkles size={14} /> ⚡ Flash Sale: Get 15% off Bali & Tokyo Experiences with code <strong>VAITOUR2026</strong>
         </div>
 
         {/* HEADER 1: PRIMARY TOP HEADER BAR */}
@@ -349,7 +349,7 @@ export default function Header() {
               gap: '20px'
             }}
           >
-            {/* SUB-HEADER LEFT DROPDOWNS: DESTINATIONS & EXPLORE TRAVELNEST */}
+            {/* SUB-HEADER LEFT DROPDOWNS: DESTINATIONS & EXPLORE VAITOUR */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
               
               {/* 1. DESTINATIONS DROPDOWN BUTTON */}
@@ -489,7 +489,7 @@ export default function Header() {
                 )}
               </div>
 
-              {/* 2. EXPLORE TRAVELNEST DROPDOWN BUTTON */}
+              {/* 2. EXPLORE VAITOUR DROPDOWN BUTTON */}
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={(e) => {
