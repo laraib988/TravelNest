@@ -8,7 +8,7 @@ import { fetchFromAPI } from '@/lib/api-client';
 
 export default function TourBookingWidget({ tour }: { tour: any }) {
   const router = useRouter();
-  const { formatPrice, t } = useCurrency();
+  const { formatPrice, t, language } = useCurrency();
 
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
