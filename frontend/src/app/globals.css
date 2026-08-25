@@ -495,3 +495,46 @@ input:focus, select:focus, textarea:focus {
     border-radius: 50px !important;
   }
 }
+
+@media (max-width: 768px) {
+  /* Tour Details Mobile */
+  .tour-gallery-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .tour-title-section {
+    order: 2;
+  }
+  .tour-image-grid {
+    order: 1;
+    display: block !important;
+    height: 300px !important;
+    margin-bottom: 20px !important;
+    border-radius: 0 !important;
+    margin-left: -24px;
+    margin-right: -24px;
+    width: calc(100% + 48px) !important;
+  }
+  .tour-gallery-thumbnails {
+    display: none !important;
+  }
+  .tour-main-title {
+    font-size: 1.6rem !important;
+  }
+  .tour-meta-row {
+    font-size: 0.85rem !important;
+    gap: 12px !important;
+  }
+  .tour-content-grid {
+    display: block !important;
+  }
+  .tour-booking-right.desktop-only {
+    display: none !important;
+  }
+  .tour-sticky-bottom-bar {
+    display: flex !important;
+  }
+  .relevant-product-card {
+    width: 42vw !important;
+  }
+}

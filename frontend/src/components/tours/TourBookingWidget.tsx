@@ -244,7 +244,7 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
         className="btn-primary"
         style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.05rem', opacity: (holding || remainingSeats <= 0 || !!capacityWarning) ? 0.5 : 1 }}
       >
-        {holding ? 'Acquiring Lock...' : remainingSeats <= 0 ? 'Sold Out' : !!capacityWarning ? 'Exceeds Capacity' : 'Checkout'}
+        {holding ? 'Acquiring Lock...' : remainingSeats <= 0 ? 'Sold Out' : !!capacityWarning ? 'Exceeds Capacity' : 'Book Now'}
         <ArrowRight size={18} />
       </button>
 

@@ -14,6 +14,8 @@ const TourReviews = dynamic(() => import('@/components/tours/TourReviews'));
 const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWidget'));
 
 export default function TourDetailPage({ initialTour: tour, relevantProducts = [] }: { initialTour: any, relevantProducts?: any[] }) {
+  const [isMobileBookingOpen, setIsMobileBookingOpen] = useState(false);
+
   if (!tour) return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--brand-accent)' }}>Experience not found.</div>;
   
   const t = (key: string) => <ClientText tKey={key} />;
@@ -82,7 +84,7 @@ return (
       <TourGallery tour={tour} />
 
       {/* TWO COLUMN CONTENT & BOOKING PANEL */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr', gap: '40px' }}>
+      <div className="tour-content-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr', gap: '40px' }}>
         {/* LEFT COLUMN: DETAILS & SRS AI REVIEW INTELLIGENCE */}
         <div>
           {/* SRS 9.3: AI REVIEW INTELLIGENCE CARD */}
@@ -248,20 +250,38 @@ return (
           )}
 
           <TourReviews tour={tour} />
+
+          {/* ABOUT SUPPLIER - newly added */}
+          <div style={{ marginTop: '40px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <h2 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={22} color="#059669" /> About the Supplier
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 700 }}>
+                {tour.supplier?.name ? tour.supplier.name.charAt(0) : 'S'}
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.1rem' }}>{tour.supplier?.name || 'Verified Supplier'}</div>
+                <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Star size={14} color="#d97706" fill="#d97706" /> {tour.cached_rating_avg} ({tour.cached_review_count} reviews)
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div>
+        <div className="tour-booking-right desktop-only">
           <TourBookingWidget tour={tour} />
         </div>
       </div>
       
-      {/* RELEVANT PRODUCTS ROW */}
+      {/* RELEVANT PRODUCTS ROW (Slider on Mobile) */}
       {relevantProducts.length > 0 && (
-        <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid #e2e8f0', marginBottom: '40px' }}>
+        <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid #e2e8f0', marginBottom: '80px' }}>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px' }}>{t('relevant_products')}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
+          <div className="relevant-products-scroll" style={{ display: 'flex', gap: '20px', overflowX: 'auto', paddingBottom: '16px', scrollbarWidth: 'none' }}>
             {relevantProducts.map(p => (
-              <a key={p.id} href={`/tours/${p.slug || p.id}`} style={{ textDecoration: 'none', display: 'block', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', background: '#fff', transition: 'transform 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}>
+              <a key={p.id} className="relevant-product-card" href={`/tours/${p.slug || p.id}`} style={{ textDecoration: 'none', display: 'block', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', background: '#fff', transition: 'transform 0.2s', cursor: 'pointer', flex: '0 0 auto', width: '260px' }}>
                 <div style={{ height: '160px', width: '100%', overflow: 'hidden' }}>
                   <Image src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 </div>
@@ -276,6 +296,31 @@ return (
                 </div>
               </a>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE STICKY BOTTOM BAR */}
+      <div className="mobile-only tour-sticky-bottom-bar" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #e2e8f0', padding: '16px', display: 'none', justifyContent: 'space-between', alignItems: 'center', zIndex: 90, boxShadow: '0 -4px 12px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontSize: '0.85rem', color: '#64748b' }}>From</span>
+          <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-primary)' }}>{formatPrice(tour.base_price)}</span>
+        </div>
+        <button onClick={() => setIsMobileBookingOpen(true)} className="btn-primary" style={{ padding: '12px 24px', borderRadius: '50px', fontSize: '1.05rem' }}>
+          Select packages
+        </button>
+      </div>
+
+      {/* MOBILE BOTTOM SHEET FOR BOOKING */}
+      {isMobileBookingOpen && (
+        <div className="mobile-only" style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.5)' }}>
+          <div style={{ flex: 1 }} onClick={() => setIsMobileBookingOpen(false)}></div>
+          <div style={{ background: '#fff', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', paddingBottom: '40px', maxHeight: '85vh', overflowY: 'auto', position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>Select Packages</h2>
+              <button onClick={() => setIsMobileBookingOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><XCircle size={28} color="#64748b" /></button>
+            </div>
+            <TourBookingWidget tour={tour} />
           </div>
         </div>
       )}
