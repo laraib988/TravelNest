@@ -111,13 +111,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const blog = await getBlog(slug);
   if (!blog) notFound();
 
-  const toc = buildToC(blog.content_markdown || '');
   // Prefer the structured FAQs column (edited by the admin); fall back to
   // extracting them from the markdown body for older articles.
   const structuredFaqs = Array.isArray(blog.faqs)
     ? (blog.faqs as { question: string; answer: string }[]).filter((f) => f?.question && f?.answer)
     : [];
   const faqs = structuredFaqs.length > 0 ? structuredFaqs : extractFaqs(blog.content_markdown || '');
+
+  // Strip extracted/structured sections from markdown to avoid duplicate identical headings
+  let cleanMarkdown = blog.content_markdown || '';
+  if (blog.quick_takeaways && blog.quick_takeaways.length > 0) {
+    cleanMarkdown = cleanMarkdown.replace(/##\s*Quick Takeaways[\s\S]*?(?=##\s|$)/i, '');
+  }
+  if (faqs.length > 0) {
+    cleanMarkdown = cleanMarkdown.replace(/##\s*FAQs?[\s\S]*?(?=##\s|$)/i, '');
+    cleanMarkdown = cleanMarkdown.replace(/##\s*Frequently Asked Questions[\s\S]*?(?=##\s|$)/i, '');
+  }
+
+  const toc = buildToC(cleanMarkdown);
   const related = await getRelatedDestinations();
 
   let articleSchema: any = null;
@@ -218,7 +229,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   td: (props) => <td style={{ border: '1px solid #e2e8f0', padding: '10px 14px' }} {...props} />,
                 }}
               >
-                {blog.content_markdown || ''}
+                {cleanMarkdown}
               </ReactMarkdown>
             </div>
 
@@ -245,9 +256,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* ToC */}
             {toc.length > 0 && (
               <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '20px' }}>
-                <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
+                <p style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
                   On This Page
-                </h3>
+                </p>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {toc.filter((t) => t.level === 2).map((t) => (
                     <a key={t.id} href={`#${t.id}`} style={{ fontSize: '0.85rem', color: '#475569', textDecoration: 'none', padding: '4px 0', borderBottom: '1px solid #f1f5f9', transition: 'color 0.15s' }}>
@@ -260,9 +271,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Share */}
             <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '20px' }}>
-              <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
                 Share This Guide
-              </h3>
+              </p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none', background: '#f8fafc' }}>X</a>
                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', textDecoration: 'none', background: '#f8fafc' }}>FB</a>
@@ -277,7 +288,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <Image src={blog.author_avatar} alt={blog.author_name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover' }}  width={56} height={56} />
                 )}
                 <div>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>{blog.author_name}</h3>
+                  <p style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{blog.author_name}</p>
                   <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{blog.author_role}</span>
                 </div>
               </div>
@@ -307,7 +318,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     )}
                   </div>
                   <div style={{ padding: '18px' }}>
-                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>{d.name}</h3>
+                    <p style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px', marginTop: 0 }}>{d.name}</p>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.country}</span>
                   </div>
                 </Link>
