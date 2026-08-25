@@ -122,59 +122,54 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
         </div>
 
         {/* Hero Content */}
-        <div style={{ position: 'absolute', bottom: '48px', left: '0', right: '0', maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <div style={{ position: 'absolute', bottom: '24px', left: '0', right: '0', maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
             <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
               background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)',
-              padding: '6px 14px', borderRadius: '9999px',
-              fontSize: '0.85rem', color: '#ffffff', fontWeight: 600
+              padding: '6px 12px', borderRadius: '9999px',
+              fontSize: '0.8rem', color: '#ffffff', fontWeight: 600,
+              whiteSpace: 'nowrap'
             }}>
               <MapPin size={14} /> {destination.country}
             </div>
             {destination.meta_data?.safety?.is_safe_for_women && (
               <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
                 background: 'rgba(236, 72, 153, 0.25)', backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(236, 72, 153, 0.5)',
-                padding: '6px 14px', borderRadius: '9999px',
-                fontSize: '0.85rem', color: '#fbcfe8', fontWeight: 700,
-                boxShadow: '0 4px 12px rgba(236, 72, 153, 0.15)'
+                padding: '6px 12px', borderRadius: '9999px',
+                fontSize: '0.8rem', color: '#fbcfe8', fontWeight: 700,
+                boxShadow: '0 4px 12px rgba(236, 72, 153, 0.15)',
+                whiteSpace: 'nowrap'
               }}>
-                <ShieldCheck size={16} /> Verified Safe for Solo Female Travelers
+                <ShieldCheck size={14} /> Verified for Solo Travelers
               </div>
             )}
           </div>
-          <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <h1 style={{
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 800, color: '#ffffff',
-              lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
+              fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 800, color: '#ffffff',
+              lineHeight: 1.1, marginBottom: '0', letterSpacing: '-0.02em',
               fontFamily: 'var(--font-heading)'
             }}>
-              {destination.name} Tours, Activities & Things to Do
+              {destination.name} Tours & Activities
             </h1>
           </div>
           <p className="desktop-only" style={{
             color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', maxWidth: '680px',
-            lineHeight: 1.6
+            lineHeight: 1.6, marginTop: '12px'
           }}>
             {destination.description}
           </p>
         </div>
       </section>
 
-      {/* MOBILE HERO TEXT (Below Image) */}
-      <div className="mobile-only" style={{ padding: '24px 24px 0' }}>
-        <h1 style={{
-          fontSize: '2rem', fontWeight: 800, color: '#0f172a',
-          lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
-          fontFamily: 'var(--font-heading)'
-        }}>
-          {destination.name} Tours, Activities & Things to Do
-        </h1>
+      {/* MOBILE DESCRIPTION (Below Image) */}
+      <div className="mobile-only" style={{ padding: '20px 24px 0' }}>
         <p style={{
           color: '#475569', fontSize: '1rem',
-          lineHeight: 1.6
+          lineHeight: 1.6, margin: 0
         }}>
           {destination.description}
         </p>
