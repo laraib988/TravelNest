@@ -517,7 +517,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                       {idx + 1}
                     </div>
 
-                    <div style={{
+                    <div className="itinerary-card" style={{
                       flex: 1, background: '#ffffff', borderRadius: '20px',
                       border: '1px solid #e2e8f0', overflow: 'hidden',
                       display: 'flex', flexDirection: item.image ? 'row' : 'column',
@@ -564,7 +564,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
               {destination.meta_data.safety.safety_score > 0 && (
                 <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: destination.meta_data.safety.safety_score >= 7 ? '#f0fdf4' : '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: destination.meta_data.safety.safety_score >= 7 ? '#16a34a' : '#ea580c', fontSize: '1.5rem', fontWeight: 800 }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', flexShrink: 0, backgroundColor: destination.meta_data.safety.safety_score >= 7 ? '#f0fdf4' : '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: destination.meta_data.safety.safety_score >= 7 ? '#16a34a' : '#ea580c', fontSize: '1.5rem', fontWeight: 800 }}>
                     {destination.meta_data.safety.safety_score}<span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>/10</span>
                   </div>
                   <div>
@@ -576,7 +576,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
 
               {destination.meta_data.safety.trusted_transport && (
                 <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', flexShrink: 0, backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Car size={28} color="#0284c7" />
                   </div>
                   <div>
@@ -641,7 +641,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
 
               return (
                 <div style={{ position: 'relative' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                  <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
                     {visible.map((product: any) => (
                       <Link key={product.id} href={`/tours/${product.slug || product.id}`} style={{ textDecoration: 'none', display: 'flex' }}>
                         <div className="card-panel" style={{ borderRadius: '16px', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
@@ -723,7 +723,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                   </div>
 
                   {pageCount > 1 && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '28px' }}>
+                    <div className="desktop-pagination" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '28px' }}>
                       <button
                         onClick={() => setProductIndex((prev) => (prev - 1 + pageCount) % pageCount)}
                         aria-label="Previous products"

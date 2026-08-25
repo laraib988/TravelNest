@@ -599,3 +599,13 @@ input:focus, select:focus, textarea:focus {
     display: none !important;
   }
 }
+
+/* Itinerary mobile layout */
+@media (max-width: 768px) {
+  .itinerary-card {
+    flex-direction: column !important;
+  }
+  .itinerary-card > div:first-child {
+    width: 100% !important;
+  }
+}
