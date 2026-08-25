@@ -71,8 +71,6 @@ export default function TourGallery({ tour }: { tour: any }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#64748b', marginBottom: '20px' }}>
           <span style={{ color: '#6366f1', fontWeight: 700 }}>{tour.cached_rating_avg}/5</span>
           <span style={{ textDecoration: 'underline' }}>{tour.cached_review_count} reviews</span>
-          <span>•</span>
-          <span>{tour.booking_count || '1K+'} booked</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#0f172a', fontSize: '0.95rem', fontWeight: 500 }}>
@@ -84,10 +82,14 @@ export default function TourGallery({ tour }: { tour: any }) {
             <Clock size={18} color="#64748b" /> 
             <span>{tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <MessageSquare size={18} color="#64748b" /> 
-            <span>Guide language: {tour.languages?.length > 1 ? `${tour.languages[0]} +${tour.languages.length - 1}` : (tour.languages?.[0] || 'English')}</span>
-          </div>
+          
+          {tour.languages && tour.languages.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <MessageSquare size={18} color="#64748b" /> 
+              <span>Guide language: {tour.languages.length > 1 ? `${tour.languages[0]} +${tour.languages.length - 1}` : tour.languages[0]}</span>
+            </div>
+          )}
+
           {(tour.meeting_point_type === 'pickup' || tour.inclusions?.some((i: string) => i.toLowerCase().includes('pickup'))) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Car size={18} color="#64748b" /> 
@@ -96,7 +98,7 @@ export default function TourGallery({ tour }: { tour: any }) {
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Users size={18} color="#64748b" /> 
-            <span>{tour.max_group_size ? `Small group (Max ${tour.max_group_size})` : 'Group tour'}</span>
+            <span>{tour.tour_type || (tour.max_group_size ? `Small group (Max ${tour.max_group_size})` : 'Group tour')}</span>
           </div>
         </div>
 

@@ -496,7 +496,15 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+.tour-detail-container {
+  margin-top: 40px !important;
+}
+
 @media (max-width: 768px) {
+  .tour-detail-container {
+    margin-top: 0 !important;
+  }
+
   /* Tour Details Mobile */
   .tour-gallery-container {
     display: flex;

@@ -75,7 +75,7 @@ export default function TourDetailPage({ initialTour: tour, relevantProducts = [
 
   
 return (
-    <div style={{ maxWidth: '1280px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
+    <div className="tour-detail-container max-w-[1280px] mx-auto px-6 bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
