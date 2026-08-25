@@ -1,9 +1,11 @@
-import { getAlternates } from '@/lib/seo';
-export const metadata = {
-  title: 'Search Tours | Vaitour',
-  description: 'Find your next adventure.',
-  alternates: getAlternates('/tours')
-};
+import { getDynamicAlternates } from '@/lib/seo';
+export async function generateMetadata() {
+  return {
+    title: 'Search Tours | Vaitour',
+    description: 'Find your next adventure.',
+    alternates: await getDynamicAlternates('/tours')
+  };
+}
 import TourSearchClient from './TourSearchClient';
 import { Suspense } from 'react';
 

@@ -1,9 +1,11 @@
-import { getAlternates } from '@/lib/seo';
-export const metadata = {
-  title: 'Destinations | Vaitour',
-  description: 'Explore the world.',
-  alternates: getAlternates('/destinations')
-};
+import { getDynamicAlternates } from '@/lib/seo';
+export async function generateMetadata() {
+  return {
+    title: 'Destinations | Vaitour',
+    description: 'Explore the world.',
+    alternates: await getDynamicAlternates('/destinations')
+  };
+}
 export const revalidate = 3600;
 
 import { createClient } from '@supabase/supabase-js';

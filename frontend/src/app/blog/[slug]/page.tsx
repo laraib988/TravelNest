@@ -39,7 +39,10 @@ export async function generateStaticParams() {
   return (data || []).map((b) => ({ slug: b.slug }));
 }
 
+import { headers } from 'next/headers';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = headersList.get('x-locale') || 'en';
   const { slug } = await params;
   const blog = await getBlog(slug);
   if (!blog) return { title: 'Blog not found' };
@@ -49,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: blog.meta_description || blog.summary,
     keywords: blog.focus_keywords || [],
     alternates: { 
-      canonical: `${APP_URL}/en/blog/${blog.slug}`,
+      canonical: `${APP_URL}/${locale}/blog/${blog.slug}`,
       languages: {
         en: `${APP_URL}/en/blog/${blog.slug}`,
         ja: `${APP_URL}/ja/blog/${blog.slug}`,
