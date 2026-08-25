@@ -113,14 +113,9 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
 
   return (
     <div className="card-panel" style={{ padding: '30px', position: 'sticky', top: '100px', background: '#ffffff', border: '1px solid #cbd5e1', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '20px', flexWrap: 'nowrap' }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-primary)', whiteSpace: 'nowrap' }}>
-            {formatPrice(currentPrice)} <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/ {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
-          </div>
-        </div>
-        <div className="badge-emerald" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0, whiteSpace: 'nowrap', padding: '4px 10px', fontSize: '0.78rem' }}>
-          <Lock size={12} /> {t('secure_payment')}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-primary)', whiteSpace: 'nowrap' }}>
+          {formatPrice(currentPrice)} <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', fontWeight: 600 }}>/ {selectedOption?.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
         </div>
       </div>
 
@@ -174,12 +169,9 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
       )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <label style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>{t('select_slots')}</label>
+        <label style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>Select Date</label>
         <input 
-          type="text" 
-          placeholder="DD/MM/YYYY"
-          onFocus={(e) => (e.target.type = 'date')}
-          onBlur={(e) => (e.target.value === '' ? (e.target.type = 'text') : null)}
+          type="date" 
           onChange={(e) => {
             if (e.target.value) {
               const d = new Date(e.target.value);
@@ -235,25 +227,27 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
         </button>
       </div>
 
-      {errorMsg && (
-        <div style={{ padding: '12px', borderRadius: 'var(--radius-sm)', background: '#ffe4e6', color: '#e11d48', fontSize: '0.85rem', marginBottom: '16px' }}>
-          {errorMsg}
-        </div>
-      )}
+      <div style={{ position: 'sticky', bottom: '-30px', margin: '0 -30px -30px -30px', padding: '16px 30px 30px 30px', background: '#fff', borderTop: '1px solid #e2e8f0', zIndex: 10 }}>
+        {errorMsg && (
+          <div style={{ padding: '12px', borderRadius: 'var(--radius-sm)', background: '#ffe4e6', color: '#e11d48', fontSize: '0.85rem', marginBottom: '16px' }}>
+            {errorMsg}
+          </div>
+        )}
 
-      <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--brand-primary)', marginBottom: '12px', fontWeight: 600 }}>
-        🔒 Secure Payment - Locks seat for 15 minutes.
-      </p>
+        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--brand-primary)', marginBottom: '12px', fontWeight: 600 }}>
+          🔒 Secure Payment - Locks seat for 15 minutes.
+        </p>
 
-      <button
-        onClick={handleAcquireHold}
-        disabled={holding || remainingSeats <= 0 || !!capacityWarning}
-        className="btn-primary"
-        style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.05rem', opacity: (holding || remainingSeats <= 0 || !!capacityWarning) ? 0.5 : 1 }}
-      >
-        {holding ? 'Acquiring Lock...' : remainingSeats <= 0 ? 'Sold Out' : !!capacityWarning ? 'Exceeds Capacity' : 'Book Now'}
-        <ArrowRight size={18} />
-      </button>
+        <button
+          onClick={handleAcquireHold}
+          disabled={holding || remainingSeats <= 0 || !!capacityWarning || !selectedSlot || (tour.options?.length > 0 && !selectedOption)}
+          className="btn-primary"
+          style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.05rem', opacity: (holding || remainingSeats <= 0 || !!capacityWarning || !selectedSlot || (tour.options?.length > 0 && !selectedOption)) ? 0.5 : 1 }}
+        >
+          {holding ? 'Acquiring Lock...' : remainingSeats <= 0 ? 'Sold Out' : !!capacityWarning ? 'Exceeds Capacity' : (!selectedSlot ? 'Select a Date' : (tour.options?.length > 0 && !selectedOption ? 'Select an Option' : 'Book Now'))}
+          <ArrowRight size={18} />
+        </button>
+      </div>
     </div>
   );
 }
