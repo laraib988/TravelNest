@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
@@ -340,8 +341,8 @@ return (
       </div>
 
       {/* MOBILE BOTTOM SHEET FOR BOOKING */}
-      {isMobileBookingOpen && (
-        <div className="mobile-only" style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.5)' }}>
+      {isMobileBookingOpen && typeof document !== 'undefined' && createPortal(
+        <div className="mobile-only" style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.5)' }}>
           <div style={{ flex: 1 }} onClick={() => setIsMobileBookingOpen(false)}></div>
           <div style={{ background: '#fff', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', paddingBottom: '40px', maxHeight: '85vh', overflowY: 'auto', position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -350,7 +351,8 @@ return (
             </div>
             <TourBookingWidget tour={tour} />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

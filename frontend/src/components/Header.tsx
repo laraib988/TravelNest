@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -785,7 +786,7 @@ export default function Header() {
 
 
               {/* MOBILE DRAWER / BOTTOM SHEET */}
-        {isMobileMenuOpen && (
+        {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
           <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }} className="mobile-only">
             {/* Backdrop */}
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', transition: 'opacity 0.3s' }} onClick={() => setIsMobileMenuOpen(false)} />
@@ -976,7 +977,7 @@ export default function Header() {
               </div>
             </div>
           </div>
-        )}
+        ), document.body)}
       </>
     );
 }
