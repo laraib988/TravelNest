@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import { ClientText, ClientPrice } from '@/components/ClientI18n';
-import { Sparkles, MapPin, CheckCircle2, HelpCircle, Star, XCircle } from 'lucide-react';
+import { Sparkles, MapPin, CheckCircle2, HelpCircle, Star, XCircle, ShieldCheck } from 'lucide-react';
 
 import dynamic from 'next/dynamic';
 import TourAskAIWidget from '@/components/tours/TourAskAIWidget';
