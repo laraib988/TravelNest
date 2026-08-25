@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { Star, Clock, MapPin, ShieldCheck, MessageSquare, Car, Users, CheckCircle } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -41,6 +41,7 @@ function WeatherWidget({ location }: { location: string }) {
 
 export default function TourGallery({ tour }: { tour: any }) {
   const { t } = useCurrency();
+  const [activeSlide, setActiveSlide] = useState(0);
 
   const cloudinaryLoader = ({ src, width, quality }: any) => {
     if (src.startsWith('http')) {
@@ -115,20 +116,39 @@ export default function TourGallery({ tour }: { tour: any }) {
         </div>
       </div>
 
-      <div className="tour-image-slider" style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollSnapType: 'x mandatory', borderRadius: 'var(--radius-lg)', height: '400px', marginBottom: '40px', scrollbarWidth: 'none' }}>
-        {tour.images?.map((img: any, i: number) => (
-          <div key={i} style={{ position: 'relative', minWidth: '100%', height: '100%', scrollSnapAlign: 'center' }}>
-            <Image 
-              loader={cloudinaryLoader}
-              src={img.url} 
-              alt={`${tour.title} Gallery Image ${i+1}`} 
-              fill
-              priority={i === 0}
-              sizes="100vw"
-              style={{ objectFit: 'cover' }} 
-            />
+      <div style={{ position: 'relative' }} className="tour-image-slider-wrapper">
+        <div onScroll={(e: any) => setActiveSlide(Math.round(e.target.scrollLeft / e.target.clientWidth))} className="tour-image-slider" style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollSnapType: 'x mandatory', borderRadius: 'var(--radius-lg)', height: '400px', marginBottom: '40px', scrollbarWidth: 'none' }}>
+          {tour.images?.map((img: any, i: number) => (
+            <div key={i} style={{ position: 'relative', minWidth: '100%', height: '100%', scrollSnapAlign: 'center' }}>
+              <Image 
+                loader={cloudinaryLoader}
+                src={img.url} 
+                alt={`${tour.title} Gallery Image ${i+1}`} 
+                fill
+                priority={i === 0}
+                sizes="100vw"
+                style={{ objectFit: 'cover' }} 
+              />
+            </div>
+          ))}
+        </div>
+        {tour.images?.length > 1 && (
+          <div style={{ position: 'absolute', bottom: '60px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 10 }}>
+            {tour.images.map((_: any, i: number) => (
+              <div 
+                key={i} 
+                style={{ 
+                  width: activeSlide === i ? '12px' : '6px', 
+                  height: '6px', 
+                  borderRadius: '3px', 
+                  background: activeSlide === i ? '#ffffff' : 'rgba(255,255,255,0.5)', 
+                  transition: 'all 0.3s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                }} 
+              />
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
