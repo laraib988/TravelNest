@@ -106,7 +106,8 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const redirectUrl = new URL(`/${detectedLocale}${pathname}`, request.url);
+  const redirectPath = pathname === '/' ? `/${detectedLocale}` : `/${detectedLocale}${pathname}`;
+  const redirectUrl = new URL(redirectPath, request.url);
   redirectUrl.search = request.nextUrl.search;
 
   return NextResponse.redirect(redirectUrl);
