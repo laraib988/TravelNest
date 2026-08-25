@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown } from 'lucide-react';
 import { useCurrency, SUPPORTED_CURRENCIES, SUPPORTED_LANGUAGES } from '@/context/CurrencyContext';
 
-export default function CurrencyLanguageDropdown() {
+export default function CurrencyLanguageDropdown({ direction = 'down' }: { direction?: 'down' | 'up' }) {
   const { currency, setCurrencyCode, language, setLanguageCode } = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'LANGUAGES' | 'CURRENCY'>('CURRENCY');
@@ -69,7 +69,8 @@ export default function CurrencyLanguageDropdown() {
         <div
           style={{
             position: 'absolute',
-            top: 'calc(100% + 8px)',
+            top: direction === 'down' ? 'calc(100% + 8px)' : 'auto',
+            bottom: direction === 'up' ? 'calc(100% + 8px)' : 'auto',
             right: 0,
             width: '260px',
             background: '#ffffff',

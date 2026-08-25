@@ -221,7 +221,7 @@ export default function Header() {
             </nav>
 
             {/* CURRENCY & LANGUAGE SELECTOR DROPDOWN */}
-            <CurrencyLanguageDropdown />
+            <CurrencyLanguageDropdown direction="up" />
 
             {/* AUTHENTICATION ACTIONS: USER PROFILE OR 2 SEPARATE BUTTONS (SIGN IN & SIGN UP) */}
             {user ? (
@@ -812,7 +812,7 @@ export default function Header() {
               <div style={{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ width: '40px', height: '4px', background: '#e2e8f0', borderRadius: '2px', marginBottom: '16px' }} />
                 <div style={{ width: '100%', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>Explore the world</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Image src="/logo.png" alt="Vaitour Logo" width={24} height={24} style={{ width: '24px', height: '24px', objectFit: 'contain' }} /><span style={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: 1 }} className="gradient-text">Vaitour</span></div>
                   <button onClick={() => setIsMobileMenuOpen(false)} style={{ position: 'absolute', right: 0, background: 'none', border: 'none', padding: '4px' }}>
                     <X size={24} color="#64748b" />
                   </button>
