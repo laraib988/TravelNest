@@ -41,7 +41,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     reset_filters: 'Reset Filters',
 
     // Grid & Cards
-    top_destinations: 'Top  Global Travel Destinations',
+    top_destinations: 'Travel Destinations',
     top_destinations_sub: 'Verified local operator hubs with instant real-time slot locks',
     from: 'From',
     per_person: '/ person',

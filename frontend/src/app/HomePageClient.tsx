@@ -597,8 +597,8 @@ export default function HomePage() {
           We guarantee safety, speed, and premium support for travelers worldwide
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="why-choose-scroll" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+          <div className="card-panel why-choose-card" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <Shield size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
             <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>100% KYC Verified Suppliers</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
@@ -606,7 +606,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="card-panel why-choose-card" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <Award size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
             <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Earn Loyalty Rewards</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
@@ -614,7 +614,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="card-panel why-choose-card" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <DollarSign size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
             <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>Best Price Guarantee</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
@@ -622,7 +622,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="card-panel" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="card-panel why-choose-card" style={{ padding: '28px 24px', borderRadius: 'var(--radius-md)', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <Headphones size={40} color="var(--brand-primary)" style={{ marginBottom: '16px' }} />
             <h3 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px' }}>24/7 AI Concierge</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
@@ -641,14 +641,14 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-              Top Rated Marketplace Experiences
+              Top Rated Experiences
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', margin: '4px 0 0' }}>
               Handpicked top-rated tours, excursions and activities
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="top-rated-controls" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 onClick={() => scrollTours('left')}
