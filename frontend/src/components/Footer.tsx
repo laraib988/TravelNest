@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCurrency } from '@/context/CurrencyContext';
+import CurrencyLanguageDropdown from './CurrencyLanguageDropdown';
 
 export default function Footer() {
   const pathname = usePathname();
@@ -49,7 +50,8 @@ export default function Footer() {
               paddingBottom: '50px',
             }}
           >
-            {/* COLUMN 2: QUICK LINKS */}
+                      <div className="footer-links-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '40px' }}>
+  {/* COLUMN 2: QUICK LINKS */}
             <div>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
                 {t('quick_links')}
@@ -78,6 +80,16 @@ export default function Footer() {
                 <li><Link href="/faq" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('faq')}</Link></li>
                 <li><Link href="/sitemap" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('sitemap')}</Link></li>
               </ul>
+            </div>
+
+                      </div>
+
+{/* COLUMN 4: PREFERENCES */}
+            <div className="footer-preferences">
+              <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
+                Preferences
+              </h4>
+              <CurrencyLanguageDropdown direction="up" />
             </div>
 
             {/* COLUMN 3: PAYMENT CHANNELS */}

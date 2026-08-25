@@ -460,3 +460,10 @@ input:focus, select:focus, textarea:focus {
     line-height: 1.4 !important;
   }
 }
+
+@media (max-width: 768px) {
+  .footer-links-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+}
