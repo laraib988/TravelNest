@@ -16,6 +16,17 @@ const TourBookingWidget = dynamic(() => import('@/components/tours/TourBookingWi
 export default function TourDetailPage({ initialTour: tour, relevantProducts = [] }: { initialTour: any, relevantProducts?: any[] }) {
   const [isMobileBookingOpen, setIsMobileBookingOpen] = useState(false);
 
+  useEffect(() => {
+    if (isMobileBookingOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileBookingOpen]);
+
   if (!tour) return <div style={{ padding: '100px', textAlign: 'center', color: 'var(--brand-accent)' }}>Experience not found.</div>;
   
   const t = (key: string) => <ClientText tKey={key} />;

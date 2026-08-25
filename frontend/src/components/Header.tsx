@@ -88,6 +88,17 @@ export default function Header() {
   const [mobileSearchQuery, setMobileSearchQuery] = useState('');
   const [featuredCities, setFeaturedCities] = useState<any[]>([]);
   const [activeHoverCountry, setActiveHoverCountry] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
   const [mobileSelectedCountry, setMobileSelectedCountry] = useState<string | null>(null);
 
   useEffect(() => {
