@@ -474,4 +474,22 @@ input:focus, select:focus, textarea:focus {
     line-height: 1.2 !important;
     margin-bottom: 10px !important;
   }
+  .hero-search-form {
+    flex-wrap: nowrap !important;
+    padding: 5px 5px 5px 12px !important;
+    gap: 6px !important;
+    border-radius: 50px !important;
+  }
+  .hero-search-input {
+    font-size: 0.8rem !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+  .hero-search-button {
+    padding: 10px 14px !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border-radius: 50px !important;
+  }
 }
