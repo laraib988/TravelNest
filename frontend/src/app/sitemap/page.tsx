@@ -69,11 +69,7 @@ export default function SitemapPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <Link href="/login" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Member Login</Link>
               <Link href="/signup" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Create Account</Link>
-              <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> User Dashboard</Link>
-              <Link href="/bookings" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> My Bookings</Link>
-              <Link href="/saved" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Saved Wishlists</Link>
-              <Link href="/profile/settings" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Account Settings</Link>
-            </div>
+              </div>
           </section>
 
           <section id="legal-policies" style={{ marginBottom: '40px' }}>
@@ -85,8 +81,7 @@ export default function SitemapPage() {
               <Link href="/terms" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Terms of Service</Link>
               <Link href="/refund-policy" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Refund Policy</Link>
               <Link href="/cancellation-policy" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Cancellation Guidelines</Link>
-              <Link href="/cookies" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Cookie Management</Link>
-            </div>
+              </div>
           </section>
 
           <section id="support" style={{ marginBottom: '40px' }}>
@@ -97,9 +92,7 @@ export default function SitemapPage() {
               <Link href="/support" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Support Center</Link>
               <Link href="/faq" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Frequently Asked Questions (FAQ)</Link>
               {/* <Link href="mailto:support@vaitour.com" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Contact Us</Link> */}
-              <Link href="/safety" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Trust & Safety Hub</Link>
-              <Link href="/accessibility" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Accessibility Features</Link>
-            </div>
+              </div>
           </section>
 
           <section id="company" style={{ marginBottom: '40px' }}>
@@ -108,11 +101,7 @@ export default function SitemapPage() {
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <Link href="/about" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> About Vaitour</Link>
-              <Link href="/careers" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Careers & Jobs</Link>
-              <Link href="/press" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Press & Media Kit</Link>
-              <Link href="/investors" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Investor Relations</Link>
-              <Link href="/impact" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Environmental Impact</Link>
-            </div>
+              </div>
           </section>
 
           <section id="programs" style={{ marginBottom: '40px' }}>
@@ -121,11 +110,7 @@ export default function SitemapPage() {
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <Link href="/loyalty" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Vaitour Rewards</Link>
-              <Link href="/affiliates" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Affiliate Network</Link>
-              <Link href="/become-a-host" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Become a Host/Supplier</Link>
-              <Link href="/gift-cards" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Digital Gift Cards</Link>
-              <Link href="/corporate" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Corporate Travel</Link>
-            </div>
+              </div>
           </section>
 
           <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginTop: '40px' }}>
