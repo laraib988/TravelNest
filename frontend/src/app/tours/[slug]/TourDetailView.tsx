@@ -259,20 +259,23 @@ return (
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               {tour.supplier?.avatar_url || tour.supplier?.profile_image ? (
                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                  <Image src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || 'Supplier'} fill style={{ objectFit: 'cover' }} sizes="48px" />
+                  <Image src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} fill style={{ objectFit: 'cover' }} sizes="48px" />
                 </div>
               ) : (
                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 700, flexShrink: 0 }}>
-                  {tour.supplier?.name ? tour.supplier.name.charAt(0) : 'S'}
+                  {(tour.supplier?.name || tour.supplier?.username) ? (tour.supplier?.name || tour.supplier?.username).charAt(0).toUpperCase() : 'S'}
                 </div>
               )}
               <div>
                 <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {tour.supplier?.name || 'Verified Supplier'} <ShieldCheck size={18} color="#059669" />
+                  {tour.supplier?.name || tour.supplier?.username || 'Verified Supplier'} <ShieldCheck size={18} color="#059669" />
                 </div>
-                {tour.supplier?.username && <div style={{ fontSize: '0.85rem', color: '#64748b' }}>@{tour.supplier.username}</div>}
+                {tour.supplier?.username && tour.supplier?.name && <div style={{ fontSize: '0.85rem', color: '#64748b' }}>@{tour.supplier.username}</div>}
                 <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-                  <Star size={14} color="#d97706" fill="#d97706" /> {tour.supplier?.total_reviews || tour.cached_review_count || 0} reviews • {tour.supplier?.upcoming_tours || 12} upcoming tours
+                  <Star size={14} color="#d97706" fill="#d97706" /> {tour.supplier?.total_reviews || tour.cached_review_count || 0} reviews
+                  {tour.supplier?.upcoming_tours !== undefined && (
+                    <span> • {tour.supplier.upcoming_tours} upcoming tours</span>
+                  )}
                 </div>
               </div>
             </div>
