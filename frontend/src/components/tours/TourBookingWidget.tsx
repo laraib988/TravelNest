@@ -176,7 +176,10 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
         <label style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>{t('select_slots')}</label>
         <input 
-          type="date" 
+          type="text" 
+          placeholder="DD/MM/YYYY"
+          onFocus={(e) => (e.target.type = 'date')}
+          onBlur={(e) => (e.target.value === '' ? (e.target.type = 'text') : null)}
           onChange={(e) => {
             if (e.target.value) {
               const d = new Date(e.target.value);
@@ -238,6 +241,10 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
         </div>
       )}
 
+      <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--brand-primary)', marginBottom: '12px', fontWeight: 600 }}>
+        🔒 Secure Payment - Locks seat for 15 minutes.
+      </p>
+
       <button
         onClick={handleAcquireHold}
         disabled={holding || remainingSeats <= 0 || !!capacityWarning}
@@ -247,10 +254,6 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
         {holding ? 'Acquiring Lock...' : remainingSeats <= 0 ? 'Sold Out' : !!capacityWarning ? 'Exceeds Capacity' : 'Book Now'}
         <ArrowRight size={18} />
       </button>
-
-      <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '14px' }}>
-        🔒 Locks seat for 15 minutes. Zero risk of overbooking.
-      </p>
     </div>
   );
 }

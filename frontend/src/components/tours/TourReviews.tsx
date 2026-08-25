@@ -113,17 +113,17 @@ export default function TourReviews({ tour }: { tour: any }) {
 
   return (
     <div style={{ marginTop: '40px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '1.6rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', gap: '16px' }}>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
           <Star size={22} color="#d97706" fill="#d97706" /> {t('traveler_reviews')}
           <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>({reviews.length})</span>
         </h2>
         <button
           onClick={() => { if (!user) { router.push(`/login?redirect=${encodeURIComponent(pathname)}`); return; } setShowReviewForm(!showReviewForm); }}
           className="btn-primary"
-          style={{ padding: '10px 20px', fontSize: '0.88rem' }}
+          style={{ padding: '10px 24px', fontSize: '0.9rem', whiteSpace: 'nowrap', flexShrink: 0 }}
         >
-          <Send size={16} /> Write a Review
+          Write a Review
         </button>
       </div>
 

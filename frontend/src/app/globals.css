@@ -505,9 +505,8 @@ input:focus, select:focus, textarea:focus {
   .tour-title-section {
     order: 2;
   }
-  .tour-image-grid {
+  .tour-image-slider {
     order: 1;
-    display: block !important;
     height: 300px !important;
     margin-bottom: 20px !important;
     border-radius: 0 !important;

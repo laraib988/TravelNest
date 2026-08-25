@@ -200,7 +200,7 @@ return (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '8px' }}>
                           <h3 style={{ fontSize: '1.15rem', color: '#0f172a', margin: 0, fontWeight: 700 }}>{item.locationName}</h3>
                           {item.timeToSpend && (
-                            <span style={{ fontSize: '0.85rem', color: '#64748b', background: '#f1f5f9', padding: '4px 10px', borderRadius: '100px', fontWeight: 600 }}>{item.timeToSpend}</span>
+                            <span style={{ fontSize: '0.85rem', color: '#64748b', background: '#f1f5f9', padding: '4px 10px', borderRadius: '100px', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.timeToSpend}</span>
                           )}
                         </div>
                         
@@ -257,13 +257,22 @@ return (
               <ShieldCheck size={22} color="#059669" /> About the Supplier
             </h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 700 }}>
-                {tour.supplier?.name ? tour.supplier.name.charAt(0) : 'S'}
-              </div>
+              {tour.supplier?.avatar_url || tour.supplier?.profile_image ? (
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                  <Image src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || 'Supplier'} fill style={{ objectFit: 'cover' }} sizes="48px" />
+                </div>
+              ) : (
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 700, flexShrink: 0 }}>
+                  {tour.supplier?.name ? tour.supplier.name.charAt(0) : 'S'}
+                </div>
+              )}
               <div>
-                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.1rem' }}>{tour.supplier?.name || 'Verified Supplier'}</div>
-                <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Star size={14} color="#d97706" fill="#d97706" /> {tour.cached_rating_avg} ({tour.cached_review_count} reviews)
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {tour.supplier?.name || 'Verified Supplier'} <ShieldCheck size={18} color="#059669" />
+                </div>
+                {tour.supplier?.username && <div style={{ fontSize: '0.85rem', color: '#64748b' }}>@{tour.supplier.username}</div>}
+                <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                  <Star size={14} color="#d97706" fill="#d97706" /> {tour.supplier?.total_reviews || tour.cached_review_count || 0} reviews • {tour.supplier?.upcoming_tours || 12} upcoming tours
                 </div>
               </div>
             </div>
@@ -304,7 +313,12 @@ return (
       <div className="mobile-only tour-sticky-bottom-bar" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #e2e8f0', padding: '16px', display: 'none', justifyContent: 'space-between', alignItems: 'center', zIndex: 90, boxShadow: '0 -4px 12px rgba(0,0,0,0.05)' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <span style={{ fontSize: '0.85rem', color: '#64748b' }}>From</span>
-          <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-primary)' }}>{formatPrice(tour.base_price)}</span>
+          <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+            {formatPrice(tour.base_price)}
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#64748b', marginLeft: '4px' }}>
+              /{tour.pricing_type?.toLowerCase().includes('vehicle') || tour.options?.[0]?.pricing_type?.toLowerCase().includes('vehicle') ? 'vehicle' : 'person'}
+            </span>
+          </span>
         </div>
         <button onClick={() => setIsMobileBookingOpen(true)} className="btn-primary" style={{ padding: '12px 24px', borderRadius: '50px', fontSize: '1.05rem' }}>
           Select packages
