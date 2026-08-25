@@ -353,6 +353,7 @@ export default function Header() {
       {(!cleanPath.startsWith('/supplier') || isSupplierLanding) && (
         <div 
           ref={subHeaderRef}
+          className="desktop-only"
         style={{ 
           background: '#ffffff', 
           borderBottom: '1px solid #e2e8f0', 
