@@ -115,7 +115,7 @@ export default function TourReviews({ tour }: { tour: any }) {
     <div style={{ marginTop: '40px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', gap: '16px' }}>
         <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-          <Star size={22} color="#d97706" fill="#d97706" /> {t('traveler_reviews')}
+          <Star size={22} color="#d97706" fill="#d97706" /> Reviews
           <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>({reviews.length})</span>
         </h2>
         <button
