@@ -348,9 +348,9 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                 <div style={{ position: 'relative' }}>
                   <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
                     {visiblePlaces.map((place, idx) => (
-                      <div key={idx} style={{
+                      <div key={idx} className="card-panel" style={{
                         borderRadius: '20px', overflow: 'hidden', border: '1px solid #e2e8f0',
-                        background: '#ffffff', transition: 'all 0.3s'
+                        background: '#ffffff', transition: 'all 0.3s', display: 'flex', flexDirection: 'column', width: '100%'
                       }}>
                         <div style={{ height: '200px', overflow: 'hidden' }}>
                           <Image width={800} height={600} 

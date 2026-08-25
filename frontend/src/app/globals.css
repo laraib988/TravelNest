@@ -571,7 +571,7 @@ input:focus, select:focus, textarea:focus {
   .mobile-slider-grid::-webkit-scrollbar {
     display: none;
   }
-  .mobile-slider-grid > div {
+  .mobile-slider-grid > * {
     flex: 0 0 85% !important; /* One full card and peek of 2nd */
     scroll-snap-align: start !important;
   }
