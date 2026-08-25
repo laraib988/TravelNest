@@ -128,7 +128,7 @@ export default function DestinationWeather({ slug, name }: DestinationWeatherPro
         )}
 
         {weather && weather.current && (
-          <div style={{
+          <div className="weather-cards-row" style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px'
           }}>
             {/* Main temperature card */}

@@ -96,7 +96,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
   return (
     <div style={{ background: '#ffffff', minHeight: '100vh' }}>
       {/* SECTION 1: HERO SECTION */}
-      <section style={{ position: 'relative', height: '75vh', minHeight: '480px', overflow: 'hidden' }}>
+      <section className="dest-hero-mobile" style={{ position: 'relative', height: '75vh', minHeight: '480px', overflow: 'hidden' }}>
         <Image
           loader={cloudinaryLoader}
           src={destination.hero_image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=80'}
@@ -105,7 +105,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
           priority
           style={{ objectFit: 'cover' }}
         />
-        <div style={{
+        <div className="dest-hero-overlay" style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(to top, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.4) 40%, rgba(15,23,42,0.1) 100%)'
         }} />
@@ -145,7 +145,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <h1 style={{
               fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 800, color: '#ffffff',
               lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
@@ -154,7 +154,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
               {destination.name} Tours, Activities & Things to Do
             </h1>
           </div>
-          <p style={{
+          <p className="desktop-only" style={{
             color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', maxWidth: '680px',
             lineHeight: 1.6
           }}>
@@ -162,6 +162,23 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
           </p>
         </div>
       </section>
+
+      {/* MOBILE HERO TEXT (Below Image) */}
+      <div className="mobile-only" style={{ padding: '24px 24px 0' }}>
+        <h1 style={{
+          fontSize: '2rem', fontWeight: 800, color: '#0f172a',
+          lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em',
+          fontFamily: 'var(--font-heading)'
+        }}>
+          {destination.name} Tours, Activities & Things to Do
+        </h1>
+        <p style={{
+          color: '#475569', fontSize: '1rem',
+          lineHeight: 1.6
+        }}>
+          {destination.description}
+        </p>
+      </div>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
         {/* SECTION 2: LIVE WEATHER */}
@@ -183,7 +200,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {highlights.map((point, idx) => (
                 <div key={idx} style={{
-                  display: 'flex', alignItems: 'flex-start', gap: '14px',
+                  display: 'flex', alignItems: 'center', gap: '14px',
                   background: '#ffffff', borderRadius: '16px', padding: '18px 22px',
                   border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
                 }}>
@@ -195,7 +212,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                   }}>
                     {idx + 1}
                   </div>
-                  <p style={{ color: '#334155', fontSize: '0.98rem', lineHeight: 1.6, margin: '6px 0 0' }}>
+                  <p style={{ color: '#334155', fontSize: '0.98rem', lineHeight: 1.6, margin: '0' }}>
                     {point}
                   </p>
                 </div>
@@ -217,7 +234,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
               Top reasons travelers love this destination.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+            <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
               {bestPoints.map((point, idx) => (
                 <div key={idx} style={{
                   background: '#f8fafc', borderRadius: '20px', padding: '28px',
@@ -334,7 +351,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
 
               return (
                 <div style={{ position: 'relative' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                  <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
                     {visiblePlaces.map((place, idx) => (
                       <div key={idx} style={{
                         borderRadius: '20px', overflow: 'hidden', border: '1px solid #e2e8f0',
@@ -360,7 +377,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
                   </div>
 
                   {showSlider && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '28px' }}>
+                    <div className="desktop-pagination" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '28px' }}>
                       <button
                         onClick={() => setTrendingIndex((prev) => (prev - 1 + pageCount) % pageCount)}
                         aria-label="Previous places"

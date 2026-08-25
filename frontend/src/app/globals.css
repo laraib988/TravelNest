@@ -545,3 +545,57 @@ input:focus, select:focus, textarea:focus {
     width: 42vw !important;
   }
 }
+
+/* Destination Page Mobile Fixes */
+@media (max-width: 768px) {
+  .dest-hero-mobile {
+    height: 350px !important;
+    min-height: auto !important;
+  }
+  .dest-hero-overlay {
+    background: linear-gradient(to top, rgba(15,23,42,0.7) 0%, transparent 100%) !important;
+  }
+  .mobile-slider-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 16px !important;
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 16px !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .mobile-slider-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .mobile-slider-grid > div {
+    flex: 0 0 85% !important; /* One full card and peek of 2nd */
+    scroll-snap-align: start !important;
+  }
+  .weather-cards-row {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 16px !important;
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 16px !important;
+    scrollbar-width: none;
+  }
+  .weather-cards-row::-webkit-scrollbar {
+    display: none;
+  }
+  .weather-cards-row > div {
+    flex: 0 0 85% !important;
+    scroll-snap-align: start !important;
+  }
+  .desktop-pagination {
+    display: none !important;
+  }
+}
