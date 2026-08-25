@@ -81,7 +81,7 @@ export default function DestinationNews({ slug, name }: DestinationNewsProps) {
           What's happening in {name} right now.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
+        <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
           {articles.map((article, idx) => (
             <a
               key={article.url || idx}
