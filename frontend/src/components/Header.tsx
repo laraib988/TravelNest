@@ -857,45 +857,46 @@ export default function Header() {
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px', paddingBottom: '40px' }}>
                 {mobileTab === 'where' ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    
-                    {/* Pills Row (Visual flair) */}
-                    <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none' }}>
-                      <button style={{ padding: '6px 16px', borderRadius: '20px', border: '1px solid #f97316', color: '#f97316', background: '#fffcf9', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Popular regions</button>
-                      <button style={{ padding: '6px 16px', borderRadius: '20px', border: '1px solid #e2e8f0', color: '#475569', background: '#f8fafc', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Popular destinations</button>
-                    </div>
 
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '8px 0 0', color: '#0f172a' }}>Popular regions</h4>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                      {Array.from(new Set(featuredCities.map(c => c.country))).map((country, idx) => {
+                    {/* Countries + Destinations — fully dynamic */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                      {Array.from(new Set(featuredCities.map(c => c.country))).map((country) => {
                         const countryCities = featuredCities.filter(c => c.country === country);
                         return (
-                          <div key={String(country)} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {/* Country Header */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#e2e8f0', overflow: 'hidden' }}>
-                                <Image src={countryCities[0]?.image_url || '/placeholder-city.jpg'} alt={String(country)} width={48} height={48} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              </div>
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Things to do in</span>
-                                <span style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0f172a' }}>{String(country)}</span>
-                              </div>
-                            </div>
-                            
-                            {/* Cities inside Country */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', paddingLeft: '60px' }}>
-                               {countryCities.map(city => (
-                                 <Link key={city.id} href={`/destinations/${city.slug}`} onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '0.95rem', color: '#475569', textDecoration: 'none', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
-                                   {city.name}
-                                 </Link>
-                               ))}
+                          <div key={String(country)} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                            {/* Country Name — bold heading only, no icon/image */}
+                            <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: '0', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px' }}>
+                              {String(country)}
+                            </h4>
+
+                            {/* Destinations in 2-column grid, each with circular thumbnail */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                              {countryCities.map(city => (
+                                <Link
+                                  key={city.id}
+                                  href={`/destinations/${city.slug}`}
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                  style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#1e293b', padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}
+                                >
+                                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: '#e2e8f0' }}>
+                                    {(city.hero_image || city.image_url) ? (
+                                      <Image src={city.hero_image || city.image_url} alt={city.name} width={36} height={36} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                      <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #f97316, #0284c7)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
+                                        {city.name?.charAt(0)}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <span style={{ fontSize: '0.88rem', fontWeight: 600, lineHeight: 1.3 }}>{city.name}</span>
+                                </Link>
+                              ))}
                             </div>
                           </div>
                         );
                       })}
                     </div>
-                    
-                    <Link href="/destinations" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#f1f5f9', borderRadius: '8px', color: '#0f172a', fontWeight: 600, textDecoration: 'none', marginTop: '10px' }}>
+
+                    <Link href="/destinations" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#f1f5f9', borderRadius: '8px', color: '#0f172a', fontWeight: 600, textDecoration: 'none', marginTop: '4px' }}>
                        Explore All Destinations &rarr;
                     </Link>
 
