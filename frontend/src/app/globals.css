@@ -332,3 +332,33 @@ input:focus, select:focus, textarea:focus {
   .mobile-only { display: none !important; }
 }
 
+
+/* Responsive Hero Styles */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 280px !important; 
+    padding: 30px 0 !important;
+  }
+  .hero-search-form {
+    padding: 4px 4px 4px 12px !important;
+    margin-top: 10px !important;
+  }
+  .hero-search-input {
+    font-size: 0.85rem !important;
+  }
+  .hero-search-input::placeholder {
+    font-size: 0.8rem !important;
+  }
+  .hero-search-button {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+  }
+  .hero-title {
+    font-size: 1.8rem !important;
+    margin-bottom: 8px !important;
+  }
+  .hero-inner-container {
+    padding: 0 16px !important;
+  }
+}
+

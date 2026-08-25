@@ -281,6 +281,7 @@ export default function HomePage() {
       
       {/* 1. HERO SECTION WITH SEARCH */}
       <section
+        className="hero-section"
         style={{
           position: 'relative',
           minHeight: '400px',
@@ -300,29 +301,30 @@ export default function HomePage() {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.55) 60%, rgba(15, 23, 42, 0.25) 100%)' }} />
         </div>
 
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '0 32px' }}>
+        <div className="hero-inner-container" style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '0 32px' }}>
           <div style={{ maxWidth: '780px' }}>
-            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', lineHeight: 1.15, marginBottom: '16px', color: '#ffffff', fontWeight: 800, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+            <h1 className="hero-title" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', lineHeight: 1.15, marginBottom: '16px', color: '#ffffff', fontWeight: 800, textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
               {t('hero_title_1')}<br />
               <span style={{ color: '#38bdf8' }}>{t('hero_title_2')}</span>
             </h1>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', color: '#ffffff', fontSize: '0.98rem', fontWeight: 600, marginBottom: '28px', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
+            <div className="desktop-only" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', color: '#ffffff', fontSize: '0.98rem', fontWeight: 600, marginBottom: '28px', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
               <span>{t('instant_confirmation')}</span>
               <span style={{ color: '#6ee7b7' }}>{t('verified_guides')}</span>
               <span>{t('free_cancellation')}</span>
             </div>
 
-            <form onSubmit={handleSearch} style={{ marginTop: '20px', borderRadius: 'var(--radius-pill)', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '600px', background: '#ffffff', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)' }}>
+            <form onSubmit={handleSearch} className="hero-search-form" style={{ marginTop: '20px', borderRadius: 'var(--radius-pill)', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '600px', background: '#ffffff', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)' }}>
               <Search size={20} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
               <input
                 type="text"
                 placeholder="e.g. Best time to visit Japan, Tokyo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="hero-search-input"
                 style={{ flex: 1, background: 'transparent', border: 'none', color: '#0f172a', fontSize: '1rem', outline: 'none' }}
               />
-              <button type="submit" disabled={searching} className="btn-primary" style={{ padding: '12px 28px', borderRadius: 'var(--radius-pill)', flexShrink: 0 }}>
+              <button type="submit" disabled={searching} className="btn-primary hero-search-button" style={{ padding: '12px 28px', borderRadius: 'var(--radius-pill)', flexShrink: 0 }}>
                 {searching ? 'Searching...' : t('explore_now')}
               </button>
             </form>

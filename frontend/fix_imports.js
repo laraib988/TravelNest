@@ -1,0 +1,1 @@
+const fs = require('fs'); let c = fs.readFileSync('src/components/Header.tsx', 'utf8'); c = c.replace(/LayoutDashboard\r?\n} from 'lucide-react';/, 'LayoutDashboard,\n  Menu,\n  X,\n  Search\n} from \'lucide-react\';'); fs.writeFileSync('src/components/Header.tsx', c);
