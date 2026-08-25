@@ -345,13 +345,15 @@ export default function Header() {
             </div>
           ) : (
             <>
-              <button onClick={() => setIsMobileMenuOpen(true)} style={{ background: "none", border: "none", padding: "4px" }}>
-                <Menu size={28} color="#0f172a" />
-              </button>
-              <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
-                <Image src="/logo.png" alt="Vaitour Logo" style={{ width: "28px", height: "28px", objectFit: "contain" }} width={28} height={28} />
-                <span style={{ fontSize: "1.25rem", fontWeight: 800, lineHeight: 1 }} className="gradient-text">Vaitour</span>
-              </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <button onClick={() => setIsMobileMenuOpen(true)} style={{ background: "none", border: "none", padding: "4px", display: "flex" }}>
+                    <Menu size={28} color="#0f172a" />
+                  </button>
+                  <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
+                    <Image src="/logo.png" alt="Vaitour Logo" style={{ width: "28px", height: "28px", objectFit: "contain" }} width={28} height={28} />
+                    <span style={{ fontSize: "1.25rem", fontWeight: 800, lineHeight: 1 }} className="gradient-text">Vaitour</span>
+                  </Link>
+                </div>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <button onClick={() => setIsMobileSearchOpen(true)} style={{ background: "none", border: "none", color: "#0f172a", padding: "4px", cursor: "pointer" }}><Search size={24} /></button>
                 <Link href={user ? "/profile" : `/login?redirect=${encodeURIComponent(pathname)}`} style={{ color: "#0f172a", display: 'flex', alignItems: 'center' }}>
