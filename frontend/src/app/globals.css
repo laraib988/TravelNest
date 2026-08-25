@@ -609,3 +609,17 @@ input:focus, select:focus, textarea:focus {
     width: 100% !important;
   }
 }
+
+.weather-merged-container {
+  display: flex;
+  flex-direction: row;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+@media (max-width: 768px) {
+  .weather-merged-container {
+    flex-direction: column;
+  }
+}

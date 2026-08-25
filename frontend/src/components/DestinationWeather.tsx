@@ -128,13 +128,11 @@ export default function DestinationWeather({ slug, name }: DestinationWeatherPro
         )}
 
         {weather && weather.current && (
-          <div className="weather-cards-row" style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px'
-          }}>
+          <div className="weather-merged-container">
             {/* Main temperature card */}
             <div style={{
               background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
-              borderRadius: '20px', padding: '32px', color: '#ffffff',
+              padding: '32px', color: '#ffffff', flex: 1,
               position: 'relative', overflow: 'hidden'
             }}>
               <div style={{ position: 'absolute', top: -30, right: -30, fontSize: '9rem', opacity: 0.15, transform: 'rotate(15deg)' }}>
@@ -175,8 +173,8 @@ export default function DestinationWeather({ slug, name }: DestinationWeatherPro
 
             {/* Live clock + last updated card */}
             <div style={{
-              background: '#ffffff', borderRadius: '20px', border: '1px solid #e2e8f0',
-              padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'center'
+              background: '#ffffff', padding: '32px', flex: 1,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                 <Clock size={20} color="#0284c7" />
