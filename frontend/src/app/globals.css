@@ -467,3 +467,11 @@ input:focus, select:focus, textarea:focus {
     gap: 16px !important;
   }
 }
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 1.25rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 10px !important;
+  }
+}
