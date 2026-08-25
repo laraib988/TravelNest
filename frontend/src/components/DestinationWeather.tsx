@@ -128,68 +128,72 @@ export default function DestinationWeather({ slug, name }: DestinationWeatherPro
         )}
 
         {weather && weather.current && (
-          <div className="weather-merged-container">
-            {/* Main temperature card */}
-            <div style={{
-              background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
-              padding: '32px', color: '#ffffff', flex: 1,
-              position: 'relative', overflow: 'hidden'
-            }}>
-              <div style={{ position: 'absolute', top: -30, right: -30, fontSize: '9rem', opacity: 0.15, transform: 'rotate(15deg)' }}>
-                {weather.current.icon}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600, opacity: 0.9, marginBottom: '16px' }}>
-                <MapPin size={14} /> {weather.destination.name}, {weather.destination.country}
-                <span style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.2)', borderRadius: '999px', padding: '2px 10px', fontSize: '0.75rem', fontWeight: 700 }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
+            borderRadius: '20px', padding: '24px', color: '#ffffff',
+            position: 'relative', overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            display: 'flex', flexDirection: 'column', gap: '24px'
+          }}>
+            <div style={{ position: 'absolute', top: -20, right: -20, fontSize: '10rem', opacity: 0.1, transform: 'rotate(15deg)', pointerEvents: 'none' }}>
+              {weather.current.icon}
+            </div>
+
+            {/* Top Row: Location & Date */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 600, opacity: 0.9 }}>
+                <MapPin size={16} /> {weather.destination.name}, {weather.destination.country}
+                <span style={{ marginLeft: '4px', background: 'rgba(255,255,255,0.2)', borderRadius: '999px', padding: '2px 10px', fontSize: '0.75rem', fontWeight: 700 }}>
                   {weather.timezoneAbbreviation || weather.timezone}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <div style={{ fontSize: '5rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', opacity: 0.8 }}>
+                 <RefreshCw size={12} /> Live Updates
+              </div>
+            </div>
+
+            {/* Middle Row: Temperature & Clock */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', zIndex: 1 }}>
+              
+              {/* Temperature Side */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ fontSize: '4rem', fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
                   {Math.round(weather.current.temperature)}°
                 </div>
                 <div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '4px' }}>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '2px' }}>
                     {weather.current.icon} {weather.current.condition}
                   </div>
-                  <div style={{ fontSize: '0.95rem', opacity: 0.9 }}>
+                  <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
                     Feels like {Math.round(weather.current.feelsLike)}°
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '24px', marginTop: '28px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>
-                  <Droplets size={16} opacity={0.9} /> Humidity: {weather.current.humidity}%
+              {/* Clock Side */}
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px 20px', borderRadius: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', opacity: 0.9 }}>
+                  <Clock size={14} /> <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Local Time in {weather.destination.name}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>
-                  <Wind size={16} opacity={0.9} /> Wind: {weather.current.windSpeed} {weather.current.units?.wind_speed_10m || 'km/h'}
+                <div style={{ fontSize: '2.4rem', fontWeight: 800, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                  {renderTime()}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>
-                  <Thermometer size={16} opacity={0.9} /> {weather.current.isDay ? 'Daytime' : 'Night'}
+                <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '6px' }}>
+                  {formatDate(now, weather.timezone)}
                 </div>
               </div>
             </div>
 
-            {/* Live clock + last updated card */}
-            <div style={{
-              background: '#ffffff', padding: '32px', flex: 1,
-              display: 'flex', flexDirection: 'column', justifyContent: 'center'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <Clock size={20} color="#0284c7" />
-                <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.1rem' }}>
-                  Local Time in {weather.destination.name}
-                </span>
+            {/* Bottom Row: Details */}
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '16px', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                <Droplets size={14} opacity={0.9} /> Humidity: {weather.current.humidity}%
               </div>
-              <div style={{ fontSize: '3.2rem', fontWeight: 800, color: '#0f172a', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-                {renderTime()}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                <Wind size={14} opacity={0.9} /> Wind: {weather.current.windSpeed} {weather.current.units?.wind_speed_10m || 'km/h'}
               </div>
-              <div style={{ color: '#64748b', fontSize: '1rem', marginTop: '8px' }}>
-                {formatDate(now, weather.timezone)}
-              </div>
-              <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '0.85rem' }}>
-                <RefreshCw size={13} /> Live — auto-updates every 5 minutes
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+                <Thermometer size={14} opacity={0.9} /> {weather.current.isDay ? 'Daytime' : 'Night'}
               </div>
             </div>
           </div>
