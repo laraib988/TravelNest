@@ -508,24 +508,7 @@ export default function Header() {
                     </div>
 
                     <div style={{ borderTop: '1px solid #e2e8f0', padding: '12px 16px', background: '#ffffff' }}>
-                      <Link
-                        href="/destinations"
-                        onClick={() => setIsDestinationsOpen(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          fontSize: '0.85rem',
-                          fontWeight: 700,
-                          color: '#0284c7',
-                          textDecoration: 'none'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-                      >
-                        <span>Explore All Destinations Globally</span>
-                        <span>→</span>
-                      </Link>
+
                     </div>
                   </div>
                 )}
@@ -896,9 +879,7 @@ export default function Header() {
                       })}
                     </div>
 
-                    <Link href="/destinations" onClick={() => setIsMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#f1f5f9', borderRadius: '8px', color: '#0f172a', fontWeight: 600, textDecoration: 'none', marginTop: '4px' }}>
-                       Explore All Destinations &rarr;
-                    </Link>
+
 
                   </div>
                 ) : (
