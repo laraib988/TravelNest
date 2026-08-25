@@ -18,7 +18,7 @@ function getSupabase() {
 // model is not provisioned on this account — openai/gpt-oss-120b is the
 // highest-quality available model. Override via GROQ_BLOG_MODEL env.
 const MODEL = process.env.GROQ_BLOG_MODEL || 'openai/gpt-oss-120b';
-const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const APP_URL = 'https://www.vaitour.com';
 
 function getGroq() {
   if (!process.env.GROQ_API_KEY) {

@@ -13,7 +13,7 @@ export const dynamicParams = true;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const APP_URL = 'https://www.vaitour.com';
 
 async function getBlog(slug: string) {
   const { data, error } = await supabase
