@@ -175,7 +175,7 @@ export default function DestinationWeather({ slug, name }: DestinationWeatherPro
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', opacity: 0.9 }}>
                   <Clock size={14} /> <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Local Time in {weather.destination.name}</span>
                 </div>
-                <div style={{ fontSize: '2.4rem', fontWeight: 800, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                <div style={{ fontSize: 'clamp(1.75rem, 6vw, 2.4rem)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em', lineHeight: 1, whiteSpace: 'nowrap' }}>
                   {renderTime()}
                 </div>
                 <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '6px' }}>
