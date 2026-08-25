@@ -88,6 +88,7 @@ export default function Header() {
   const [mobileSearchQuery, setMobileSearchQuery] = useState('');
   const [featuredCities, setFeaturedCities] = useState<any[]>([]);
   const [activeHoverCountry, setActiveHoverCountry] = useState<string | null>(null);
+  const [mobileSelectedCountry, setMobileSelectedCountry] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -839,47 +840,67 @@ export default function Header() {
               {/* Tab Content */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px', paddingBottom: '40px' }}>
                 {mobileTab === 'where' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-                    {/* Countries + Destinations — fully dynamic */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-                      {Array.from(new Set(featuredCities.map(c => c.country))).map((country) => {
-                        const countryCities = featuredCities.filter(c => c.country === country);
-                        return (
-                          <div key={String(country)} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                            {/* Country Name — bold heading only, no icon/image */}
-                            <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: '0', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px' }}>
-                              {String(country)}
-                            </h4>
-
-                            {/* Destinations in 2-column grid, each with circular thumbnail */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                              {countryCities.map(city => (
-                                <Link
-                                  key={city.id}
-                                  href={`/destinations/${city.slug}`}
-                                  onClick={() => setIsMobileMenuOpen(false)}
-                                  style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#1e293b', padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}
+                    {/* Country Tags — rounded pill style, dynamic */}
+                    {(() => {
+                      const countries = Array.from(new Set(featuredCities.map(c => c.country)));
+                      const activeCountry = mobileSelectedCountry || countries[0];
+                      return (
+                        <>
+                          {/* Country Pills */}
+                          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
+                            {countries.map((country) => {
+                              const isActive = activeCountry === country;
+                              return (
+                                <button
+                                  key={String(country)}
+                                  onClick={() => setMobileSelectedCountry(String(country))}
+                                  style={{
+                                    flexShrink: 0,
+                                    padding: '8px 18px',
+                                    borderRadius: '50px',
+                                    border: isActive ? '2px solid #f97316' : '2px solid #e2e8f0',
+                                    background: isActive ? '#fff7ed' : '#f8fafc',
+                                    color: isActive ? '#f97316' : '#475569',
+                                    fontSize: '0.9rem',
+                                    fontWeight: isActive ? 700 : 500,
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    transition: 'all 0.2s'
+                                  }}
                                 >
-                                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: '#e2e8f0' }}>
-                                    {(city.hero_image || city.image_url) ? (
-                                      <Image src={city.hero_image || city.image_url} alt={city.name} width={36} height={36} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                      <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #f97316, #0284c7)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
-                                        {city.name?.charAt(0)}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <span style={{ fontSize: '0.88rem', fontWeight: 600, lineHeight: 1.3 }}>{city.name}</span>
-                                </Link>
-                              ))}
-                            </div>
+                                  {String(country)}
+                                </button>
+                              );
+                            })}
                           </div>
-                        );
-                      })}
-                    </div>
 
-
+                          {/* Destinations for selected country */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            {featuredCities.filter(c => c.country === activeCountry).map(city => (
+                              <Link
+                                key={city.id}
+                                href={`/destinations/${city.slug}`}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#1e293b', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}
+                              >
+                                <div style={{ width: '38px', height: '38px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0, background: '#e2e8f0' }}>
+                                  {(city.hero_image || city.image_url) ? (
+                                    <Image src={city.hero_image || city.image_url} alt={city.name} width={38} height={38} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  ) : (
+                                    <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #f97316, #0284c7)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.8rem', fontWeight: 700 }}>
+                                      {city.name?.charAt(0)}
+                                    </div>
+                                  )}
+                                </div>
+                                <span style={{ fontSize: '0.88rem', fontWeight: 600, lineHeight: 1.3 }}>{city.name}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </>
+                      );
+                    })()}
 
                   </div>
                 ) : (
