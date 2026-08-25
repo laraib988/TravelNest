@@ -215,7 +215,7 @@ export function customerBookingConfirmationHtml(data: BookingEmailData): string 
   <!-- CTA -->
   <tr>
     <td style="padding:24px 32px 8px;text-align:center;">
-      <a href="${appUrl}/bookings" style="display:inline-block;background:#0284c7;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:13px 32px;border-radius:10px;">View My Bookings</a>
+      <a href="${appUrl}/my-bookings" style="display:inline-block;background:#0284c7;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:13px 32px;border-radius:10px;">View My Bookings</a>
       <p style="color:#94a3b8;font-size:12px;margin-top:12px;">Need help? Our support team is here 24/7.</p>
     </td>
   </tr>`;
@@ -294,7 +294,7 @@ export function supplierNewOrderHtml(data: BookingEmailData): string {
   <!-- CTA -->
   <tr>
     <td style="padding:24px 32px 8px;text-align:center;">
-      <a href="${appUrl}/supplier/bookings" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:13px 32px;border-radius:10px;">Manage Booking</a>
+      <a href="${appUrl}/supplier/my-bookings" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:13px 32px;border-radius:10px;">Manage Booking</a>
       <p style="color:#94a3b8;font-size:12px;margin-top:12px;">New orders appear in your supplier dashboard instantly.</p>
     </td>
   </tr>`;

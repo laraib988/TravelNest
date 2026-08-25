@@ -326,7 +326,7 @@ useEffect(() => {
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token || '';
 
-      const res = await fetch('/api/public/bookings', {
+      const res = await fetch('/api/public/my-bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
