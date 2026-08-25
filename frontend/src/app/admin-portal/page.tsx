@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useAuth } from '@/context/AuthContext';
+import { getAdminDashboardStats, getAdminBookings } from './actions';
 import {
   DollarSign, Calendar, Users, ShieldCheck, TrendingUp, TrendingDown,
   ArrowUpRight, BarChart3, Star, Activity, Zap, Tag,
