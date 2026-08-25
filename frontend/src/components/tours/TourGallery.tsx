@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-import { Star, Clock, MapPin, ShieldCheck } from 'lucide-react';
+import { Star, Clock, MapPin, ShieldCheck, MessageSquare, Car, Users, CheckCircle } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 import Image from 'next/image';
 
@@ -56,24 +56,60 @@ export default function TourGallery({ tour }: { tour: any }) {
 
   return (
     <div className="tour-gallery-container">
-      <div className="tour-badges-row" style={{ display: 'flex', flexWrap: 'nowrap', gap: '8px', marginBottom: '12px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none', whiteSpace: 'nowrap' }}>
-        <span className="badge-emerald" style={{ flexShrink: 0 }}>{tour.category_name}</span>
-        <span className="badge-amber" style={{ flexShrink: 0 }}>⚡ {tour.confirmation_type || 'Instant Confirmation'}</span>
-        {tour.payment_option?.toLowerCase().includes('later') || tour.payment_option?.toLowerCase().includes('after') ? <span className="badge-sky" style={{ flexShrink: 0, background: '#e0f2fe', color: '#0369a1', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>💸 Pay After Tour</span> : null}
-        {tour.merchandising_badges?.filter((b: string) => b.toLowerCase() !== 'new').map((badge: string, i: number) => (
-          <span key={i} className="badge-rose" style={{ flexShrink: 0 }}>{badge}</span>
-        ))}
-      </div>
-
       <div className="tour-title-section" style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-          <h1 className="tour-main-title" style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#0f172a', flex: 1 }}>{tour.title}</h1>
+        <h1 className="tour-main-title" style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px', color: '#0f172a', lineHeight: 1.25 }}>{tour.title}</h1>
+        
+        <div className="tour-badges-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+          <span className="badge-emerald" style={{ padding: '2px 6px', fontSize: '0.7rem' }}>{tour.category_name}</span>
+          <span className="badge-amber" style={{ padding: '2px 6px', fontSize: '0.7rem' }}>⚡ {tour.confirmation_type || 'Instant Confirmation'}</span>
+          {tour.payment_option?.toLowerCase().includes('later') || tour.payment_option?.toLowerCase().includes('after') ? <span className="badge-sky" style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>💸 Pay After Tour</span> : null}
+          {tour.merchandising_badges?.filter((b: string) => b.toLowerCase() !== 'new').map((badge: string, i: number) => (
+            <span key={i} className="badge-rose" style={{ padding: '2px 6px', fontSize: '0.7rem' }}>{badge}</span>
+          ))}
         </div>
-        <div className="tour-meta-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '20px', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Star size={16} color="#d97706" fill="#d97706" /> <strong style={{ color: '#0f172a' }}>{tour.cached_rating_avg}</strong> ({tour.cached_review_count} reviews)</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}><Clock size={16} /> {tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><ShieldCheck size={16} color="#059669" /> Verified Supplier</span>
-          <WeatherWidget location={tour.pickup_location || tour.meeting_point?.address || tour.destination_id} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#64748b', marginBottom: '20px' }}>
+          <span style={{ color: '#6366f1', fontWeight: 700 }}>{tour.cached_rating_avg}/5</span>
+          <span style={{ textDecoration: 'underline' }}>{tour.cached_review_count} reviews</span>
+          <span>•</span>
+          <span>{tour.booking_count || '1K+'} booked</span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#0f172a', fontSize: '0.95rem', fontWeight: 500 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <MapPin size={18} color="#64748b" /> 
+            <span>Depart from {tour.pickup_location || tour.destination?.name || (tour.meeting_point?.address ? tour.meeting_point.address.split(',')[0] : 'Designated Location')}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Clock size={18} color="#64748b" /> 
+            <span>{tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <MessageSquare size={18} color="#64748b" /> 
+            <span>Guide language: {tour.languages?.length > 1 ? `${tour.languages[0]} +${tour.languages.length - 1}` : (tour.languages?.[0] || 'English')}</span>
+          </div>
+          {(tour.meeting_point_type === 'pickup' || tour.inclusions?.some((i: string) => i.toLowerCase().includes('pickup'))) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Car size={18} color="#64748b" /> 
+              <span>Hotel pick-up</span>
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Users size={18} color="#64748b" /> 
+            <span>{tour.max_group_size ? `Small group (Max ${tour.max_group_size})` : 'Group tour'}</span>
+          </div>
+        </div>
+
+        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <CheckCircle size={18} color="#0f172a" style={{ marginTop: '2px' }} />
+            <div>
+              <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>Free cancellation (24 hours notice)</div>
+              <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.4 }}>
+                You'll get a full refund if you cancel at least 24 hour(s) before the activity starts.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
