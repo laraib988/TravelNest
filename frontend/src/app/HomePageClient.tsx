@@ -334,30 +334,30 @@ export default function HomePage() {
 
       {/* 2. STATIC QUICK CATEGORIES BAR */}
       <section style={{ maxWidth: '1280px', margin: '0 auto 40px', padding: '24px 24px 0' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+        <div className="categories-container">
           
           {/* Card 1 - Tours & experiences */}
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <div className="category-card">
             <Compass size={32} color="#f97316" />
-            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'left' }}>Tours & experiences</span>
+            <span className="category-card-text">Tours & experiences</span>
           </div>
 
           {/* Card 2 - Attraction tickets */}
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <div className="category-card">
             <Ticket size={32} color="#8b5cf6" />
-            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'left' }}>Attraction tickets</span>
+            <span className="category-card-text">Attraction tickets</span>
           </div>
 
           {/* Card 3 - Transport */}
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <div className="category-card">
             <Train size={32} color="#3b82f6" />
-            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'left' }}>Transport</span>
+            <span className="category-card-text">Transport</span>
           </div>
 
           {/* Card 4 - Car rentals */}
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}>
+            <div className="category-card">
             <Car size={32} color="#10b981" />
-            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a', textAlign: 'left' }}>Car rentals</span>
+            <span className="category-card-text">Car rentals</span>
           </div>
 
         </div>
