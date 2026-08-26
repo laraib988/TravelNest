@@ -27,18 +27,24 @@ export async function GET(request: Request) {
     }
 
     // Fetch bookings matching the customer_id
-    // To handle emails safely without PostgREST parser issues on '@', we use filter on the array or do it in two steps.
-    // For safety, let's fetch by customer_id and then filter locally if needed, or use proper quoting.
-    const { data: bookings, error } = await adminAuth
-      .from('bookings')
-      .select('*')
-      .or(`customer_id.eq.${userId},traveler_details->>lead_email.eq."${userEmail}"`)
-      .order('created_at', { ascending: false });
+    // To handle emails safely without PostgREST parser issues on '@', we query separately and merge.
+    const [ { data: byId, error: err1 }, { data: byEmail, error: err2 } ] = await Promise.all([
+      adminAuth.from('bookings').select('*').eq('customer_id', userId).order('created_at', { ascending: false }),
+      adminAuth.from('bookings').select('*').eq('traveler_details->>lead_email', userEmail).order('created_at', { ascending: false })
+    ]);
 
-    if (error) {
-      console.error('Error fetching bookings:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (err1 || err2) {
+      console.error('Error fetching bookings:', err1 || err2);
+      return NextResponse.json({ error: (err1 || err2)?.message }, { status: 500 });
     }
+
+    // Merge and deduplicate by booking id
+    const bookingMap = new Map();
+    [...(byId || []), ...(byEmail || [])].forEach((b: any) => bookingMap.set(b.id, b));
+    let bookings = Array.from(bookingMap.values());
+    
+    // Sort combined results by created_at descending
+    bookings.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     if (bookings && bookings.length > 0) {
       const listingIds = Array.from(new Set(bookings.map((b: any) => b.listing_id)));

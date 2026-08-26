@@ -46,6 +46,7 @@ export default function ProfilePage() {
   const [newTravelerName, setNewTravelerName] = useState('');
   const [travelerMsg, setTravelerMsg] = useState<string | null>(null);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [loyaltyHistory, setLoyaltyHistory] = useState<any[]>([]);
 
   const token = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
@@ -56,7 +57,11 @@ export default function ProfilePage() {
     try {
       const accessToken = await token();
       if (!accessToken) return;
-      const res = await fetch('/api/profile', { headers: { Authorization: `Bearer ${accessToken}` } });
+      const [res, historyRes] = await Promise.all([
+        fetch('/api/profile', { headers: { Authorization: `Bearer ${accessToken}` } }),
+        fetch('/api/profile/loyalty-history', { headers: { Authorization: `Bearer ${accessToken}` } })
+      ]);
+      
       const data = await res.json();
       if (data.profile) {
         setProfile((prev) => ({
@@ -64,6 +69,11 @@ export default function ProfilePage() {
           ...data.profile,
           saved_travelers: data.profile.saved_travelers || [],
         }));
+      }
+
+      if (historyRes.ok) {
+        const hData = await historyRes.json();
+        if (hData.history) setLoyaltyHistory(hData.history);
       }
     } catch (err) {
       console.log('Profile load fallback to context');
@@ -210,6 +220,23 @@ export default function ProfilePage() {
               Redeem your points as a discount at checkout — up to <strong>${totalSavings.toFixed(2)}</strong> savings.
             </span>
           </div>
+
+          {loyaltyHistory.length > 0 && (
+            <div style={{ marginTop: '24px' }}>
+              <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#92400e', marginBottom: '12px' }}>History</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {loyaltyHistory.map((item) => (
+                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '12px 16px', borderRadius: '12px', border: '1px solid #fde68a' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#92400e', fontSize: '0.9rem' }}>{item.description}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#b45309', marginTop: '2px' }}>{new Date(item.created_at).toLocaleDateString()}</div>
+                    </div>
+                    <div style={{ fontWeight: 800, color: '#16a34a' }}>+{item.amount} pts</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Editable Profile Form */}
