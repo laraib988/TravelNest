@@ -271,7 +271,7 @@ return (
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               {tour.supplier?.avatar_url || tour.supplier?.profile_image ? (
                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                  <Image src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} fill style={{ objectFit: 'cover' }} sizes="48px" />
+                  <img src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ) : (
                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 700, flexShrink: 0 }}>
@@ -312,8 +312,8 @@ return (
               </h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {tour.supplier?.avatar_url || tour.supplier?.profile_image ? (
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                    <Image src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} fill style={{ objectFit: 'cover' }} sizes="40px" />
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                    <img src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 ) : (
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.1rem', fontWeight: 700, flexShrink: 0 }}>
