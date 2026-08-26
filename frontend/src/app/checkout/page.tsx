@@ -523,7 +523,19 @@ useEffect(() => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '32px' }}>
         {/* FORM */}
-        <form onSubmit={handleSubmitCheckout} className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '30px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* MOBILE ORDER SUMMARY HEADER */}
+          <div className="mobile-only card-panel" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1' }}>
+            <h4 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 800, marginBottom: '8px' }}>{tourTitle}</h4>
+            <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', color: '#475569', flexWrap: 'wrap', alignItems: 'center' }}>
+              <div><strong style={{color: '#0f172a'}}>Option:</strong> {tourOptionName}</div>
+              <div>•</div>
+              <div><strong style={{color: '#0f172a'}}>Date:</strong> {format(new Date(selectedDate), 'MMM d, yyyy')}</div>
+              <div>•</div>
+              <div><strong style={{color: '#0f172a'}}>Guests:</strong> {totalPax}</div>
+            </div>
+          </div>
+          <form id="checkout-form" onSubmit={handleSubmitCheckout} className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '30px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
           <h2 style={{ fontSize: '1.4rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
             <ShieldCheck size={20} color="#059669" /> Lead Traveler Details
           </h2>
@@ -703,6 +715,47 @@ useEffect(() => {
               />
             </div>
           </div>
+          
+          {/* MOBILE PROMO CODE INPUT */}
+          <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1' }}>
+            <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Promo / Coupon Code</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                placeholder="Try: WELCOME20, SUMMER15"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: '#0f172a', outline: 'none', textTransform: 'uppercase' }}
+              />
+              <button type="button" onClick={(e) => { e.preventDefault(); handleApplyCoupon(e as any); }} disabled={validatingCoupon} className="btn-secondary" style={{ padding: '10px 16px', fontSize: '0.9rem' }}>
+                <Tag size={16} /> Apply
+              </button>
+            </div>
+            {couponMsg && (
+              <div style={{ fontSize: '0.8rem', marginTop: '8px', color: couponMsg.startsWith('✓') ? '#059669' : '#dc2626', fontWeight: 600 }}>
+                {couponMsg}
+              </div>
+            )}
+          </div>
+
+          {/* MOBILE LOYALTY POINTS */}
+          {user?.id && (
+            <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', borderRadius: '12px', background: '#fffbeb', border: '1px solid #fde68a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <Coins size={18} color="#d97706" />
+                <span style={{ fontWeight: 700, color: '#92400e', fontSize: '0.9rem' }}>Loyalty Points</span>
+              </div>
+              <div style={{ fontSize: '0.82rem', color: '#b45309', marginBottom: '12px' }}>
+                You have <strong>{loyaltyPoints}</strong> points = {formatPrice(Math.floor(loyaltyPoints / 100) * 0.5)} off.
+              </div>
+              {loyaltyPoints >= 100 && (
+                <button type="button" onClick={handleApplyLoyalty} disabled={loyaltyApplied} className="btn-secondary" style={{ padding: '10px 16px', fontSize: '0.85rem', background: loyaltyApplied ? '#e2e8f0' : '#2563eb', borderColor: '#2563eb', color: '#ffffff', width: '100%' }}>
+                  {loyaltyApplied ? 'Loyalty Discount Applied' : 'Claim Loyalty Discount'}
+                </button>
+              )}
+              {loyaltyMsg && <div style={{ fontSize: '0.78rem', marginTop: '8px', color: loyaltyMsg.startsWith('✓') ? '#059669' : '#dc2626', fontWeight: 600 }}>{loyaltyMsg}</div>}
+            </div>
+          )}
 
           <h2 style={{ fontSize: '1.4rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
             <CreditCard size={20} color="var(--brand-primary)" /> Payment Details
@@ -751,18 +804,21 @@ useEffect(() => {
             </div>
           )}
 
-          <button type="submit" disabled={submitting || timeLeft <= 0 || !isCheckoutValid} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.1rem', opacity: !isCheckoutValid ? 0.6 : 1, cursor: !isCheckoutValid ? 'not-allowed' : 'pointer' }}>
-            {submitting ? 'Processing...' : (customerPaymentChoice === 'pay_later' ? 'Confirm Reservation (Pay Later)' : 'Pay & Confirm Reservation')}
-          </button>
-          {!isCheckoutValid && (
-            <div style={{ fontSize: '0.8rem', color: '#dc2626', marginTop: '8px', textAlign: 'center', fontWeight: 600 }}>
-              Please fill all required fields (*) and verify your email to continue.
-            </div>
-          )}
+          <div className="desktop-only">
+            <button type="submit" disabled={submitting || timeLeft <= 0 || !isCheckoutValid} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1.1rem', opacity: !isCheckoutValid ? 0.6 : 1, cursor: !isCheckoutValid ? 'not-allowed' : 'pointer' }}>
+              {submitting ? 'Processing...' : (customerPaymentChoice === 'pay_later' ? 'Confirm Reservation (Pay Later)' : 'Pay & Confirm Reservation')}
+            </button>
+            {!isCheckoutValid && (
+              <div style={{ fontSize: '0.8rem', color: '#dc2626', marginTop: '8px', textAlign: 'center', fontWeight: 600 }}>
+                Please fill all required fields (*) and verify your email to continue.
+              </div>
+            )}
+          </div>
         </form>
+      </div>
 
         {/* ORDER SUMMARY */}
-        <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '24px', height: 'fit-content', border: '1px solid #cbd5e1', background: '#ffffff' }}>
+        <div className="card-panel desktop-only" style={{ borderRadius: 'var(--radius-lg)', padding: '24px', height: 'fit-content', border: '1px solid #cbd5e1', background: '#ffffff' }}>
           <h3 style={{ fontSize: '1.2rem', marginBottom: '16px', color: '#0f172a' }}>Order Summary</h3>
           
           <div style={{ marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
@@ -842,6 +898,31 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* Spacing for mobile sticky footer */}
+      <div className="mobile-only" style={{ height: '100px' }}></div>
+
+      {/* MOBILE STICKY FOOTER */}
+      <div className="mobile-only" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#ffffff', borderTop: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 100, boxShadow: '0 -4px 16px rgba(0,0,0,0.08)' }}>
+        <div>
+          {(discountAmount > 0 || loyaltyDiscount > 0) ? (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.9rem', color: '#64748b', textDecoration: 'line-through', marginBottom: '2px' }}>{formatPrice(basePrice)}</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)', lineHeight: 1 }}>{formatPrice(Math.max(0, basePrice - discountAmount - loyaltyDiscount))}</span>
+              <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700, marginTop: '4px' }}>Discount Applied!</span>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600, marginBottom: '2px' }}>Total</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)', lineHeight: 1 }}>{formatPrice(basePrice)}</span>
+            </div>
+          )}
+        </div>
+        <button form="checkout-form" type="submit" disabled={submitting || timeLeft <= 0 || !isCheckoutValid} className="btn-primary" style={{ padding: '14px 24px', fontSize: '1.1rem', opacity: !isCheckoutValid ? 0.6 : 1, cursor: !isCheckoutValid ? 'not-allowed' : 'pointer', borderRadius: '12px' }}>
+          {submitting ? 'Processing...' : (customerPaymentChoice === 'pay_later' ? 'Pay Later' : 'Pay Now')}
+        </button>
+      </div>
+
     </div>
   );
 }
