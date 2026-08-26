@@ -623,3 +623,53 @@ input:focus, select:focus, textarea:focus {
     flex-direction: column;
   }
 }
+
+
+/* Tour Detail Specific */
+.tour-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tour-cancellation-box {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+.tour-gallery-desktop {
+  display: none;
+}
+.tour-gallery-mobile {
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .tour-meta-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+  }
+  .tour-cancellation-box {
+    display: flex;
+    justify-content: flex-end;
+    border-top: none;
+    margin-top: 12px;
+    padding-top: 0;
+  }
+  .tour-cancellation-box > div {
+    max-width: 400px;
+  }
+  .tour-gallery-desktop {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    height: 480px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .tour-gallery-mobile {
+    display: none;
+  }
+}

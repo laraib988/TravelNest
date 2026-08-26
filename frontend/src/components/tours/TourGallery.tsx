@@ -69,55 +69,59 @@ export default function TourGallery({ tour }: { tour: any }) {
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#64748b', marginBottom: '20px' }}>
-          <span style={{ color: '#6366f1', fontWeight: 700 }}>{tour.cached_rating_avg}/5</span>
-          <span style={{ textDecoration: 'underline' }}>{tour.cached_review_count} reviews</span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#0f172a', fontSize: '0.95rem', fontWeight: 500 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <MapPin size={18} color="#64748b" /> 
-            <span>Depart from {tour.pickup_location || tour.destination?.name || (tour.meeting_point?.address ? tour.meeting_point.address.split(',')[0] : 'Designated Location')}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Clock size={18} color="#64748b" /> 
-            <span>{tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
-          </div>
-          
-          {tour.languages && tour.languages.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <MessageSquare size={18} color="#64748b" /> 
-              <span>Guide language: {tour.languages.length > 1 ? `${tour.languages[0]} +${tour.languages.length - 1}` : tour.languages[0]}</span>
+        <div className="tour-meta-wrapper">
+          <div className="tour-meta-row" style={{ color: '#0f172a', fontSize: '0.95rem', fontWeight: 500 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#64748b' }}>
+              <span style={{ color: '#6366f1', fontWeight: 700 }}>{tour.cached_rating_avg}/5</span>
+              <span style={{ textDecoration: 'underline' }}>{tour.cached_review_count} reviews</span>
             </div>
-          )}
-
-          {(tour.meeting_point_type === 'pickup' || tour.inclusions?.some((i: string) => i.toLowerCase().includes('pickup'))) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Car size={18} color="#64748b" /> 
-              <span>Hotel pick-up</span>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <MapPin size={18} color="#64748b" /> 
+              <span>Depart from {tour.pickup_location || tour.destination?.name || (tour.meeting_point?.address ? tour.meeting_point.address.split(',')[0] : 'Designated Location')}</span>
             </div>
-          )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Users size={18} color="#64748b" /> 
-            <span>{tour.tour_type || (tour.max_group_size ? `Small group (Max ${tour.max_group_size})` : 'Group tour')}</span>
-          </div>
-        </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={18} color="#64748b" /> 
+              <span>{tour.duration_text || `${tour.duration_minutes / 60} Hours`}</span>
+            </div>
+            
+            {tour.languages && tour.languages.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <MessageSquare size={18} color="#64748b" /> 
+                <span>Guide: {tour.languages.length > 1 ? `${tour.languages[0]} +${tour.languages.length - 1}` : tour.languages[0]}</span>
+              </div>
+            )}
 
-        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <CheckCircle size={18} color="#0f172a" style={{ marginTop: '2px' }} />
-            <div>
-              <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>Free cancellation (24 hours notice)</div>
-              <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.4 }}>
-                You'll get a full refund if you cancel at least 24 hour(s) before the activity starts.
+            {(tour.meeting_point_type === 'pickup' || tour.inclusions?.some((i: string) => i.toLowerCase().includes('pickup'))) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Car size={18} color="#64748b" /> 
+                <span>Hotel pick-up</span>
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Users size={18} color="#64748b" /> 
+              <span>{tour.tour_type || (tour.max_group_size ? `Small group (Max ${tour.max_group_size})` : 'Group tour')}</span>
+            </div>
+          </div>
+
+          <div className="tour-cancellation-box">
+            <div className="cancel-inner" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <CheckCircle size={18} color="#0f172a" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div>
+                <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>Free cancellation</div>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.4 }}>
+                  Full refund with 24h notice.
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ position: 'relative' }} className="tour-image-slider-wrapper">
-        <div onScroll={(e: any) => setActiveSlide(Math.round(e.target.scrollLeft / e.target.clientWidth))} className="tour-image-slider" style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollSnapType: 'x mandatory', borderRadius: 'var(--radius-lg)', height: '400px', marginBottom: '40px', scrollbarWidth: 'none' }}>
+      <div className="tour-gallery-mobile" style={{ position: 'relative', marginBottom: '40px' }}>
+        <div onScroll={(e: any) => setActiveSlide(Math.round(e.target.scrollLeft / e.target.clientWidth))} className="tour-image-slider" style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollSnapType: 'x mandatory', borderRadius: 'var(--radius-lg)', height: '400px', scrollbarWidth: 'none' }}>
           {tour.images?.map((img: any, i: number) => (
             <div key={i} style={{ position: 'relative', minWidth: '100%', height: '100%', scrollSnapAlign: 'center' }}>
               <Image 
@@ -133,23 +137,52 @@ export default function TourGallery({ tour }: { tour: any }) {
           ))}
         </div>
         {tour.images?.length > 1 && (
-          <div style={{ position: 'absolute', bottom: '60px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 10 }}>
+          <div style={{ position: 'absolute', bottom: '20px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 10 }}>
             {tour.images.map((_: any, i: number) => (
               <div 
                 key={i} 
                 style={{ 
-                  width: activeSlide === i ? '12px' : '6px', 
+                  width: activeSlide === i ? '24px' : '6px', 
                   height: '6px', 
                   borderRadius: '3px', 
                   background: activeSlide === i ? '#ffffff' : 'rgba(255,255,255,0.5)', 
-                  transition: 'all 0.3s',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                  transition: 'all 0.3s' 
                 }} 
               />
             ))}
           </div>
         )}
       </div>
+
+      {tour.images && tour.images.length > 0 && (
+        <div className="tour-gallery-desktop">
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Image 
+              loader={cloudinaryLoader}
+              src={tour.images[0].url} 
+              alt={tour.title} 
+              fill 
+              sizes="50vw" 
+              style={{ objectFit: 'cover' }} 
+              priority 
+            />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '12px', height: '100%' }}>
+            {tour.images.slice(1, 5).map((img: any, i: number) => (
+              <div key={i} style={{ position: 'relative', width: '100%', height: '100%' }}>
+                <Image 
+                  loader={cloudinaryLoader}
+                  src={img.url} 
+                  alt={`${tour.title} ${i+2}`} 
+                  fill 
+                  sizes="25vw" 
+                  style={{ objectFit: 'cover' }} 
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
