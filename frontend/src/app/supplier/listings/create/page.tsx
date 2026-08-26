@@ -897,7 +897,7 @@ export default function CreateListingPage() {
                   <ServiceAreaMap
                     productId={productId || ''}
                     initialCenter={logistics.pickupLocationMap ? [logistics.pickupLocationMap.lat, logistics.pickupLocationMap.lng] : [31.5, 74.3]}
-                    onSave={(mapData) => setLogistics({ ...logistics, pickupLocationMap: mapData, serviceArea: 'custom' })}
+                    onSave={(mapData, locs, searchName) => setLogistics({ ...logistics, pickupLocationMap: mapData, serviceArea: 'custom', pickupLocation: searchName || logistics.pickupLocation })}
                   />
 {logistics.pickupLocationMap && (
                       <div style={{ marginTop: '10px', fontSize: '0.9rem', color: '#10b981', background: '#ecfdf5', padding: '10px', borderRadius: '8px' }}>
