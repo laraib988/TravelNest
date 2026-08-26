@@ -124,14 +124,10 @@ export default function TourGallery({ tour }: { tour: any }) {
         <div onScroll={(e: any) => setActiveSlide(Math.round(e.target.scrollLeft / e.target.clientWidth))} className="tour-image-slider" style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollSnapType: 'x mandatory', borderRadius: 'var(--radius-lg)', height: '400px', scrollbarWidth: 'none' }}>
           {tour.images?.map((img: any, i: number) => (
             <div key={i} style={{ position: 'relative', minWidth: '100%', height: '100%', scrollSnapAlign: 'center' }}>
-              <Image 
-                loader={cloudinaryLoader}
-                src={img.url} 
+              <img 
+                src={cloudinaryLoader({ src: img.url, width: 800, quality: 75 })} 
                 alt={`${tour.title} Gallery Image ${i+1}`} 
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                style={{ objectFit: 'cover' }} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
             </div>
           ))}
@@ -157,26 +153,19 @@ export default function TourGallery({ tour }: { tour: any }) {
       {tour.images && tour.images.length > 0 && (
         <div className="tour-gallery-desktop">
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-            <Image 
-              loader={cloudinaryLoader}
-              src={tour.images[0].url} 
+            <img 
+              src={cloudinaryLoader({ src: tour.images[0].url, width: 1200, quality: 75 })} 
               alt={tour.title} 
-              fill 
-              sizes="50vw" 
-              style={{ objectFit: 'cover' }} 
-              priority 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
             />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '12px', height: '100%' }}>
             {tour.images.slice(1, 5).map((img: any, i: number) => (
               <div key={i} style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <Image 
-                  loader={cloudinaryLoader}
-                  src={img.url} 
+                <img 
+                  src={cloudinaryLoader({ src: img.url, width: 600, quality: 75 })} 
                   alt={`${tour.title} ${i+2}`} 
-                  fill 
-                  sizes="25vw" 
-                  style={{ objectFit: 'cover' }} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
               </div>
             ))}

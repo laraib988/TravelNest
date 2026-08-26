@@ -197,7 +197,7 @@ return (
                       description: 'Meet your guide and group to begin your journey.',
                       isLogistics: true
                     },
-                    ...tour.itinerary,
+                    ...(tour.itinerary || []),
                     {
                       locationName: 'Drop-off: ' + (tour.dropoff_point?.address || 'Designated Location'),
                       description: 'Your tour concludes here. We hope you had a great time!',
