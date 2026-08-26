@@ -37,6 +37,9 @@ export const metadata = {
     template: '%s | Vaitour'
   },
   description: 'Book authentic, top-rated local tours, sunset cruises, food walks, and travel experiences worldwide. Connect with verified local guides and plan your perfect trip.',
+  verification: {
+    google: 'E5I3y-OC4eYmBFKcLBcSTLLke3DNZEKzD05x3wOfyzE',
+  },
   openGraph: {
     title: 'Vaitour - Book Authentic Local Tours & Travel Experiences',
     description: 'Book authentic, top-rated local tours, sunset cruises, food walks, and travel experiences worldwide. Connect with verified local guides and plan your perfect trip.',
