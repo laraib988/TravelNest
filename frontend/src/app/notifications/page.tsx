@@ -16,15 +16,24 @@ export default function NotificationsPage() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const data = await fetchFromAPI('/users/me/notifications');
-      setNotifications(Array.isArray(data) ? data : (data.data || []));
+      const data = await fetchFromAPI('/customer/bookings');
+      if (Array.isArray(data) && data.length > 0) {
+        // Map bookings to notifications
+        const realNotifications = data.map((b: any) => ({
+          id: `notif_${b.id}`,
+          type: 'booking',
+          title: b.status === 'PENDING_SUPPLIER_APPROVAL' ? 'Booking Requested' : 'Booking Confirmed!',
+          message: `Your booking for ${b.traveler_details?.tour_name || 'your tour'} is ${b.status === 'PENDING_SUPPLIER_APPROVAL' ? 'pending approval' : 'confirmed'}.`,
+          time: new Date(b.created_at).toLocaleDateString(),
+          read: false,
+          link: '/my-bookings'
+        }));
+        setNotifications(realNotifications);
+      } else {
+        setNotifications([{ id: 'notif_welcome', type: 'promo', title: 'Welcome to Vaitour!', message: 'Explore the best tours around the world.', time: 'Just now', read: false, link: '/' }]);
+      }
     } catch (err) {
-      setNotifications([
-        { id: 'notif_1', type: 'booking', title: 'Booking Confirmed!', message: 'Your trip to Bali is confirmed. View your voucher now.', time: '2 hours ago', read: false, link: '/my-bookings' },
-        { id: 'notif_2', type: 'price', title: 'Price Drop Alert', message: 'The Paris Louvre Tour you saved dropped in price by 15%.', time: '1 day ago', read: false, link: '/wishlist' },
-        { id: 'notif_3', type: 'promo', title: 'Summer Sale is Here', message: 'Use code SUMMER20 to get 20% off all yacht charters.', time: '3 days ago', read: true, link: '/' },
-        { id: 'notif_4', type: 'review', title: 'How was your trip?', message: 'Leave a review for your recent stay in Maldives to earn credits.', time: '1 week ago', read: true, link: '/my-bookings' }
-      ]);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }

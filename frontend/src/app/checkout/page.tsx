@@ -415,10 +415,10 @@ useEffect(() => {
           <h1 style={{ fontSize: '2.2rem', marginBottom: '8px', color: '#0f172a', textAlign: 'center' }}>
             {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? 'Booking Submitted!' : 'Booking Confirmed!'}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
+          <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '32px', textAlign: 'center' }}>
             {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' 
-              ? `Your booking request has been sent to the supplier. You will receive an email once it is approved.`
-              : `Your electronic ticket has been dispatched to <strong>${confirmedBooking.traveler_details.lead_email}</strong>.`}
+              ? 'Your booking request has been sent to the supplier. You will receive an email once it is approved.'
+              : <>Your electronic ticket has been dispatched to <strong>{confirmedBooking.traveler_details.lead_email}</strong>.</>}
           </p>
 
           {/* QR VOUCHER CARD */}
@@ -428,7 +428,8 @@ useEffect(() => {
                 <span className={confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"} style={{ marginBottom: '8px', display: 'inline-block' }}>
                   {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT BOOKING CONFIRMED'}
                 </span>
-                <h3 style={{ fontSize: '1.4rem', color: '#0f172a' }}>{confirmedBooking.option_name || 'VIP Package'}</h3>
+                <h2 style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: 800, marginBottom: '4px' }}>{tourTitle}</h2>
+                <h3 style={{ fontSize: '1.1rem', color: '#334155', fontWeight: 600, marginBottom: '8px' }}>Option: {confirmedBooking.option_name || 'Standard'}</h3>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Lead Guest: <strong>{confirmedBooking.traveler_details.lead_name}</strong> ({confirmedBooking.traveler_details.lead_phone})</span>
               </div>
             </div>
