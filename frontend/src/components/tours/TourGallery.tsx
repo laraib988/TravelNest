@@ -159,17 +159,35 @@ export default function TourGallery({ tour }: { tour: any }) {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
             />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '12px', height: '100%' }}>
-            {tour.images.slice(1, 5).map((img: any, i: number) => (
-              <div key={i} style={{ position: 'relative', width: '100%', height: '100%' }}>
-                <img 
-                  src={cloudinaryLoader({ src: img.url, width: 600, quality: 75 })} 
-                  alt={`${tour.title} ${i+2}`} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                />
+          {tour.images.length > 1 && (() => {
+            const remainingImages = tour.images.slice(1, 5);
+            return (
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: remainingImages.length <= 2 ? '1fr' : '1fr 1fr', 
+                gridTemplateRows: remainingImages.length === 1 ? '1fr' : '1fr 1fr', 
+                gap: '12px', 
+                height: '100%' 
+              }}>
+                {remainingImages.map((img: any, i: number) => (
+                  <div 
+                    key={i} 
+                    style={{ 
+                      position: 'relative', 
+                      width: '100%', 
+                      height: '100%',
+                      gridColumn: remainingImages.length === 3 && i === 2 ? 'span 2' : 'auto'
+                    }}>
+                    <img 
+                      src={cloudinaryLoader({ src: img.url, width: 600, quality: 75 })} 
+                      alt={`${tour.title} ${i+2}`} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </div>
       )}
     </div>
