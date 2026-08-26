@@ -9,13 +9,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.vaitour.com';
   const locales = ['en', 'ja', 'ur', 'fr', 'ar'];
 
-  // 1. Static Pages & Destinations
+  // 1. Static Pages
   const staticPages = [
     '', '/ai-planner', '/blog', '/about', '/contact', '/faq', 
     '/privacy', '/terms', '/cancellation-policy', '/refund-policy'
   ];
-  const destinations = ['bali', 'tokyo', 'paris', 'lahore', 'dubai', 'rome', 'karachi', 'islamabad'];
-  const basePages = [...staticPages, ...destinations.map(d => `/destinations/${d}`)];
+  
+  const { data: dests } = await supabase
+    .from('destinations')
+    .select('slug')
+    .eq('is_published', true);
+    
+  const destinationUrls = (dests || []).map(d => `/destinations/${d.slug}`);
+  const basePages = [...staticPages, ...destinationUrls];
   
   const staticUrls = basePages.flatMap((page) => 
     locales.map((locale) => {

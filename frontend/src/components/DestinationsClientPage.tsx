@@ -76,7 +76,7 @@ export default function DestinationsClientPage({ initialDestinations }: Props) {
         {filteredDestinations.length === 0 ? (
           <div className="card-panel" style={{ padding: '60px', textAlign: 'center', borderRadius: '24px' }}>
             <h3 style={{ fontSize: '1.2rem', color: '#0f172a', marginBottom: '8px' }}>No destination matches your search</h3>
-            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Try searching for cities like Bali, Tokyo, Paris, or Lahore.</p>
+            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Try searching for cities like Tokyo or Kyoto.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>

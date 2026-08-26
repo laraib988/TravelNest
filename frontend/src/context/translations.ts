@@ -17,7 +17,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     instant_confirmation: '⚡ Instant Confirmation',
     verified_guides: '✅ Verified Local Guides',
     free_cancellation: '🆓 Free Cancellation',
-    search_placeholder: "Where to next? (e.g. 'Bali', 'Tokyo ramen', 'Sunset cruise', 'Dubai', 'Rome')",
+    search_placeholder: "Where to next? (e.g. 'Tokyo ramen', 'Kyoto temple', 'Mount Fuji')",
     explore_now: 'Explore Now',
 
     // Categories
