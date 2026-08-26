@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     // Fetch bookings for this supplier, order by created_at descending
     const { data: bookings, error } = await supabaseAdmin
       .from('bookings')
-      .select('id, customer_id, supplier_id, product_id, status, total_price, booking_date, created_at, tour_date, payment_status')
+      .select('*')
       .eq('supplier_id', supplierId)
       .order('created_at', { ascending: false });
 

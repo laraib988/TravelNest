@@ -108,7 +108,7 @@ export default function SitemapPage() {
             <div className="sitemap-links-grid">
               <Link href="/support" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Support Center</Link>
               <Link href="/faq" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Frequently Asked Questions (FAQ)</Link>
-              {/* <Link href="mailto:support@vaitour.com" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Contact Us</Link> */}
+              {/* <Link href="/contact" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Contact Us</Link> */}
               </div>
           </section>
 
@@ -145,3 +145,4 @@ export default function SitemapPage() {
     </div>
   );
 }
+

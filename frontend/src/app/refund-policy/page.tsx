@@ -236,7 +236,7 @@ export default function RefundPolicyPage() {
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Need manual assistance?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>If you missed your trip due to an emergency, contact us directly.</p>
             </div>
-            <Link href="mailto:support@vaitour.com" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="/contact" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               Contact Support <ArrowRight size={16} />
             </Link>
           </div>
@@ -246,3 +246,4 @@ export default function RefundPolicyPage() {
     </div>
   );
 }
+

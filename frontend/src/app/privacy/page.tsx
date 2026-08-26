@@ -228,8 +228,9 @@ export default function PrivacyPolicyPage() {
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Want to manage your data?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>Contact our Data Protection Officer for data requests.</p>
             </div>
-            <Link href="mailto:support@vaitour.com" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              Contact DPO <ArrowRight size={16} />
+            <Link href="/contact" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Mail size={18} />
+              Contact Support
             </Link>
           </div>
 
