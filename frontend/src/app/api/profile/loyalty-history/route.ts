@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
     if (profile) {
       history.push({
-        id: \signup-\\,
+        id: `signup-${profile.id}`,
         type: 'EARNED',
         amount: 50,
         description: 'Account Signup Bonus',
@@ -33,7 +33,6 @@ export async function GET(request: Request) {
       });
     }
 
-    // Also get bookings where customer_id = user.id OR email matches
     const [ { data: byId }, { data: byEmail } ] = await Promise.all([
       admin.from('bookings').select('id, created_at, traveler_details').eq('customer_id', user.id),
       admin.from('bookings').select('id, created_at, traveler_details').eq('traveler_details->>lead_email', user.email)
@@ -46,10 +45,10 @@ export async function GET(request: Request) {
     if (bookings) {
       for (const b of bookings) {
         history.push({
-          id: \ooking-\\,
+          id: `booking-${b.id}`,
           type: 'EARNED',
           amount: 100,
-          description: \Reward for booking: \\,
+          description: `Reward for booking: ${b.traveler_details?.tour_name || 'Tour'}`,
           created_at: b.created_at
         });
       }

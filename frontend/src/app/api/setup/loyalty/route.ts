@@ -9,7 +9,7 @@ export async function GET() {
       throw new Error('Missing Supabase credentials');
     }
 
-    const createTableSQL = \
+    const createTableSQL = `
       CREATE TABLE IF NOT EXISTS public.loyalty_history (
         id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
         customer_id UUID NOT NULL,
@@ -23,13 +23,13 @@ export async function GET() {
       ALTER TABLE public.loyalty_history ENABLE ROW LEVEL SECURITY;
       DROP POLICY IF EXISTS "Allow all access to loyalty history" ON public.loyalty_history;
       CREATE POLICY "Allow all access to loyalty history" ON public.loyalty_history FOR ALL USING (true) WITH CHECK (true);
-    \;
+    `;
 
-    const res = await fetch(\\/rest/v1/\, {
+    const res = await fetch(`${supabaseUrl}/rest/v1/`, {
       method: 'POST',
       headers: {
         'apikey': supabaseServiceKey,
-        'Authorization': \Bearer \\,
+        'Authorization': `Bearer ${supabaseServiceKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ query: createTableSQL })
