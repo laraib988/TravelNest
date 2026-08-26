@@ -4,11 +4,17 @@ import { headers } from 'next/headers';
 export async function generateMetadata() {
   const headersList = await headers();
   const locale = headersList.get('x-locale') || 'en';
+  
+  const seoTitle = 'Vaitour | Book Local Tours, Activities & Experiences Worldwide';
+  const seoDesc = 'Find and book the best local tours, day trips, and travel experiences. Connect directly with verified local guides in Japan and worldwide. Instant booking and free cancellation.';
+  const url = locale === 'en' ? 'https://www.vaitour.com/en' : `https://www.vaitour.com/${locale}`;
+
   return {
-    title: 'Vaitour - Global Tours, Activities & Experiences',
-    description: 'Vaitour connects travelers with KYC-verified local tour operators across Japan and globally, offering instant booking, free cancellation, and multilingual support.',
+    title: seoTitle,
+    description: seoDesc,
+    keywords: ['book local tours', 'Japan local guides', 'travel experiences', 'day trips', 'verified tour operators', 'holiday activities'],
     alternates: {
-      canonical: locale === 'en' ? 'https://www.vaitour.com/en' : `https://www.vaitour.com/${locale}`,
+      canonical: url,
       languages: {
         en: 'https://www.vaitour.com/en',
         ja: 'https://www.vaitour.com/ja',
@@ -17,6 +23,19 @@ export async function generateMetadata() {
         ar: 'https://www.vaitour.com/ar',
         'x-default': 'https://www.vaitour.com/en',
       }
+    },
+    openGraph: {
+      title: seoTitle,
+      description: seoDesc,
+      url: url,
+      type: 'website',
+      images: [{ url: 'https://www.vaitour.com/og-image.jpg', width: 1200, height: 630, alt: 'Vaitour Experiences' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seoTitle,
+      description: seoDesc,
+      images: ['https://www.vaitour.com/og-image.jpg'],
     }
   };
 }
