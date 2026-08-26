@@ -327,10 +327,14 @@ input:focus, select:focus, textarea:focus {
     .desktop-only { display: none !important; }
     .hidden-mobile { display: none !important; }
     .mobile-only { display: flex !important; }
+    .checkout-grid { display: block !important; }
+    .checkout-form-padding { padding: 16px !important; }
   }
   @media (min-width: 769px) {
     .mobile-only { display: none !important; }
     .hide-desktop { display: none !important; }
+    .checkout-grid { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 32px; }
+    .checkout-form-padding { padding: 30px; }
   }
 
 

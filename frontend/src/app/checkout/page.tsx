@@ -521,11 +521,11 @@ useEffect(() => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '32px' }}>
+      <div className="checkout-grid">
         {/* FORM */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {/* MOBILE ORDER SUMMARY HEADER */}
-          <div className="mobile-only card-panel" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1', flexDirection: 'column' }}>
+          <div className="mobile-only card-panel" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
             <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 800, marginBottom: '6px' }}>
               {tourTitle}
             </div>
@@ -533,7 +533,7 @@ useEffect(() => {
               <strong style={{color: '#0f172a'}}>Option:</strong> {tourOptionName} &nbsp;•&nbsp; <strong style={{color: '#0f172a'}}>Date:</strong> {new Date(tourDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} &nbsp;•&nbsp; <strong style={{color: '#0f172a'}}>Guests:</strong> {quantity}
             </div>
           </div>
-          <form id="checkout-form" onSubmit={handleSubmitCheckout} className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '30px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
+          <form id="checkout-form" onSubmit={handleSubmitCheckout} className="card-panel checkout-form-padding" style={{ borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1', background: '#ffffff' }}>
           <h2 style={{ fontSize: '1.4rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
             <ShieldCheck size={20} color="#059669" /> Lead Traveler Details
           </h2>
@@ -551,7 +551,7 @@ useEffect(() => {
             </div>
             <div id="lead-email-field">
               <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Email Address (for voucher) <span style={{ color: '#dc2626' }}>*</span></label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <input
                   type="email"
                   required
@@ -586,7 +586,7 @@ useEffect(() => {
                     <KeyRound size={16} color="#2563eb" />
                     <span style={{ fontSize: '0.85rem', color: '#1e40af', fontWeight: 700 }}>Enter the 6-digit code sent to your email</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <input
                       type="text"
                       inputMode="numeric"
@@ -760,7 +760,7 @@ useEffect(() => {
           </h2>
 
           {paymentOption === 'Reserve Now Pay Later' && (
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
               <label style={{ flex: 1, padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_later' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_later' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_later'} onChange={() => setCustomerPaymentChoice('pay_later')} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
