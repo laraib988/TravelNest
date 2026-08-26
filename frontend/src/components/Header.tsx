@@ -55,6 +55,7 @@ export default function Header() {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   const subHeaderRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {
@@ -77,6 +78,9 @@ export default function Header() {
       if (subHeaderRef.current && !subHeaderRef.current.contains(event.target as Node)) {
         setIsDestinationsOpen(false);
         setIsExploreOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -234,11 +238,11 @@ export default function Header() {
             </nav>
 
             {/* CURRENCY & LANGUAGE SELECTOR DROPDOWN */}
-            <CurrencyLanguageDropdown direction="up" />
+            <CurrencyLanguageDropdown direction="down" />
 
             {/* AUTHENTICATION ACTIONS: USER PROFILE OR 2 SEPARATE BUTTONS (SIGN IN & SIGN UP) */}
             {user ? (
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative' }} ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   style={{
