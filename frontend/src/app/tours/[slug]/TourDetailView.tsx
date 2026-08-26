@@ -263,8 +263,8 @@ return (
 
           <TourReviews tour={tour} />
 
-          {/* ABOUT SUPPLIER - newly added */}
-          <div style={{ marginTop: '40px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          {/* ABOUT SUPPLIER - MOBILE ONLY */}
+          <div className="mobile-only" style={{ marginTop: '40px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
             <h2 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <ShieldCheck size={22} color="#059669" /> About the Supplier
             </h2>
@@ -285,9 +285,6 @@ return (
                 {tour.supplier?.username && tour.supplier?.name && <div style={{ fontSize: '0.85rem', color: '#64748b' }}>@{tour.supplier.username}</div>}
                 <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
                   <Star size={14} color="#d97706" fill="#d97706" /> {tour.supplier?.total_reviews || tour.cached_review_count || 0} reviews
-                  {tour.supplier?.upcoming_tours !== undefined && (
-                    <span> • {tour.supplier.upcoming_tours} upcoming tours</span>
-                  )}
                 </div>
               </div>
             </div>
@@ -295,7 +292,46 @@ return (
         </div>
         
         <div className="tour-booking-right desktop-only">
-          <TourBookingWidget tour={tour} />
+          <div style={{ position: 'sticky', top: '100px' }}>
+            <TourBookingWidget tour={tour} />
+
+            <div style={{ marginTop: '20px', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '16px', background: '#ffffff', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <CheckCircle2 size={18} color="#0f172a" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div>
+                <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>Free cancellation</div>
+                <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.4 }}>
+                  Full refund with 24h notice.
+                </div>
+              </div>
+            </div>
+
+            {/* ABOUT SUPPLIER */}
+            <div style={{ marginTop: '20px', padding: '20px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <h2 style={{ fontSize: '1.2rem', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck size={20} color="#059669" /> About the Supplier
+              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {tour.supplier?.avatar_url || tour.supplier?.profile_image ? (
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                    <Image src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} fill style={{ objectFit: 'cover' }} sizes="40px" />
+                  </div>
+                ) : (
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.1rem', fontWeight: 700, flexShrink: 0 }}>
+                    {(tour.supplier?.name || tour.supplier?.username) ? (tour.supplier?.name || tour.supplier?.username).charAt(0).toUpperCase() : 'S'}
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {tour.supplier?.name || tour.supplier?.username || 'Verified Supplier'} <ShieldCheck size={16} color="#059669" />
+                  </div>
+                  {tour.supplier?.username && tour.supplier?.name && <div style={{ fontSize: '0.8rem', color: '#64748b' }}>@{tour.supplier.username}</div>}
+                  <div style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <Star size={13} color="#d97706" fill="#d97706" /> {tour.supplier?.total_reviews || tour.cached_review_count || 0} reviews
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       

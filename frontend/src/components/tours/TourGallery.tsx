@@ -106,7 +106,7 @@ export default function TourGallery({ tour }: { tour: any }) {
             </div>
           </div>
 
-          <div className="tour-cancellation-box">
+          <div className="tour-cancellation-box mobile-only">
             <div className="cancel-inner" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <CheckCircle size={18} color="#0f172a" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div>
