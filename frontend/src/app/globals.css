@@ -323,14 +323,15 @@ input:focus, select:focus, textarea:focus {
 
 
 /* Responsive Utilities */
-@media (max-width: 768px) {
-  .desktop-only { display: none !important; }
-  .mobile-only { display: flex !important; }
-}
-@media (min-width: 769px) {
-  .desktop-only { display: flex !important; }
-  .mobile-only { display: none !important; }
-}
+  @media (max-width: 768px) {
+    .desktop-only { display: none !important; }
+    .hidden-mobile { display: none !important; }
+    .mobile-only { display: flex !important; }
+  }
+  @media (min-width: 769px) {
+    .mobile-only { display: none !important; }
+    .hide-desktop { display: none !important; }
+  }
 
 
 /* Responsive Hero Styles */

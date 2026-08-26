@@ -525,14 +525,12 @@ useEffect(() => {
         {/* FORM */}
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {/* MOBILE ORDER SUMMARY HEADER */}
-          <div className="mobile-only card-panel" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1' }}>
-            <h4 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 800, marginBottom: '8px' }}>{tourTitle}</h4>
-            <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', color: '#475569', flexWrap: 'wrap', alignItems: 'center' }}>
-              <div><strong style={{color: '#0f172a'}}>Option:</strong> {tourOptionName}</div>
-              <div>•</div>
-              <div><strong style={{color: '#0f172a'}}>Date:</strong> {new Date(tourDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-              <div>•</div>
-              <div><strong style={{color: '#0f172a'}}>Guests:</strong> {quantity}</div>
+          <div className="mobile-only card-panel" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1', flexDirection: 'column' }}>
+            <div style={{ fontSize: '1rem', color: '#0f172a', fontWeight: 800, marginBottom: '6px' }}>
+              {tourTitle}
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#475569', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <strong style={{color: '#0f172a'}}>Option:</strong> {tourOptionName} &nbsp;•&nbsp; <strong style={{color: '#0f172a'}}>Date:</strong> {new Date(tourDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} &nbsp;•&nbsp; <strong style={{color: '#0f172a'}}>Guests:</strong> {quantity}
             </div>
           </div>
           <form id="checkout-form" onSubmit={handleSubmitCheckout} className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '30px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
@@ -717,7 +715,7 @@ useEffect(() => {
           </div>
           
           {/* MOBILE PROMO CODE INPUT */}
-          <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1' }}>
+          <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1', flexDirection: 'column' }}>
             <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Promo / Coupon Code</label>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
@@ -740,7 +738,7 @@ useEffect(() => {
 
           {/* MOBILE LOYALTY POINTS */}
           {user?.id && (
-            <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', borderRadius: '12px', background: '#fffbeb', border: '1px solid #fde68a' }}>
+            <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', borderRadius: '12px', background: '#fffbeb', border: '1px solid #fde68a', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <Coins size={18} color="#d97706" />
                 <span style={{ fontWeight: 700, color: '#92400e', fontSize: '0.9rem' }}>Loyalty Points</span>
@@ -894,7 +892,7 @@ useEffect(() => {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
             <span>Total Payable</span>
-            <span>{formatPrice(Math.max(0, basePrice - discountAmount - loyaltyDiscount))}</span>
+            <span>{formatPrice(Math.max(0, subtotal - discountAmount - loyaltyDiscount))}</span>
           </div>
         </div>
       </div>
