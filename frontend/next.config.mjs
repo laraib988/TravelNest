@@ -25,27 +25,30 @@ const nextConfig = {
     ],
   },
   async redirects() {
+    // Point directly to /en/destination to avoid the middleware locale
+    // redirect chain (which would add an extra 307 hop).
+    // All destination paths have been verified to return HTTP 200.
     const brokenLinks = [
-      { from: 'bookings', to: '/my-bookings' },
-      { from: 'saved', to: '/wishlist' },
-      { from: 'corporate', to: '/about' },
-      { from: 'investors', to: '/about' },
-      { from: 'press', to: '/about' },
-      { from: 'cookies', to: '/privacy' },
-      { from: 'dashboard', to: '/' },
-      { from: 'become-a-host', to: '/supplier/signup' },
-      { from: 'impact', to: '/about' },
-      { from: 'gift-cards', to: '/' },
-      { from: 'accessibility', to: '/support' },
-      { from: 'profile/settings', to: '/settings' },
-      { from: 'safety', to: '/support' },
-      { from: 'affiliates', to: '/supplier/signup' },
-      { from: 'careers', to: '/about' },
+      { from: 'bookings',         to: '/en/my-bookings' },
+      { from: 'saved',            to: '/en/wishlist' },
+      { from: 'corporate',        to: '/en/about' },
+      { from: 'investors',        to: '/en/about' },
+      { from: 'press',            to: '/en/about' },
+      { from: 'cookies',         to: '/en/privacy' },
+      { from: 'dashboard',        to: '/en' },
+      { from: 'become-a-host',   to: '/en/supplier/signup' },
+      { from: 'impact',           to: '/en/about' },
+      { from: 'gift-cards',       to: '/en' },
+      { from: 'accessibility',    to: '/en/support' },
+      { from: 'profile/settings', to: '/en/profile' },
+      { from: 'safety',           to: '/en/support' },
+      { from: 'affiliates',       to: '/en/supplier/signup' },
+      { from: 'careers',          to: '/en/about' },
     ];
     
     return brokenLinks.flatMap(link => [
-      { source: `/${link.from}`, destination: link.to, permanent: true },
-      { source: `/en/${link.from}`, destination: link.to, permanent: true }
+      { source: `/${link.from}`,     destination: link.to, permanent: true },
+      { source: `/en/${link.from}`,  destination: link.to, permanent: true },
     ]);
   },
   async headers() {

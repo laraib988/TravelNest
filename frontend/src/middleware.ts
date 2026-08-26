@@ -74,13 +74,22 @@ export function middleware(request: NextRequest) {
 
   // 2. Internationalization (i18n) Sub-path Routing
   // Exclude static asset folders/files specifically to avoid redirect loops
+  // Also exclude legacy paths that are handled by next.config.mjs permanent
+  // redirects — letting middleware touch them first would add an extra 307 hop.
+  const LEGACY_REDIRECT_PATHS = [
+    '/bookings', '/saved', '/corporate', '/investors', '/press', '/cookies',
+    '/dashboard', '/become-a-host', '/impact', '/gift-cards', '/accessibility',
+    '/safety', '/affiliates', '/careers',
+  ];
   if (
     pathname.includes('.') || 
     pathname.startsWith('/_next') || 
     pathname.startsWith('/images/') || 
     pathname === '/favicon.ico' ||
     pathname.startsWith('/admin-portal') ||
-    pathname.startsWith('/supplier')
+    pathname.startsWith('/supplier') ||
+    pathname.startsWith('/profile/settings') ||
+    LEGACY_REDIRECT_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))
   ) {
     return NextResponse.next();
   }
