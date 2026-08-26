@@ -26,11 +26,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch bookings matching either the customer_id or the lead_email in traveler_details
+    // Fetch bookings matching the customer_id
+    // To handle emails safely without PostgREST parser issues on '@', we use filter on the array or do it in two steps.
+    // For safety, let's fetch by customer_id and then filter locally if needed, or use proper quoting.
     const { data: bookings, error } = await adminAuth
       .from('bookings')
       .select('*')
-      .or(`customer_id.eq.${userId},traveler_details->>lead_email.eq.${userEmail}`)
+      .or(`customer_id.eq.${userId},traveler_details->>lead_email.eq."${userEmail}"`)
       .order('created_at', { ascending: false });
 
     if (error) {

@@ -257,7 +257,9 @@ export default function Header() {
                     boxShadow: 'var(--shadow-sm)'
                   }}
                 >
-                  <Image src={user.avatar} alt={user.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}  width={32} height={32} />
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, border: '1px solid #bfdbfe' }}>
+                    {(user.name || 'U').charAt(0).toUpperCase()}
+                  </div>
                   <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a' }}>{user.name}</span>
                   <ChevronDown size={14} color="#64748b" />
                 </button>

@@ -118,6 +118,31 @@ export async function POST(request: Request) {
           console.error('Failed to create supplier notification:', notifError);
         }
 
+        if (customerId && customerId !== 'cust-current-user') {
+          try {
+            // Update the profile with the latest name, phone, and add 100 points
+            const { data: existingProfile } = await supabaseAdmin
+              .from('profiles')
+              .select('loyalty_points')
+              .eq('id', customerId)
+              .single();
+              
+            if (existingProfile) {
+              await supabaseAdmin
+                .from('profiles')
+                .update({
+                  name: lead_name || 'Guest',
+                  phone: lead_phone || '',
+                  loyalty_points: (existingProfile.loyalty_points || 0) + 100,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', customerId);
+            }
+          } catch (e) {
+            console.error('Failed to update customer profile points:', e);
+          }
+        }
+
         // Resolve supplier email to notify them of the new order.
         let supplierEmail: string | null = null;
         try {

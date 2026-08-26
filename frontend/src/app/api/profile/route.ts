@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     const admin = createClient(supabaseUrl, supabaseServiceKey);
     const { data, error } = await admin
       .from('profiles')
-      .select('id, full_name, email, role, avatar_url, created_at, updated_at, phone, bio')
+      .select('*')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -74,7 +74,7 @@ export async function PATCH(request: Request) {
     const admin = createClient(supabaseUrl, supabaseServiceKey);
     const { data: existing, error: fetchError } = await admin
       .from('profiles')
-      .select('id, full_name, email, role, avatar_url, created_at, updated_at, phone, bio')
+      .select('*')
       .eq('id', user.id)
       .maybeSingle();
 
