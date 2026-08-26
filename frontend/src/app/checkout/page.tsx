@@ -530,9 +530,9 @@ useEffect(() => {
             <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', color: '#475569', flexWrap: 'wrap', alignItems: 'center' }}>
               <div><strong style={{color: '#0f172a'}}>Option:</strong> {tourOptionName}</div>
               <div>•</div>
-              <div><strong style={{color: '#0f172a'}}>Date:</strong> {new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              <div><strong style={{color: '#0f172a'}}>Date:</strong> {new Date(tourDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
               <div>•</div>
-              <div><strong style={{color: '#0f172a'}}>Guests:</strong> {totalPax}</div>
+              <div><strong style={{color: '#0f172a'}}>Guests:</strong> {quantity}</div>
             </div>
           </div>
           <form id="checkout-form" onSubmit={handleSubmitCheckout} className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '30px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
@@ -907,14 +907,14 @@ useEffect(() => {
         <div>
           {(discountAmount > 0 || loyaltyDiscount > 0) ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.9rem', color: '#64748b', textDecoration: 'line-through', marginBottom: '2px' }}>{formatPrice(basePrice)}</span>
-              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)', lineHeight: 1 }}>{formatPrice(Math.max(0, basePrice - discountAmount - loyaltyDiscount))}</span>
+              <span style={{ fontSize: '0.9rem', color: '#64748b', textDecoration: 'line-through', marginBottom: '2px' }}>{formatPrice(subtotal)}</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)', lineHeight: 1 }}>{formatPrice(Math.max(0, subtotal - discountAmount - loyaltyDiscount))}</span>
               <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700, marginTop: '4px' }}>Discount Applied!</span>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600, marginBottom: '2px' }}>Total</span>
-              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)', lineHeight: 1 }}>{formatPrice(basePrice)}</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--brand-primary)', lineHeight: 1 }}>{formatPrice(subtotal)}</span>
             </div>
           )}
         </div>
