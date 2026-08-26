@@ -153,7 +153,12 @@ export default function TourBookingWidget({ tour }: { tour: any }) {
                 >
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0f172a' }}>{opt.title || opt.name}</div>
-                    {opt.description && <div style={{ fontSize: '0.75rem', color: '#059669' }}>{opt.description}</div>}
+                    {opt.description && (
+                      <div style={{ fontSize: '0.75rem', color: '#059669' }}>
+                        {opt.description}
+                        {isGroup && opt.max_capacity ? ` (upto ${opt.max_capacity} persons)` : ''}
+                      </div>
+                    )}
                     <div style={{ fontSize: '0.75rem', color: (exceedsCapacity || available === 0) ? '#dc2626' : '#059669', marginTop: '4px' }}>
                       {available === 0 ? 'Sold Out' : `${available} ${isGroup ? 'vehicles' : 'seats'} available`} 
                       {quantity > maxCap && ` (Max capacity: ${maxCap})`}
