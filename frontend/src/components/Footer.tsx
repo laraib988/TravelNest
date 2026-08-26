@@ -136,7 +136,7 @@ export default function Footer() {
               </div>
             </div>
 
-          </div></div>
+          </div>
 
           
           {/* BOTTOM COPYRIGHT BAR */}
