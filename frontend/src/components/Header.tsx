@@ -142,9 +142,9 @@ export default function Header() {
         {/* HEADER 1: PRIMARY TOP HEADER BAR */}
         <div 
           style={{ 
-            maxWidth: '1280px', 
+            maxWidth: '100%', 
             margin: '0 auto', 
-            padding: '12px 24px', 
+            padding: '12px 32px', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between',
@@ -395,9 +395,9 @@ export default function Header() {
       >
           <div 
             style={{ 
-              maxWidth: '1280px', 
+              maxWidth: '100%', 
               margin: '0 auto', 
-              padding: '0 24px', 
+              padding: '0 32px', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'space-between',
