@@ -52,7 +52,14 @@ useEffect(() => {
 
   const paymentOption = searchParams.get('payment_option') || 'Pay Now';
   const confirmationType = searchParams.get('confirmation_type') || 'Instant Confirmation';
-  const [customerPaymentChoice, setCustomerPaymentChoice] = useState(paymentOption === 'Reserve Now Pay Later' ? 'pay_later' : 'pay_now');
+  // Pay After Tour = customer defaults to pay_later but CAN choose pay_now to confirm immediately
+  // Reserve Now Pay Later = same logic
+  // Pay Now = only pay_now
+  const isPayAfterTour = paymentOption === 'Pay After Tour';
+  const isReservePayLater = paymentOption === 'Reserve Now Pay Later';
+  const [customerPaymentChoice, setCustomerPaymentChoice] = useState(
+    (isPayAfterTour || isReservePayLater) ? 'pay_later' : 'pay_now'
+  );
 
   const [formData, setFormData] = useState({
     lead_name: '',
@@ -326,7 +333,7 @@ useEffect(() => {
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token || '';
 
-      const res = await fetch('/api/public/my-bookings', {
+      const res = await fetch('/api/public/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
@@ -408,10 +415,10 @@ useEffect(() => {
           <h1 style={{ fontSize: '2.2rem', marginBottom: '8px', color: '#0f172a', textAlign: 'center' }}>
             {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? 'Booking Submitted!' : 'Booking Confirmed!'}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
+          <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '32px', textAlign: 'center' }}>
             {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' 
-              ? `Your booking request has been sent to the supplier. You will receive an email once it is approved.`
-              : `Your electronic ticket has been dispatched to <strong>${confirmedBooking.traveler_details.lead_email}</strong>.`}
+              ? 'Your booking request has been sent to the supplier. You will receive an email once it is approved.'
+              : <>Your electronic ticket has been dispatched to <strong>{confirmedBooking.traveler_details.lead_email}</strong>.</>}
           </p>
 
           {/* QR VOUCHER CARD */}
@@ -421,7 +428,8 @@ useEffect(() => {
                 <span className={confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"} style={{ marginBottom: '8px', display: 'inline-block' }}>
                   {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT BOOKING CONFIRMED'}
                 </span>
-                <h3 style={{ fontSize: '1.4rem', color: '#0f172a' }}>{confirmedBooking.option_name || 'VIP Package'}</h3>
+                <h2 style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: 800, marginBottom: '4px' }}>{tourTitle}</h2>
+                <h3 style={{ fontSize: '1.1rem', color: '#334155', fontWeight: 600, marginBottom: '8px' }}>Option: {confirmedBooking.option_name || 'Standard'}</h3>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Lead Guest: <strong>{confirmedBooking.traveler_details.lead_name}</strong> ({confirmedBooking.traveler_details.lead_phone})</span>
               </div>
             </div>
@@ -759,9 +767,43 @@ useEffect(() => {
             <CreditCard size={20} color="var(--brand-primary)" /> Payment Details
           </h2>
 
-          {paymentOption === 'Reserve Now Pay Later' && (
+          {/* Pay After Tour — supplier allows pay after tour, show both options */}
+          {isPayAfterTour && (
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ padding: '14px 16px', borderRadius: 'var(--radius-md)', background: '#fffbeb', border: '1px solid #fde68a', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.2rem' }}>🏷️</span>
+                <div>
+                  <strong style={{ display: 'block', color: '#92400e', marginBottom: '4px', fontSize: '0.95rem' }}>Pay After Tour — Supplier's Policy</strong>
+                  <span style={{ fontSize: '0.85rem', color: '#b45309' }}>This supplier allows you to pay <strong>after completing the tour</strong>. You can reserve your spot now with no upfront payment, or pay the full amount immediately to get instant booking confirmation.</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <label style={{ flex: 1, minWidth: '200px', padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_later' ? '#f59e0b' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_later' ? '#fffbeb' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_later'} onChange={() => setCustomerPaymentChoice('pay_later')} style={{ width: '18px', height: '18px', accentColor: '#f59e0b' }} />
+                    <span style={{ fontWeight: 700, color: '#92400e', fontSize: '1rem' }}>🕐 Pay After Tour</span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: '#b45309', marginLeft: '28px' }}>Reserve your spot now — no payment required today. You will receive a secure payment link after your tour completes.</div>
+                  <div style={{ marginLeft: '28px', marginTop: '8px', padding: '6px 10px', background: '#fef3c7', borderRadius: '6px', fontSize: '0.78rem', color: '#92400e', fontWeight: 600 }}>⚠️ Booking is PENDING until payment received</div>
+                </label>
+
+                <label style={{ flex: 1, minWidth: '200px', padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_now' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_now' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_now'} onChange={() => setCustomerPaymentChoice('pay_now')} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                    <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '1rem' }}>✅ Pay Now — Confirm Instantly</span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginLeft: '28px' }}>Pay the full amount now and get <strong>instant booking confirmation</strong>. Your booking is secured immediately.</div>
+                  <div style={{ marginLeft: '28px', marginTop: '8px', padding: '6px 10px', background: '#dcfce7', borderRadius: '6px', fontSize: '0.78rem', color: '#166534', fontWeight: 600 }}>✓ Booking CONFIRMED upon payment</div>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Reserve Now Pay Later — separate from Pay After Tour */}
+          {isReservePayLater && !isPayAfterTour && (
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <label style={{ flex: 1, padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_later' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_later' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
+              <label style={{ flex: 1, minWidth: '200px', padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_later' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_later' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_later'} onChange={() => setCustomerPaymentChoice('pay_later')} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
                   <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.05rem' }}>Reserve Now, Pay Later</span>
@@ -769,7 +811,7 @@ useEffect(() => {
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '28px' }}>Secure your spot today and pay closer to the date. No money charged now.</div>
               </label>
 
-              <label style={{ flex: 1, padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_now' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_now' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
+              <label style={{ flex: 1, minWidth: '200px', padding: '16px', border: `2px solid ${customerPaymentChoice === 'pay_now' ? 'var(--brand-primary)' : '#cbd5e1'}`, borderRadius: 'var(--radius-md)', background: customerPaymentChoice === 'pay_now' ? '#f0f9ff' : '#ffffff', cursor: 'pointer', transition: 'all 0.2s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_now'} onChange={() => setCustomerPaymentChoice('pay_now')} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
                   <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.05rem' }}>Pay Now</span>
@@ -779,6 +821,7 @@ useEffect(() => {
             </div>
           )}
 
+          {/* Payment input or info based on choice */}
           {customerPaymentChoice === 'pay_now' ? (
             <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#f0f9ff', border: '1px solid #bae6fd', marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
@@ -793,11 +836,17 @@ useEffect(() => {
               />
             </div>
           ) : (
-            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <Clock size={20} color="#64748b" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: isPayAfterTour ? '#fffbeb' : '#f8fafc', border: `1px solid ${isPayAfterTour ? '#fde68a' : '#e2e8f0'}`, marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '1.3rem', flexShrink: 0, marginTop: '2px' }}>{isPayAfterTour ? '🕐' : '⏱️'}</span>
               <div>
-                <strong style={{ display: 'block', color: '#334155', marginBottom: '4px' }}>No payment required right now</strong>
-                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Your card details are not needed yet. We will send you a secure payment link 3 days before the experience.</span>
+                <strong style={{ display: 'block', color: '#334155', marginBottom: '4px' }}>
+                  {isPayAfterTour ? 'No payment required now — Pay After Tour' : 'No payment required right now'}
+                </strong>
+                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  {isPayAfterTour
+                    ? 'Your spot is reserved. After your tour is complete, you will receive a secure payment link via email to settle the balance.'
+                    : 'Your card details are not needed yet. We will send you a secure payment link 3 days before the experience.'}
+                </span>
               </div>
             </div>
           )}

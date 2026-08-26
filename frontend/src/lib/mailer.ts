@@ -47,8 +47,8 @@ function layout(body: string): string {
           <!-- HEADER -->
           <tr>
             <td style="background:linear-gradient(135deg,#0284c7 0%,#0ea5e9 60%,#06b6d4 100%);padding:28px 32px;text-align:center;">
-              <div style="font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Travel<strong style="color:#fbbf24;">Nest</strong></div>
-              <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px;">Book • Explore • Travel</div>
+              <div style="font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Vai<strong style="color:#fbbf24;">tour</strong></div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px;">Premium Travel Experiences</div>
             </td>
           </tr>
           ${body}

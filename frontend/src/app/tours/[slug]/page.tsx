@@ -63,6 +63,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const rawDesc = tour.basic_info?.summary || tour.experience_details?.short_desc || `Book the incredible ${rawTitle} today with instant confirmation and free cancellation on Vaitour.`;
   const seoDesc = rawDesc.substring(0, 155);
+  
+  const ogImage = tour.basic_info?.photos?.heroImage || 'https://www.vaitour.com/og-image.jpg';
 
   return {
     title: seoTitle,
@@ -79,11 +81,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: rawTitle,
-      description: rawDesc,
-      images: tour.basic_info?.photos?.heroImage ? [tour.basic_info.photos.heroImage] : [],
+      title: seoTitle,
+      description: seoDesc,
+      url: canonicalUrl,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: rawTitle,
+        }
+      ],
       locale: locale,
+      type: 'article',
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: seoTitle,
+      description: seoDesc,
+      images: [ogImage],
+    }
   };
 }
 
@@ -196,6 +213,59 @@ export default async function Page({ params }: Props) {
     itinerary: p.itinerary || [],
     faqs: p.experience_details?.faqs || [],
   };
+  const productSchema = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: mappedListing.title,
+    image: mappedListing.images.map(img => img.url),
+    description: mappedListing.description,
+    sku: mappedListing.id,
+    offers: {
+      '@type': 'Offer',
+      url: `https://www.vaitour.com/en/tours/${params.slug}`,
+      priceCurrency: 'USD',
+      price: mappedListing.base_price,
+      availability: 'https://schema.org/InStock',
+    },
+    ...(mappedListing.cached_review_count > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: mappedListing.cached_rating_avg,
+        reviewCount: mappedListing.cached_review_count,
+      }
+    })
+  };
 
-  return <TourDetailView initialTour={mappedListing} relevantProducts={relevantProducts} />;
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://www.vaitour.com'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tours',
+        item: 'https://www.vaitour.com/tours'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: mappedListing.title,
+        item: `https://www.vaitour.com/en/tours/${params.slug}`
+      }
+    ]
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <TourDetailView initialTour={mappedListing} relevantProducts={relevantProducts} />
+    </>
+  );
 }

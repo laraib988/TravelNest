@@ -2,22 +2,35 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder';
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-}
-
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const { data: bookings, error } = await getSupabase()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    const adminAuth = createClient(supabaseUrl, supabaseKey);
+    
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    
+    let userId = null;
+    let userEmail = null;
+    
+    if (token) {
+      const { data: userData } = await adminAuth.auth.getUser(token);
+      if (userData?.user) {
+        userId = userData.user.id;
+        userEmail = userData.user.email;
+      }
+    }
+
+    if (!userId && !userEmail) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Fetch bookings matching either the customer_id or the lead_email in traveler_details
+    const { data: bookings, error } = await adminAuth
       .from('bookings')
-      .select('id, customer_id, supplier_id, product_id, status, total_price, booking_date, created_at, tour_date, payment_status')
-      // Assuming 'cust-current-user' since there's no real auth yet
-      .eq('customer_id', 'cust-current-user')
+      .select('*')
+      .or(`customer_id.eq.${userId},traveler_details->>lead_email.eq.${userEmail}`)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -27,7 +40,7 @@ export async function GET() {
 
     if (bookings && bookings.length > 0) {
       const listingIds = Array.from(new Set(bookings.map((b: any) => b.listing_id)));
-      const { data: listings } = await getSupabase()
+      const { data: listings } = await adminAuth
         .from('products')
         .select('id, basic_info')
         .in('id', listingIds);

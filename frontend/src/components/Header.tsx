@@ -708,75 +708,75 @@ export default function Header() {
               </Link>
 
               {/* BELL / NOTIFICATIONS ICON */}
-              <Link 
-                href="/notifications" 
-                aria-label="Notifications" 
-                style={{ textDecoration: 'none', position: 'relative' }}
-                onMouseEnter={() => setActiveTooltip('NOTIFICATIONS')}
-                onMouseLeave={() => setActiveTooltip(null)}
-              >
-                <div 
-                  style={{ 
-                    position: 'relative', 
-                    cursor: 'pointer', 
-                    background: '#f8fafc', 
-                    padding: '9px', 
-                    borderRadius: '50%', 
-                    border: '1px solid #cbd5e1', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    boxShadow: 'var(--shadow-sm)',
-                    transition: 'all 0.2s' 
-                  }}
+              {user && (
+                <Link 
+                  href="/notifications" 
+                  aria-label="Notifications" 
+                  style={{ textDecoration: 'none', position: 'relative' }}
+                  onMouseEnter={() => setActiveTooltip('NOTIFICATIONS')}
+                  onMouseLeave={() => setActiveTooltip(null)}
                 >
-                  <Bell size={17} color="#475569" />
-                  {unreadNotifications > 0 && (
-                    <span 
-                      style={{ 
-                        position: 'absolute', 
-                        top: '-3px', 
-                        right: '-3px', 
-                        background: '#e11d48', 
-                        color: '#ffffff', 
-                        fontSize: '0.62rem', 
-                        fontWeight: 800, 
-                        borderRadius: '50%', 
-                        width: '16px', 
-                        height: '16px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center' 
-                      }}
-                    >
-                      {unreadNotifications}
-                    </span>
-                  )}
-                </div>
-
-                {activeTooltip === 'NOTIFICATIONS' && (
                   <div 
                     style={{ 
-                      position: 'absolute', 
-                      top: '46px', 
-                      left: '50%', 
-                      transform: 'translateX(-50%)', 
-                      background: '#0284c7', 
-                      color: '#ffffff', 
-                      fontSize: '0.72rem', 
-                      fontWeight: 700, 
-                      padding: '4px 10px', 
-                      borderRadius: '6px', 
-                      whiteSpace: 'nowrap', 
-                      boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', 
-                      pointerEvents: 'none', 
-                      zIndex: 250 
+                      width: '36px', 
+                      height: '36px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      borderRadius: '50%', 
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      transition: 'all 0.2s ease',
+                      position: 'relative'
                     }}
                   >
-                    Notifications
+                    <Bell size={17} color="#475569" />
+                    {unreadNotifications > 0 && (
+                      <span 
+                        style={{ 
+                          position: 'absolute', 
+                          top: '-4px', 
+                          right: '-4px', 
+                          background: '#e11d48', 
+                          color: '#fff', 
+                          fontSize: '0.65rem', 
+                          fontWeight: 800, 
+                          width: '18px', 
+                          height: '18px', 
+                          borderRadius: '50%', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center' 
+                        }}
+                      >
+                        {unreadNotifications}
+                      </span>
+                    )}
                   </div>
-                )}
-              </Link>
+
+                  {activeTooltip === 'NOTIFICATIONS' && (
+                    <div 
+                      style={{ 
+                        position: 'absolute', 
+                        top: '46px', 
+                        left: '50%', 
+                        transform: 'translateX(-50%)', 
+                        background: '#0f172a', 
+                        color: '#fff', 
+                        fontSize: '0.7rem', 
+                        padding: '4px 10px', 
+                        borderRadius: '6px', 
+                        whiteSpace: 'nowrap',
+                        fontWeight: 600,
+                        pointerEvents: 'none',
+                        zIndex: 250 
+                      }}
+                    >
+                      Notifications
+                    </div>
+                  )}
+                </Link>
+              )}
 
             </div>
           </div>
