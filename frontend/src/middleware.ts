@@ -13,7 +13,19 @@ const DEFAULT_LOCALE = 'en';
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
 
-  // 0. WWW Redirect (Force www.vaitour.com)
+  // ─────────────────────────────────────────────
+  // 0a. Strip trailing slashes (permanent 301)
+  //     Prevents SEO "trailing slash mismatch" redirect chains.
+  //     e.g. /en/ → /en, /tours/ → /tours
+  //     Root "/" is intentionally excluded.
+  // ─────────────────────────────────────────────
+  if (pathname !== '/' && pathname.endsWith('/')) {
+    const strippedUrl = new URL(request.url);
+    strippedUrl.pathname = pathname.replace(/\/+$/, '');
+    return NextResponse.redirect(strippedUrl, 301);
+  }
+
+  // 0b. WWW Redirect (Force www.vaitour.com)
   if (hostname === 'vaitour.com') {
     const wwwUrl = new URL(request.url);
     wwwUrl.hostname = 'www.vaitour.com';
