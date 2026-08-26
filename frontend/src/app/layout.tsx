@@ -31,8 +31,45 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: 'Vaitour - Global Tours, Activities & Experiences Marketplace',
-  description: 'Book top-rated tours, sunset cruises, food walks, and experiences worldwide with real-time availability and AI trip planning.',
+  metadataBase: new URL('https://www.vaitour.com'),
+  title: {
+    default: 'Vaitour - Book Authentic Local Tours & Travel Experiences',
+    template: '%s | Vaitour'
+  },
+  description: 'Book authentic, top-rated local tours, sunset cruises, food walks, and travel experiences worldwide. Connect with verified local guides and plan your perfect trip.',
+  openGraph: {
+    title: 'Vaitour - Book Authentic Local Tours & Travel Experiences',
+    description: 'Book authentic, top-rated local tours, sunset cruises, food walks, and travel experiences worldwide. Connect with verified local guides and plan your perfect trip.',
+    url: 'https://www.vaitour.com',
+    siteName: 'Vaitour',
+    images: [
+      {
+        url: 'https://www.vaitour.com/og-image.jpg', // Placeholder for your actual OG image
+        width: 1200,
+        height: 630,
+        alt: 'Vaitour - Global Travel Experiences',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vaitour - Book Authentic Local Tours & Travel Experiences',
+    description: 'Book authentic, top-rated local tours, sunset cruises, food walks, and travel experiences worldwide. Connect with verified local guides and plan your perfect trip.',
+    images: ['https://www.vaitour.com/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 import { headers } from 'next/headers';

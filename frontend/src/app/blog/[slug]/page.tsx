@@ -71,6 +71,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       authors: [blog.author_name],
       publishedTime: blog.published_at,
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: blog.meta_title || blog.title,
+      description: blog.meta_description || blog.summary,
+      images: blog.hero_image ? [blog.hero_image] : [],
+    },
   };
 }
 
@@ -153,9 +159,29 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ]
   };
 
+  const fallbackArticleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: blog.title,
+    image: blog.hero_image ? [blog.hero_image] : [],
+    datePublished: blog.published_at,
+    author: [{
+      '@type': 'Person',
+      name: blog.author_name,
+    }],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Vaitour',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.vaitour.com/icon.png'
+      }
+    }
+  };
+
   const jsonLd = [
     breadcrumbSchema,
-    articleSchema && { ...articleSchema, '@context': 'https://schema.org' },
+    articleSchema ? { ...articleSchema, '@context': 'https://schema.org' } : fallbackArticleSchema,
     faqSchema && { ...faqSchema, '@context': 'https://schema.org' },
   ].filter(Boolean);
 
