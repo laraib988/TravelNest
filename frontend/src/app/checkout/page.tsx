@@ -558,14 +558,14 @@ useEffect(() => {
                   value={formData.lead_email}
                   disabled={!!verifiedEmail}
                   onChange={(e) => setFormData({ ...formData, lead_email: e.target.value })}
-                  style={{ flex: 1, padding: '12px', borderRadius: 'var(--radius-sm)', background: verifiedEmail ? '#f0fdf4' : '#f8fafc', border: verifiedEmail ? '1px solid #86efac' : '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
+                  style={{ flex: '1 1 200px', minWidth: 0, padding: '12px', borderRadius: 'var(--radius-sm)', background: verifiedEmail ? '#f0fdf4' : '#f8fafc', border: verifiedEmail ? '1px solid #86efac' : '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
                 />
                 {!verifiedEmail ? (
                   <button
                     type="button"
                     onClick={handleSendOtp}
                     disabled={otpSending || !formData.lead_email.trim()}
-                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', borderRadius: 'var(--radius-sm)', background: '#2563eb', color: '#ffffff', fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: otpSending || !formData.lead_email.trim() ? 'not-allowed' : 'pointer', opacity: otpSending || !formData.lead_email.trim() ? 0.6 : 1, whiteSpace: 'nowrap' }}
+                    style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '12px 16px', borderRadius: 'var(--radius-sm)', background: '#2563eb', color: '#ffffff', fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: otpSending || !formData.lead_email.trim() ? 'not-allowed' : 'pointer', opacity: otpSending || !formData.lead_email.trim() ? 0.6 : 1, whiteSpace: 'nowrap' }}
                   >
                     <Mail size={16} /> {otpSending ? 'Sending...' : 'Verify Email'}
                   </button>
@@ -717,16 +717,16 @@ useEffect(() => {
           {/* MOBILE PROMO CODE INPUT */}
           <div className="mobile-only" style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #cbd5e1', flexDirection: 'column' }}>
             <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>Promo / Coupon Code</label>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
               <input
                 type="text"
                 placeholder="Try: WELCOME20, SUMMER15"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value)}
-                style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', color: '#0f172a', outline: 'none', textTransform: 'uppercase' }}
+                style={{ flex: '1 1 0', minWidth: 0, padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', outline: 'none', textTransform: 'uppercase' }}
               />
-              <button type="button" onClick={(e) => { e.preventDefault(); handleApplyCoupon(e as any); }} disabled={validatingCoupon} className="btn-secondary" style={{ padding: '10px 16px', fontSize: '0.9rem' }}>
-                <Tag size={16} /> Apply
+              <button type="button" onClick={(e) => { e.preventDefault(); handleApplyCoupon(e as any); }} disabled={validatingCoupon} className="btn-secondary" style={{ flex: '0 0 auto', padding: '10px 14px', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
+                <Tag size={14} /> Apply
               </button>
             </div>
             {couponMsg && (

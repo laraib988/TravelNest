@@ -41,8 +41,10 @@ export default function Footer() {
       >
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px' }}>
           
-          {/* MAIN FOOTER GRID */}
+          {/* MOBILE: Quick Links + Support side by side in one row */}
+          {/* DESKTOP: all columns flex in one row (existing behaviour) */}
           <div
+            className="footer-top-row"
             style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -51,47 +53,50 @@ export default function Footer() {
               paddingBottom: '50px',
             }}
           >
-            {/* COLUMN 1: QUICK LINKS */}
-            <div style={{ flex: '1 1 200px' }}>
-              <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
-                {t('quick_links')}
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.95rem' }}>
-                <li><Link href="/community" style={{ color: '#d1d5db', textDecoration: 'none' }}>Community Forum</Link></li>
-                <li><Link href="/loyalty" style={{ color: '#d1d5db', textDecoration: 'none' }}>Loyalty & Rewards</Link></li>
-                <li><Link href="/blog" style={{ color: '#d1d5db', textDecoration: 'none' }}>Travel Journal</Link></li>
-                <li><Link href="/ai-planner" style={{ color: '#d1d5db', textDecoration: 'none' }}>AI Trip Studio</Link></li>
-                <li><Link href="/supplier" style={{ color: '#d1d5db', textDecoration: 'none' }}>Supplier Portal</Link></li>
-                <li><Link href="/about" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('about_us')}</Link></li>
-                <li><Link href="/support" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('help_support')}</Link></li>
-              </ul>
+            {/* QUICK LINKS + SUPPORT wrapper — on mobile these sit side-by-side, on desktop they're normal flex items */}
+            <div className="footer-links-group" style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', flex: '1 1 400px' }}>
+              {/* COLUMN 1: QUICK LINKS */}
+              <div style={{ flex: '1 1 160px' }}>
+                <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
+                  {t('quick_links')}
+                </h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.95rem' }}>
+                  <li><Link href="/community" style={{ color: '#d1d5db', textDecoration: 'none' }}>Community Forum</Link></li>
+                  <li><Link href="/loyalty" style={{ color: '#d1d5db', textDecoration: 'none' }}>Loyalty &amp; Rewards</Link></li>
+                  <li><Link href="/blog" style={{ color: '#d1d5db', textDecoration: 'none' }}>Travel Journal</Link></li>
+                  <li><Link href="/ai-planner" style={{ color: '#d1d5db', textDecoration: 'none' }}>AI Trip Studio</Link></li>
+                  <li><Link href="/supplier" style={{ color: '#d1d5db', textDecoration: 'none' }}>Supplier Portal</Link></li>
+                  <li><Link href="/about" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('about_us')}</Link></li>
+                  <li><Link href="/support" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('help_support')}</Link></li>
+                </ul>
+              </div>
+
+              {/* COLUMN 2: SUPPORT */}
+              <div style={{ flex: '1 1 160px' }}>
+                <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
+                  {t('support')}
+                </h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.95rem' }}>
+                  <li><Link href="/privacy" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('privacy_policy')}</Link></li>
+                  <li><Link href="/terms" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('terms_service')}</Link></li>
+                  <li><Link href="/cancellation-policy" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('cancellation_policy')}</Link></li>
+                  <li><Link href="/refund-policy" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('refund_policy')}</Link></li>
+                  <li><Link href="/faq" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('faq')}</Link></li>
+                  <li><Link href="/sitemap" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('sitemap')}</Link></li>
+                </ul>
+              </div>
             </div>
 
-            {/* COLUMN 2: SUPPORT */}
-            <div style={{ flex: '1 1 200px' }}>
-              <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
-                {t('support')}
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.95rem' }}>
-                <li><Link href="/privacy" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('privacy_policy')}</Link></li>
-                <li><Link href="/terms" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('terms_service')}</Link></li>
-                <li><Link href="/cancellation-policy" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('cancellation_policy')}</Link></li>
-                <li><Link href="/refund-policy" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('refund_policy')}</Link></li>
-                <li><Link href="/faq" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('faq')}</Link></li>
-                <li><Link href="/sitemap" style={{ color: '#d1d5db', textDecoration: 'none' }}>{t('sitemap')}</Link></li>
-              </ul>
-            </div>
-
-            {/* COLUMN 3: PREFERENCES (MOBILE ONLY) */}
-            <div className="mobile-only" style={{ flex: '1 1 200px' }}>
-              <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
+            {/* COLUMN 3: PREFERENCES (mobile only) */}
+            <div className="mobile-only" style={{ flex: '1 1 100%', flexDirection: 'column', gap: '12px', paddingTop: '8px' }}>
+              <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>
                 Preferences
               </h4>
               <CurrencyLanguageDropdown direction="up" />
             </div>
 
             {/* COLUMN 4: PAYMENT CHANNELS */}
-            <div style={{ flex: '1 1 380px', maxWidth: '380px' }}>
+            <div style={{ flex: '1 1 300px', maxWidth: '380px' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
                 Payment Channels
               </h4>
@@ -112,7 +117,6 @@ export default function Footer() {
                 <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
                   UPI
                 </div>
-                
                 {/* Row 2 */}
                 <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
                   DISCOVER
@@ -121,7 +125,7 @@ export default function Footer() {
                   Diners
                 </div>
                 <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
-                   Pay
+                   Pay
                 </div>
                 <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
                   G Pay
@@ -132,7 +136,7 @@ export default function Footer() {
               </div>
             </div>
 
-          </div>
+          </div></div>
 
           
           {/* BOTTOM COPYRIGHT BAR */}
