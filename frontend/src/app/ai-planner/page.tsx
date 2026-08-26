@@ -240,22 +240,37 @@ export default function AIPlannerPage() {
   };
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '40px auto', padding: '0 24px', background: '#f8fafc' }}>
+    <div className="ai-page-container" style={{ maxWidth: '1440px', margin: '40px auto', background: '#f8fafc' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .ai-page-container { padding: 0 24px; }
+        .ai-planner-title { font-size: 3.2rem; margin-bottom: 16px; color: #0f172a; font-weight: 800; line-height: 1.2; }
+        .ai-planner-layout { display: flex; gap: 32px; align-items: flex-start; }
+        .ai-col-left { flex: 1.2; width: 100%; }
+        .ai-col-right { flex: 1; display: flex; flex-direction: column; height: 820px; width: 100%; }
+        
+        @media (max-width: 900px) {
+          .ai-page-container { padding: 0 16px; margin-top: 20px !important; }
+          .ai-planner-title { font-size: 2.2rem; }
+          .ai-planner-layout { flex-direction: column; }
+          .ai-col-left { order: 2; }
+          .ai-col-right { order: 1; height: 600px; }
+        }
+      `}} />
 
       <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 40px' }}>
         <div className="badge-amber animate-pulse-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
           <Sparkles size={14} /> Karvaan AI Travel Agent
         </div>
-        <h1 style={{ fontSize: '3.2rem', marginBottom: '16px', color: '#0f172a', fontWeight: 800 }}>AI Trip Studio</h1>
+        <h1 className="ai-planner-title">AI Trip Studio</h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6 }}>
           Plan itineraries, get live weather, route-optimized day plans, curated dining &amp; stays, and booking intent — all in one conversation with your AI agent.
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
+      <div className="ai-planner-layout">
 
         {/* LEFT COLUMN: AI TRIP PLANNER */}
-        <div style={{ flex: '1.2' }}>
+        <div className="ai-col-left">
           <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '36px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
             <h2 style={{ fontSize: '1.5rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Compass className="text-brand-primary" /> AI Trip Planner</h2>
 
@@ -289,7 +304,7 @@ export default function AIPlannerPage() {
         </div>
 
         {/* RIGHT COLUMN: AI TRAVEL AGENT */}
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', height: '820px' }}>
+        <div className="ai-col-right">
           <div className="card-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-lg)', background: '#ffffff', border: '2px solid var(--brand-primary)', overflow: 'hidden' }}>
 
             <div style={{ padding: '20px', background: 'var(--brand-primary)', color: 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>

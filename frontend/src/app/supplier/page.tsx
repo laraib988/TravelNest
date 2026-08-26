@@ -144,28 +144,48 @@ export default function SupplierPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'var(--font-body)' }}>
+    <div className="supplier-page-container" style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'var(--font-body)' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .supplier-hero-section { padding: 80px 24px 60px; background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0ea5e9 100%); position: relative; overflow: hidden; }
+        .supplier-hero-layout { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 48px; }
+        .hero-content-col { flex: 1 1 500px; max-width: 600px; }
+        .hero-title { font-size: 3rem; font-weight: 800; color: #ffffff; line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.02em; }
+        .hero-subtitle { font-size: 1.12rem; color: rgba(255,255,255,0.85); line-height: 1.6; margin: 0 0 28px; }
+        .hero-form-col { flex: 1 1 400px; max-width: 460px; background: #ffffff; padding: 36px 32px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .hero-img-col { flex: 1 1 380px; max-width: 440px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: -30px; position: relative; z-index: 10; padding: 0 24px; }
+        .section-title { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 0 0 10px; }
+        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .how-it-works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        
+        @media (max-width: 768px) {
+          .supplier-hero-section { padding: 40px 16px 60px; }
+          .hero-content-col { flex: 1 1 100%; max-width: 100%; text-align: center; }
+          .hero-img-col { flex: 1 1 100%; max-width: 100%; }
+          .hero-title { font-size: 2.2rem; }
+          .hero-subtitle { font-size: 1rem; }
+          .hero-form-col { flex: 1 1 100%; max-width: 100%; padding: 24px 20px; }
+          .stats-grid { margin-top: -10px; grid-template-columns: 1fr 1fr; }
+          .section-title { font-size: 1.8rem; }
+          .benefits-grid { grid-template-columns: 1fr; }
+          .how-it-works-grid { grid-template-columns: 1fr; }
+          .testimonials-grid { grid-template-columns: 1fr; }
+        }
+      `}} />
 
-      {/* ═══════════════════════════════════════════════════════════════ */}
       {/* SECTION 1: HERO BANNER */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0ea5e9 100%)',
-          padding: '80px 24px 60px',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
+      <section className="supplier-hero-section">
         {/* Decorative circles */}
         <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', bottom: '-40px', left: '-40px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
 
         <div style={{ maxWidth: '1280px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '48px' }}>
+          <div className="supplier-hero-layout">
 
             {/* Left content */}
-            <div style={{ flex: '1 1 520px', maxWidth: '600px' }}>
+            <div className="hero-content-col">
               <div
                 style={{
                   display: 'inline-flex',
@@ -185,24 +205,11 @@ export default function SupplierPage() {
                 <ShieldCheck size={14} /> Trusted by 500+ Tour Operators Worldwide
               </div>
 
-              <h1 style={{
-                fontSize: '3rem',
-                fontWeight: 800,
-                color: '#ffffff',
-                lineHeight: 1.15,
-                margin: '0 0 16px',
-                letterSpacing: '-0.02em'
-              }}>
+              <h1 className="hero-title">
                 Grow Your Travel Business with Vaitour
               </h1>
 
-              <p style={{
-                fontSize: '1.12rem',
-                color: 'rgba(255,255,255,0.85)',
-                lineHeight: 1.65,
-                margin: '0 0 32px',
-                maxWidth: '520px'
-              }}>
+              <p className="hero-subtitle">
                 Join the fastest-growing travel marketplace. List your tours, activities, and experiences — reach millions of travelers and get paid securely every week.
               </p>
 
@@ -276,7 +283,7 @@ export default function SupplierPage() {
             </div>
 
             {/* Right: Hero Image */}
-            <div style={{ flex: '1 1 380px', maxWidth: '440px', display: 'flex', justifyContent: 'center' }}>
+            <div className="hero-img-col" style={{ display: 'flex', justifyContent: 'center' }}>
               <div
                 style={{
                   width: '100%',
@@ -321,7 +328,7 @@ export default function SupplierPage() {
           }}>
             PARTNER BENEFITS
           </span>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px' }}>
+          <h2 className="section-title">
             Why Operators Choose Vaitour
           </h2>
           <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '560px', margin: '0 auto', lineHeight: 1.6 }}>
@@ -329,7 +336,7 @@ export default function SupplierPage() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
+        <div className="benefits-grid">
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
@@ -382,7 +389,7 @@ export default function SupplierPage() {
             }}>
               GET STARTED
             </span>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px' }}>
+            <h2 className="section-title">
               How It Works
             </h2>
             <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
@@ -390,7 +397,7 @@ export default function SupplierPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+          <div className="how-it-works-grid">
             {howItWorks.map((item, index) => (
               <div
                 key={item.step}
@@ -467,7 +474,7 @@ export default function SupplierPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+          <div className="benefits-grid">
             {[
               { icon: PlusCircle, title: 'Listing Builder', desc: 'Create tours with photos, pricing tiers, time slots, and rich descriptions in minutes.', color: '#0284c7' },
               { icon: Calendar, title: 'Availability Calendar', desc: 'Manage daily slots, block dates, set seasonal pricing, and control inventory in real-time.', color: '#7c3aed' },
@@ -535,7 +542,7 @@ export default function SupplierPage() {
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+          <div className="testimonials-grid">
             {testimonials.map((t) => (
               <div
                 key={t.name}

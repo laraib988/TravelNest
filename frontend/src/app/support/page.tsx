@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   ArrowRight, Info, Headphones, Calendar, CreditCard, RefreshCcw, 
@@ -13,27 +13,46 @@ export const metadata: Metadata = {
 
 export default function HelpSupportPage() {
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+    <div className="support-page-container" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .support-hero-section { background: #0f172a; padding: 80px 24px; text-align: center; color: #fff; margin-bottom: 60px; }
+        .support-hero-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -1px; color: #ffffff; }
+        .support-hero-desc { font-size: 1.15rem; color: #cbd5e1; max-width: 750px; margin: 0 auto; line-height: 1.6; }
+        
+        .support-layout { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: minmax(280px, 1fr) 3fr; gap: 40px; align-items: start; }
+        .support-sidebar { position: sticky; top: 100px; background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; max-height: calc(100vh - 120px); overflow-y: auto; }
+        .support-main-content { background: #fff; padding: 40px; border-radius: 16px; border: 1px solid #e2e8f0; color: #334155; line-height: 1.8; }
+        
+        .contact-box { background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 40px; }
+        .contact-box-content { flex: 1 1 200px; }
+        
+        @media (max-width: 768px) {
+          .support-hero-section { padding: 50px 16px; margin-bottom: 40px; }
+          .support-hero-title { font-size: 2.2rem; }
+          .support-hero-desc { font-size: 1rem; }
+          
+          .support-layout { grid-template-columns: 1fr; padding: 0 16px; gap: 24px; }
+          .support-sidebar { position: static; max-height: none; margin-bottom: 0px; }
+          .support-main-content { padding: 24px 16px; }
+          .support-main-content h2 { align-items: flex-start !important; line-height: 1.4; }
+          .support-main-content h2 svg { flex-shrink: 0; margin-top: 4px; }
+          
+          .contact-box { flex-direction: column; text-align: center; }
+          .contact-box a { width: 100%; justify-content: center; }
+        }
+      `}} />
       {/* HERO SECTION */}
-      <div 
-        style={{ 
-          background: '#0f172a', 
-          padding: '80px 24px', 
-          textAlign: 'center', 
-          color: '#fff',
-          marginBottom: '60px'
-        }}
-      >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Global Support Center</h1>
-        <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
+      <div className="support-hero-section">
+        <h1 className="support-hero-title">Global Support Center</h1>
+        <p className="support-hero-desc">
           We are dedicated to ensuring your journeys are seamless and stress-free. Explore our massively detailed support directory below to find exhaustive answers, troubleshooting steps, and direct pathways to our customer success teams.
         </p>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 3fr', gap: '40px', alignItems: 'start' }}>
+      <div className="support-layout">
         
         {/* STICKY SIDEBAR (TABLE OF CONTENTS) */}
-        <div style={{ position: 'sticky', top: '100px', background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+        <div className="support-sidebar">
           <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             Support Topics
           </h4>
@@ -58,7 +77,7 @@ export default function HelpSupportPage() {
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="card-panel" style={{ background: '#fff', padding: '40px', borderRadius: '16px', border: '1px solid #e2e8f0', color: '#334155', lineHeight: 1.8 }}>
+        <div className="support-main-content card-panel">
           
           <div style={{ marginBottom: '32px', padding: '16px 20px', background: '#e0f2fe', borderRadius: '8px', borderLeft: '4px solid #0284c7', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
             <Info size={24} color="#0284c7" style={{ flexShrink: 0, marginTop: '2px' }} />
@@ -195,8 +214,8 @@ export default function HelpSupportPage() {
             <p style={{ marginTop: '16px' }}>To trigger this protocol, you must reply to your existing support ticket explicitly requesting a "Tier 3 Managerial Escalation." When this specific phrase is used, the ticket is immediately yanked from the standard queue and assigned to a Senior Resolution Specialistâ€”veterans of the company who possess the highest level of unilateral authority to override standard algorithms, issue immediate manual refunds out of our corporate budget, or ban problematic suppliers. These specialists will conduct a fresh, entirely unbiased forensic review of the communication logs, the supplier's history, and your submitted evidence. While this deep-dive investigation may take an additional 3 to 5 business days, it ensures that your grievance is heard by the highest echelons of the company, guaranteeing that ultimate fairness and logical justice dictate the final outcome of your dispute.</p>
           </section>
 
-          <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginTop: '40px' }}>
-            <div>
+          <div className="contact-box">
+            <div className="contact-box-content">
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Still need immediate help?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>Our global support team is available 24/7 to assist you.</p>
             </div>

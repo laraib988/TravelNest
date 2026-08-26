@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   ArrowRight, Info, CheckSquare, UserCheck, Key, Globe, 
@@ -14,27 +14,46 @@ export const metadata: Metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+    <div className="terms-page-container" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .terms-hero-section { background: #0f172a; padding: 80px 24px; text-align: center; color: #fff; margin-bottom: 60px; }
+        .terms-hero-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -1px; color: #ffffff; }
+        .terms-hero-desc { font-size: 1.15rem; color: #cbd5e1; max-width: 750px; margin: 0 auto; line-height: 1.6; }
+        
+        .terms-layout { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: minmax(280px, 1fr) 3fr; gap: 40px; align-items: start; }
+        .terms-sidebar { position: sticky; top: 100px; background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; max-height: calc(100vh - 120px); overflow-y: auto; }
+        .terms-main-content { background: #fff; padding: 40px; border-radius: 16px; border: 1px solid #e2e8f0; color: #334155; line-height: 1.8; }
+        
+        .contact-box { background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 40px; }
+        .contact-box-content { flex: 1 1 200px; }
+        
+        @media (max-width: 768px) {
+          .terms-hero-section { padding: 50px 16px; margin-bottom: 40px; }
+          .terms-hero-title { font-size: 2.2rem; }
+          .terms-hero-desc { font-size: 1rem; }
+          
+          .terms-layout { grid-template-columns: 1fr; padding: 0 16px; gap: 24px; }
+          .terms-sidebar { position: static; max-height: none; margin-bottom: 0px; }
+          .terms-main-content { padding: 24px 16px; }
+          .terms-main-content h2 { align-items: flex-start !important; line-height: 1.4; }
+          .terms-main-content h2 svg { flex-shrink: 0; margin-top: 4px; }
+          
+          .contact-box { flex-direction: column; text-align: center; }
+          .contact-box a { width: 100%; justify-content: center; }
+        }
+      `}} />
       {/* HERO SECTION */}
-      <div 
-        style={{ 
-          background: '#0f172a', 
-          padding: '80px 24px', 
-          textAlign: 'center', 
-          color: '#fff',
-          marginBottom: '60px'
-        }}
-      >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Vaitour Terms of Service Agreement</h1>
-        <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
+      <div className="terms-hero-section">
+        <h1 className="terms-hero-title">Vaitour Terms of Service Agreement</h1>
+        <p className="terms-hero-desc">
           By accessing and using Vaitour, you agree to comply with our global standards. Review these 18 foundational rules that govern our marketplace, protect your rights, and ensure a secure ecosystem for all travelers and hosts.
         </p>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 3fr', gap: '40px', alignItems: 'start' }}>
+      <div className="terms-layout">
         
         {/* STICKY SIDEBAR (TABLE OF CONTENTS) */}
-        <div style={{ position: 'sticky', top: '100px', background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+        <div className="terms-sidebar">
           <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             Table of Contents
           </h4>
@@ -61,7 +80,7 @@ export default function TermsOfServicePage() {
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="card-panel" style={{ background: '#fff', padding: '40px', borderRadius: '16px', border: '1px solid #e2e8f0', color: '#334155', lineHeight: 1.8 }}>
+        <div className="terms-main-content card-panel">
           
           <div style={{ marginBottom: '32px', padding: '16px 20px', background: '#e0f2fe', borderRadius: '8px', borderLeft: '4px solid #0284c7', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
             <Info size={24} color="#0284c7" style={{ flexShrink: 0, marginTop: '2px' }} />
@@ -196,8 +215,8 @@ export default function TermsOfServicePage() {
             <p>We reserve the right to revise, update, or completely rewrite these Terms of Service at our sole discretion. We will notify active users of significant material changes via email. Your continued use of the platform following any modifications constitutes your formal acceptance of the new Terms.</p>
           </section>
 
-          <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginTop: '40px' }}>
-            <div>
+          <div className="contact-box">
+            <div className="contact-box-content">
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Legal Inquiries?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>If you have questions about these terms, reach out to our legal team.</p>
             </div>

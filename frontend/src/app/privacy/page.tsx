@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   ArrowRight, Info, Database, User, CreditCard, Smartphone, 
@@ -13,27 +13,46 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+    <div className="privacy-page-container" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .privacy-hero-section { background: #0f172a; padding: 80px 24px; text-align: center; color: #fff; margin-bottom: 60px; }
+        .privacy-hero-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -1px; color: #ffffff; }
+        .privacy-hero-desc { font-size: 1.15rem; color: #cbd5e1; max-width: 750px; margin: 0 auto; line-height: 1.6; }
+        
+        .privacy-layout { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: minmax(280px, 1fr) 3fr; gap: 40px; align-items: start; }
+        .privacy-sidebar { position: sticky; top: 100px; background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; max-height: calc(100vh - 120px); overflow-y: auto; }
+        .privacy-main-content { background: #fff; padding: 40px; border-radius: 16px; border: 1px solid #e2e8f0; color: #334155; line-height: 1.8; }
+        
+        .contact-box { background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 40px; }
+        .contact-box-content { flex: 1 1 200px; }
+        
+        @media (max-width: 768px) {
+          .privacy-hero-section { padding: 50px 16px; margin-bottom: 40px; }
+          .privacy-hero-title { font-size: 2.2rem; }
+          .privacy-hero-desc { font-size: 1rem; }
+          
+          .privacy-layout { grid-template-columns: 1fr; padding: 0 16px; gap: 24px; }
+          .privacy-sidebar { position: static; max-height: none; margin-bottom: 0px; }
+          .privacy-main-content { padding: 24px 16px; }
+          .privacy-main-content h2 { align-items: flex-start !important; line-height: 1.4; }
+          .privacy-main-content h2 svg { flex-shrink: 0; margin-top: 4px; }
+          
+          .contact-box { flex-direction: column; text-align: center; }
+          .contact-box a { width: 100%; justify-content: center; }
+        }
+      `}} />
       {/* HERO SECTION */}
-      <div 
-        style={{ 
-          background: '#0f172a', 
-          padding: '80px 24px', 
-          textAlign: 'center', 
-          color: '#fff',
-          marginBottom: '60px'
-        }}
-      >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Comprehensive Privacy Policy</h1>
-        <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
+      <div className="privacy-hero-section">
+        <h1 className="privacy-hero-title">Comprehensive Privacy Policy</h1>
+        <p className="privacy-hero-desc">
           Your privacy is a fundamental human right. Review our comprehensive privacy guidelines to understand exactly how we collect, process, and fiercely protect your personal information within the Vaitour ecosystem.
         </p>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 3fr', gap: '40px', alignItems: 'start' }}>
+      <div className="privacy-layout">
         
         {/* STICKY SIDEBAR (TABLE OF CONTENTS) */}
-        <div style={{ position: 'sticky', top: '100px', background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+        <div className="privacy-sidebar">
           <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             Privacy Details
           </h4>
@@ -59,7 +78,7 @@ export default function PrivacyPolicyPage() {
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="card-panel" style={{ background: '#fff', padding: '40px', borderRadius: '16px', border: '1px solid #e2e8f0', color: '#334155', lineHeight: 1.8 }}>
+        <div className="privacy-main-content card-panel">
           
           <div style={{ marginBottom: '32px', padding: '16px 20px', background: '#e0f2fe', borderRadius: '8px', borderLeft: '4px solid #0284c7', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
             <Info size={24} color="#0284c7" style={{ flexShrink: 0, marginTop: '2px' }} />
@@ -204,8 +223,8 @@ export default function PrivacyPolicyPage() {
             <p style={{ marginTop: '16px' }}>Whenever material changes are madeâ€”such as integrating a new category of third-party processor or altering our retention timelinesâ€”we will proactively notify all active users. This is not done via a silent website footer update, but rather via a direct, unavoidable email alert and a highly visible, blocking in-app notification that requires your acknowledgment before you can book your next tour. For any highly specific questions, formal data deletion requests, GDPR portability inquiries, or if you simply wish to speak with a human about how your data is routed, you can reach our dedicated legal team and Data Protection Officer directly via the contact options listed at the bottom of this page. Your continued use of the platform after these transparent updates signifies your ongoing, informed, and educated agreement to these constantly evolving, highly protective terms.</p>
           </section>
 
-          <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginTop: '40px' }}>
-            <div>
+          <div className="contact-box">
+            <div className="contact-box-content">
               <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', marginBottom: '4px' }}>Want to manage your data?</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#64748b' }}>Contact our Data Protection Officer for data requests.</p>
             </div>

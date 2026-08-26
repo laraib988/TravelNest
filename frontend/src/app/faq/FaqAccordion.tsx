@@ -129,9 +129,9 @@ export default function FaqAccordion() {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '32px', alignItems: 'start' }}>
-      {/* STICKY TABLE OF CONTENTS */}
-      <aside style={{ position: 'sticky', top: '100px', background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(15,23,42,0.06)' }}>
+      <div className="faq-accordion-layout">
+        {/* STICKY TABLE OF CONTENTS */}
+        <aside className="faq-sidebar">
         <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <List size={15} color="#0284c7" /> On This Page
         </div>

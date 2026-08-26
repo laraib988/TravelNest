@@ -39,13 +39,26 @@ export default async function BlogIndexPage() {
   const posts = await getPublishedBlogs();
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 24px 80px' }}>
+    <div className="blog-page-container" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .blog-page-container { padding: 40px 24px 80px; }
+        .blog-hero-title { font-size: 2.5rem; color: #0f172a; font-weight: 800; margin-bottom: 12px; }
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
+        .blog-meta-row { display: flex; align-items: center; gap: 14px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; flex-wrap: wrap; }
+        
+        @media (max-width: 768px) {
+          .blog-page-container { padding: 24px 16px 60px; }
+          .blog-hero-title { font-size: 1.8rem; }
+          .blog-grid { grid-template-columns: 1fr; gap: 20px; }
+        }
+      `}} />
+      
       {/* HEADER SECTION */}
       <div style={{ textAlign: 'center', marginBottom: '48px' }}>
         <div className="badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
           <Sparkles size={14} /> Daily Travel Blog Engine
         </div>
-        <h1 style={{ fontSize: '2.5rem', color: '#0f172a', fontWeight: 800, marginBottom: '12px' }}>
+        <h1 className="blog-hero-title">
           Vaitour Journal & Destination Guides
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '700px', margin: '0 auto' }}>
@@ -59,7 +72,7 @@ export default async function BlogIndexPage() {
           <p>No published articles yet. Check back soon.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' }}>
+        <div className="blog-grid">
           {posts.map((post) => (
             <article key={post.slug} className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: '220px', position: 'relative' }}>
@@ -71,7 +84,7 @@ export default async function BlogIndexPage() {
 
               <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                  <div className="blog-meta-row">
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       {post.author_avatar && (
                         <Image src={post.author_avatar} alt={post.author_name} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }}  width={22} height={22} />

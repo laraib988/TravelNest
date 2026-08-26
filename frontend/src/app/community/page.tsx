@@ -19,13 +19,30 @@ export default async function CommunityDirectoryPage() {
     .limit(50);
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 24px' }}>
-      <div style={{ background: 'var(--brand-primary)', borderRadius: '16px', padding: '40px', color: '#fff', marginBottom: '40px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '12px', color: '#ffffff' }}>Travel Community Forum</h1>
-        <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Ask questions, share tips, and get advice from verified local guides.</p>
-        <div style={{ marginTop: '24px', display: 'flex', gap: '8px', maxWidth: '500px', margin: '24px auto 0' }}>
-          <input type="text" placeholder="Search discussions..." style={{ flex: 1, padding: '14px', borderRadius: '8px', border: 'none', outline: 'none' }} />
-          <button className="btn-secondary" style={{ background: '#fff', color: 'var(--brand-primary)', border: 'none' }}>
+    <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 24px' }} className="community-page-container">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .community-page-container { margin: 20px auto !important; padding: 0 16px !important; }
+        .community-hero { background: var(--brand-primary); border-radius: 16px; padding: 40px; color: #fff; margin-bottom: 30px; text-align: center; }
+        .community-title { font-size: 2.5rem; margin-bottom: 12px; color: #ffffff; font-weight: 800; }
+        .community-subtitle { font-size: 1.1rem; opacity: 0.9; padding: 0 10px; }
+        .community-search-bar { margin-top: 24px; display: flex; gap: 8px; max-width: 500px; margin: 24px auto 0; }
+        
+        @media (max-width: 768px) {
+          .community-hero { padding: 30px 20px; }
+          .community-title { font-size: 1.8rem; }
+          .community-subtitle { font-size: 0.95rem; }
+        }
+        @media (min-width: 769px) {
+          .community-page-container { margin: 40px auto !important; padding: 0 24px !important; }
+        }
+      `}} />
+
+      <div className="community-hero">
+        <h1 className="community-title">Travel Community Forum</h1>
+        <p className="community-subtitle">Ask questions, share tips, and get advice from verified local guides.</p>
+        <div className="community-search-bar">
+          <input type="text" placeholder="Search discussions..." style={{ flex: 1, padding: '14px', borderRadius: '8px', border: 'none', outline: 'none', width: '100%' }} />
+          <button className="btn-secondary" style={{ background: '#fff', color: 'var(--brand-primary)', border: 'none', padding: '0 20px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Search size={20} />
           </button>
         </div>

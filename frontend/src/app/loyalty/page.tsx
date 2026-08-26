@@ -14,16 +14,31 @@ import Link from 'next/link';
 
 export default function LoyaltyPage() {
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
+    <div className="loyalty-page-container" style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', fontFamily: 'var(--font-body)' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .loyalty-page-container { padding: 40px 24px 80px; }
+        .loyalty-hero-layout { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+        .loyalty-main-title { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin: 0; line-height: 1.2; }
+        .loyalty-top-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 28px; margin-bottom: 36px; }
+        .loyalty-points-number { font-size: 3.2rem; font-weight: 800; color: #92400e; line-height: 1; }
+        .loyalty-perks-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+
+        @media (max-width: 768px) {
+          .loyalty-page-container { padding: 24px 16px 60px; }
+          .loyalty-top-grid { grid-template-columns: 1fr; }
+          .loyalty-main-title { font-size: 1.8rem; }
+          .loyalty-points-number { font-size: 2.5rem; }
+        }
+      `}} />
       <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
         
         {/* HERO BANNER */}
-        <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="loyalty-hero-layout">
           <div>
             <div className="badge-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
               <Award size={14} /> Vaitour Rewards & Loyalty Program
             </div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>
+            <h1 className="loyalty-main-title">
               Vaitour Explorer
             </h1>
             <p style={{ color: '#475569', fontSize: '1.05rem', marginTop: '6px', maxWidth: '640px' }}>
@@ -33,7 +48,7 @@ export default function LoyaltyPage() {
         </div>
 
         {/* TOP SECTION: INFORMATIONAL POINTS BALANCE & TIER BENEFITS */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '28px', marginBottom: '36px' }}>
+        <div className="loyalty-top-grid">
           
           {/* POINTS EXPLANATION CARD */}
           <div 
@@ -58,7 +73,7 @@ export default function LoyaltyPage() {
                 How Points Work
               </span>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '10px 0 4px' }}>
-                <span style={{ fontSize: '3.2rem', fontWeight: 800, color: '#92400e', lineHeight: 1 }}>
+                <span className="loyalty-points-number">
                   100
                 </span>
                 <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#b45309' }}>NestPoints</span>
@@ -88,7 +103,7 @@ export default function LoyaltyPage() {
               </div>
 
               {/* UNLOCKED PERKS ROW */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+              <div className="loyalty-perks-row">
                 
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '14px' }}>
                   <CheckCircle2 size={18} color="#64748b" style={{ marginBottom: '6px' }} />

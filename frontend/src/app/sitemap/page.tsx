@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   ArrowRight, Map, User, FileText, Headphones, Building, 
@@ -12,27 +12,44 @@ export const metadata: Metadata = {
 
 export default function SitemapPage() {
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+    <div className="sitemap-page-container" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '80px' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .sitemap-hero-section { background: #0f172a; padding: 80px 24px; text-align: center; color: #fff; margin-bottom: 60px; }
+        .sitemap-hero-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -1px; color: #ffffff; }
+        .sitemap-hero-desc { font-size: 1.15rem; color: #cbd5e1; max-width: 750px; margin: 0 auto; line-height: 1.6; }
+        
+        .sitemap-layout { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: minmax(280px, 1fr) 3fr; gap: 40px; align-items: start; }
+        .sitemap-sidebar { position: sticky; top: 100px; background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; max-height: calc(100vh - 120px); overflow-y: auto; }
+        .sitemap-main-content { background: #fff; padding: 40px; border-radius: 16px; border: 1px solid #e2e8f0; color: #334155; }
+        
+        .sitemap-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        
+        @media (max-width: 768px) {
+          .sitemap-hero-section { padding: 50px 16px; margin-bottom: 40px; }
+          .sitemap-hero-title { font-size: 2.2rem; }
+          .sitemap-hero-desc { font-size: 1rem; }
+          
+          .sitemap-layout { grid-template-columns: 1fr; padding: 0 16px; gap: 24px; }
+          .sitemap-sidebar { position: static; max-height: none; margin-bottom: 0px; }
+          .sitemap-main-content { padding: 24px 16px; }
+          .sitemap-main-content h2 { align-items: flex-start !important; line-height: 1.4; }
+          .sitemap-main-content h2 svg { flex-shrink: 0; margin-top: 4px; }
+          
+          .sitemap-links-grid { grid-template-columns: 1fr; }
+        }
+      `}} />
       {/* HERO SECTION */}
-      <div 
-        style={{ 
-          background: '#0f172a', 
-          padding: '80px 24px', 
-          textAlign: 'center', 
-          color: '#fff',
-          marginBottom: '60px'
-        }}
-      >
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '20px', letterSpacing: '-1px', color: '#ffffff' }}>Platform Sitemap</h1>
-        <p style={{ fontSize: '1.15rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: 1.6 }}>
+      <div className="sitemap-hero-section">
+        <h1 className="sitemap-hero-title">Platform Sitemap</h1>
+        <p className="sitemap-hero-desc">
           Explore the complete architectural layout of the Vaitour ecosystem. From hidden destinations to our exhaustive legal directories, find exactly what you are looking for in seconds.
         </p>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 3fr', gap: '40px', alignItems: 'start' }}>
+      <div className="sitemap-layout">
         
         {/* STICKY SIDEBAR (TABLE OF CONTENTS) */}
-        <div style={{ position: 'sticky', top: '100px', background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+        <div className="sitemap-sidebar">
           <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             Site Directory
           </h4>
@@ -47,13 +64,13 @@ export default function SitemapPage() {
         </div>
 
         {/* MAIN CONTENT AREA */}
-        <div className="card-panel" style={{ background: '#fff', padding: '40px', borderRadius: '16px', border: '1px solid #e2e8f0', color: '#334155' }}>
+        <div className="sitemap-main-content card-panel">
           
           <section id="main-nav" style={{ marginBottom: '40px' }}>
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '2px solid #f1f5f9', paddingBottom: '12px' }}>
               <Compass size={28} color="#0284c7" /> Main Exploration
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="sitemap-links-grid">
               <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#3b82f6', textDecoration: 'none', fontWeight: 600 }}><ChevronRight size={18} /> Home Page</Link>
               <Link href="/tours" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> All Tours & Experiences</Link>
               <Link href="/destinations" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Destinations</Link>
@@ -66,7 +83,7 @@ export default function SitemapPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '2px solid #f1f5f9', paddingBottom: '12px' }}>
               <User size={28} color="#16a34a" /> User Portals
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="sitemap-links-grid">
               <Link href="/login" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Member Login</Link>
               <Link href="/signup" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Create Account</Link>
               </div>
@@ -76,7 +93,7 @@ export default function SitemapPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '2px solid #f1f5f9', paddingBottom: '12px' }}>
               <Shield size={28} color="#8b5cf6" /> Legal & Policies
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="sitemap-links-grid">
               <Link href="/privacy" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Comprehensive Privacy Policy</Link>
               <Link href="/terms" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Terms of Service</Link>
               <Link href="/refund-policy" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Refund Policy</Link>
@@ -88,7 +105,7 @@ export default function SitemapPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '2px solid #f1f5f9', paddingBottom: '12px' }}>
               <Headphones size={28} color="#dc2626" /> Help & Support
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="sitemap-links-grid">
               <Link href="/support" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Global Support Center</Link>
               <Link href="/faq" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Frequently Asked Questions (FAQ)</Link>
               {/* <Link href="mailto:support@vaitour.com" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Contact Us</Link> */}
@@ -99,7 +116,7 @@ export default function SitemapPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '2px solid #f1f5f9', paddingBottom: '12px' }}>
               <Building size={28} color="#d97706" /> Company & Brand
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="sitemap-links-grid">
               <Link href="/about" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> About Vaitour</Link>
               </div>
           </section>
@@ -108,7 +125,7 @@ export default function SitemapPage() {
             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '2px solid #f1f5f9', paddingBottom: '12px' }}>
               <Zap size={28} color="#0ea5e9" /> Programs & Offers
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="sitemap-links-grid">
               <Link href="/loyalty" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', textDecoration: 'none' }}><ChevronRight size={18} /> Vaitour Rewards</Link>
               </div>
           </section>
