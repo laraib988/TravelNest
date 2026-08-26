@@ -521,7 +521,7 @@ input:focus, select:focus, textarea:focus {
   .tour-image-slider {
     order: 1;
     height: 300px !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 8px !important;
     border-radius: 0 !important;
     margin-left: -16px !important;
     margin-right: -16px !important;

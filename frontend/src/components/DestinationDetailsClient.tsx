@@ -346,7 +346,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
 
               return (
                 <div style={{ position: 'relative' }}>
-                  <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                  <div className="mobile-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', paddingLeft: '24px' }}>
                     {visiblePlaces.map((place, idx) => (
                       <div key={idx} className="card-panel" style={{
                         borderRadius: '20px', overflow: 'hidden', border: '1px solid #e2e8f0',

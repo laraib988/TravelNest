@@ -99,6 +99,31 @@ return (
       <div className="tour-content-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr', gap: '40px' }}>
         {/* LEFT COLUMN: DETAILS & SRS AI REVIEW INTELLIGENCE */}
         <div>
+          {/* ABOUT THE SUPPLIER */}
+          {tour.supplier_profile && (
+            <div style={{ marginBottom: '32px', paddingBottom: '32px', borderBottom: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <ShieldCheck size={22} color="#0f172a" />
+                <h2 style={{ fontSize: '1.4rem', color: '#0f172a', margin: 0, fontWeight: 800 }}>About the Supplier</h2>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {tour.supplier_profile.avatar_url ? (
+                  <Image src={tour.supplier_profile.avatar_url} alt={tour.supplier_profile.name} width={50} height={50} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ShieldCheck size={24} color="#94a3b8" />
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a' }}>{tour.supplier_profile.name}</div>
+                  <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                    <Star size={14} color="#d97706" fill="#d97706" /> {tour.supplier_total_reviews} total product reviews
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* SRS 9.3: AI REVIEW INTELLIGENCE CARD */}
           {tour.ai_review_summary && (
             <div className="card-panel" style={{ padding: '24px', marginBottom: '32px', background: '#f0f9ff', border: '1px solid #7dd3fc' }}>

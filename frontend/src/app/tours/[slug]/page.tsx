@@ -111,7 +111,23 @@ export default async function Page({ params }: Props) {
   // This effectively merges the waterfall into a single timing block, and cache() dedupes it.
   const p = await getTour(id);
   const reviewsData = await getReviews(id) || [];
-  const rawRelevant = await getRelevantProducts(id);
+  if (!p) {
+    notFound(); 
+  }
+
+  const [rawRelevant, supplierProfile, supplierProductsRes] = await Promise.all([
+    getRelevantProducts(id),
+    p.supplier_id ? supabase.from('profiles').select('name, avatar_url').eq('id', p.supplier_id).single().then(r => r.data) : null,
+    p.supplier_id ? supabase.from('products').select('id').eq('supplier_id', p.supplier_id) : { data: null }
+  ]);
+  
+  let supplierTotalReviews = 0;
+  if (supplierProductsRes.data && supplierProductsRes.data.length > 0) {
+    const productIds = supplierProductsRes.data.map(prod => prod.id);
+    const { count } = await supabase.from('reviews').select('*', { count: 'exact', head: true }).in('listing_id', productIds);
+    supplierTotalReviews = count || 0;
+  }
+
   const relevantProducts = rawRelevant.map((rp: any) => ({
     id: rp.id,
     slug: rp.id,
@@ -121,10 +137,6 @@ export default async function Page({ params }: Props) {
     cached_rating_avg: 5.0,
     cached_review_count: 0
   }));
-
-  if (!p) {
-    notFound(); 
-  }
 
   if (p.status !== 'PUBLISHED' && p.status !== 'APPROVED') {
     if (p.destination_id) {
@@ -212,6 +224,8 @@ export default async function Page({ params }: Props) {
     reviews: reviewsData,
     itinerary: p.itinerary || [],
     faqs: p.experience_details?.faqs || [],
+    supplier_profile: supplierProfile,
+    supplier_total_reviews: supplierTotalReviews,
   };
   const productSchema = {
     '@context': 'https://schema.org/',
