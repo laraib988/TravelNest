@@ -41,18 +41,18 @@ export default function Footer() {
       >
         <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 24px' }}>
           
-          {/* MAIN 4-COLUMN FOOTER GRID */}
+          {/* MAIN FOOTER GRID */}
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
               gap: '40px',
               paddingBottom: '50px',
             }}
           >
-                      <div className="footer-links-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '40px' }}>
-  {/* COLUMN 2: QUICK LINKS */}
-            <div>
+            {/* COLUMN 1: QUICK LINKS */}
+            <div style={{ flex: '1 1 200px' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
                 {t('quick_links')}
               </h4>
@@ -67,8 +67,8 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* COLUMN 3: SUPPORT */}
-            <div>
+            {/* COLUMN 2: SUPPORT */}
+            <div style={{ flex: '1 1 200px' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
                 {t('support')}
               </h4>
@@ -82,22 +82,20 @@ export default function Footer() {
               </ul>
             </div>
 
-                      </div>
-
-{/* COLUMN 4: PREFERENCES */}
-            <div className="footer-preferences">
+            {/* COLUMN 3: PREFERENCES (MOBILE ONLY) */}
+            <div className="mobile-only" style={{ flex: '1 1 200px' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
                 Preferences
               </h4>
               <CurrencyLanguageDropdown direction="up" />
             </div>
 
-            {/* COLUMN 3: PAYMENT CHANNELS */}
-            <div>
+            {/* COLUMN 4: PAYMENT CHANNELS */}
+            <div style={{ flex: '1 1 380px', maxWidth: '380px' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', marginBottom: '22px' }}>
                 Payment Channels
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', maxWidth: '380px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
                 {/* Row 1 */}
                 <div style={{ background: '#1e293b', color: '#f8fafc', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '30px', border: '1px solid #334155', whiteSpace: 'nowrap' }}>
                   VISA
