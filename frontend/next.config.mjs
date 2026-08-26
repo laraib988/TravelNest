@@ -24,6 +24,30 @@ const nextConfig = {
       { protocol: 'https', hostname: 'placehold.co' },
     ],
   },
+  async redirects() {
+    const brokenLinks = [
+      { from: 'bookings', to: '/my-bookings' },
+      { from: 'saved', to: '/wishlist' },
+      { from: 'corporate', to: '/about' },
+      { from: 'investors', to: '/about' },
+      { from: 'press', to: '/about' },
+      { from: 'cookies', to: '/privacy' },
+      { from: 'dashboard', to: '/' },
+      { from: 'become-a-host', to: '/supplier/signup' },
+      { from: 'impact', to: '/about' },
+      { from: 'gift-cards', to: '/' },
+      { from: 'accessibility', to: '/support' },
+      { from: 'profile/settings', to: '/settings' },
+      { from: 'safety', to: '/support' },
+      { from: 'affiliates', to: '/supplier/signup' },
+      { from: 'careers', to: '/about' },
+    ];
+    
+    return brokenLinks.flatMap(link => [
+      { source: `/${link.from}`, destination: link.to, permanent: true },
+      { source: `/en/${link.from}`, destination: link.to, permanent: true }
+    ]);
+  },
   async headers() {
     return [
       {
