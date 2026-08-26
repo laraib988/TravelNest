@@ -125,7 +125,7 @@ export async function POST(request: Request) {
       account_created: accountCreated,
       new_account: accountCreated,
       credentials: accountCreated
-        ? { email, temporary_password: temporaryPassword, login_url: `${process.env.APP_URL || 'http://localhost:3000'}/login` }
+        ? { email, temporary_password: temporaryPassword, login_url: `${process.env.APP_URL || 'https://www.vaitour.com'}/login` }
         : undefined,
       loyalty_bonus: accountCreated ? SIGNUP_BONUS_POINTS : 0,
     });

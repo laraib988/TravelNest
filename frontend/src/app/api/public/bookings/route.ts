@@ -161,8 +161,12 @@ export async function POST(request: Request) {
           lead_phone: lead_phone || '',
           special_requirements: special_requirements || '',
           supplier_email: supplierEmail || '',
-          appUrl: process.env.APP_URL || 'http://localhost:3000',
-          newAccountCredentials: new_account_credentials || undefined,
+          appUrl: process.env.APP_URL || 'https://www.vaitour.com',
+          newAccountCredentials: new_account_credentials ? {
+            email: new_account_credentials.email,
+            temporaryPassword: new_account_credentials.temporary_password,
+            loginUrl: new_account_credentials.login_url || (process.env.APP_URL || 'https://www.vaitour.com') + '/login'
+          } : undefined,
         });
         if (emailResult.errors.length > 0) {
           console.warn('Booking email issues:', emailResult.errors.join('; '));

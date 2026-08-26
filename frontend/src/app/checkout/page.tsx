@@ -472,7 +472,7 @@ useEffect(() => {
               <h3 style={{ fontSize: '1.1rem', color: '#92400e', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <KeyRound size={18} /> Your Vaitour Account Credentials
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', fontSize: '0.9rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px', fontSize: '0.9rem' }}>
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Login URL:</span>
                   <div style={{ fontWeight: 700, color: '#0f172a' }}>{accountCredentials.login_url}</div>
@@ -572,18 +572,18 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={handleSendOtp}
-                    disabled={otpSending || !formData.lead_email.trim()}
-                    style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '12px 16px', borderRadius: 'var(--radius-sm)', background: '#2563eb', color: '#ffffff', fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: otpSending || !formData.lead_email.trim() ? 'not-allowed' : 'pointer', opacity: otpSending || !formData.lead_email.trim() ? 0.6 : 1, whiteSpace: 'nowrap' }}
+                    disabled={otpSending || !formData.lead_email.trim() || otpSent}
+                    style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '12px 24px', borderRadius: 'var(--radius-sm)', background: '#2563eb', color: '#ffffff', fontWeight: 700, fontSize: '0.95rem', border: 'none', cursor: otpSending || !formData.lead_email.trim() || otpSent ? 'not-allowed' : 'pointer', opacity: otpSending || !formData.lead_email.trim() || otpSent ? 0.6 : 1, whiteSpace: 'nowrap' }}
                   >
-                    <Mail size={16} /> {otpSending ? 'Sending...' : 'Verify Email'}
+                    <Mail size={18} /> {otpSending ? 'Sending...' : otpSent ? 'Code Sent' : 'Verify Email'}
                   </button>
                 ) : (
                   <button
                     type="button"
                     disabled
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0 16px', borderRadius: 'var(--radius-sm)', background: '#d1fae5', color: '#065f46', fontWeight: 700, fontSize: '0.85rem', border: '1px solid #86efac', cursor: 'not-allowed', whiteSpace: 'nowrap', opacity: 1 }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '12px 24px', borderRadius: 'var(--radius-sm)', background: '#d1fae5', color: '#065f46', fontWeight: 700, fontSize: '0.95rem', border: '1px solid #86efac', cursor: 'not-allowed', whiteSpace: 'nowrap', opacity: 1 }}
                   >
-                    <CheckCircle2 size={16} /> Verified
+                    <CheckCircle2 size={18} /> Verified
                   </button>
                 )}
               </div>
@@ -608,7 +608,7 @@ useEffect(() => {
                       type="button"
                       onClick={handleVerifyOtp}
                       disabled={otpVerifying || otpInput.length !== 6}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 18px', borderRadius: 'var(--radius-sm)', background: '#059669', color: '#ffffff', fontWeight: 700, fontSize: '0.85rem', border: 'none', cursor: otpVerifying || otpInput.length !== 6 ? 'not-allowed' : 'pointer', opacity: otpVerifying || otpInput.length !== 6 ? 0.6 : 1, whiteSpace: 'nowrap' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 24px', borderRadius: 'var(--radius-sm)', background: '#059669', color: '#ffffff', fontWeight: 700, fontSize: '1rem', border: 'none', cursor: otpVerifying || otpInput.length !== 6 ? 'not-allowed' : 'pointer', opacity: otpVerifying || otpInput.length !== 6 ? 0.6 : 1, whiteSpace: 'nowrap' }}
                     >
                       {otpVerifying ? 'Verifying...' : 'Verify Code'}
                     </button>
