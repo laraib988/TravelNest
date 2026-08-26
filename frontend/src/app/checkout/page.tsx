@@ -530,7 +530,7 @@ useEffect(() => {
             <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', color: '#475569', flexWrap: 'wrap', alignItems: 'center' }}>
               <div><strong style={{color: '#0f172a'}}>Option:</strong> {tourOptionName}</div>
               <div>•</div>
-              <div><strong style={{color: '#0f172a'}}>Date:</strong> {format(new Date(selectedDate), 'MMM d, yyyy')}</div>
+              <div><strong style={{color: '#0f172a'}}>Date:</strong> {new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
               <div>•</div>
               <div><strong style={{color: '#0f172a'}}>Guests:</strong> {totalPax}</div>
             </div>
