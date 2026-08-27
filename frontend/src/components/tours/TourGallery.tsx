@@ -152,39 +152,40 @@ export default function TourGallery({ tour }: { tour: any }) {
 
       {tour.images && tour.images.length > 0 && (
         <div className="tour-gallery-desktop">
-          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 0 }}>
             <img 
               src={cloudinaryLoader({ src: tour.images[0].url, width: 1200, quality: 75 })} 
               alt={tour.title} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} 
             />
           </div>
           {tour.images.length > 1 && (() => {
             const remainingImages = tour.images.slice(1, 5);
-            return (
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: remainingImages.length <= 2 ? '1fr' : '1fr 1fr', 
-                gridTemplateRows: remainingImages.length === 1 ? '1fr' : '1fr 1fr', 
-                gap: '12px', 
-                height: '100%' 
-              }}>
-                {remainingImages.map((img: any, i: number) => (
-                  <div 
-                    key={i} 
-                    style={{ 
-                      position: 'relative', 
-                      width: '100%', 
-                      height: '100%',
-                      gridColumn: remainingImages.length === 3 && i === 2 ? 'span 2' : 'auto'
-                    }}>
-                    <img 
-                      src={cloudinaryLoader({ src: img.url, width: 600, quality: 75 })} 
-                      alt={`${tour.title} ${i+2}`} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                    />
-                  </div>
-                ))}
+              return (
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: remainingImages.length <= 2 ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))', 
+                  gridTemplateRows: remainingImages.length === 1 ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))', 
+                  gap: '12px', 
+                  height: '100%' 
+                }}>
+                  {remainingImages.map((img: any, i: number) => (
+                    <div 
+                      key={i} 
+                      style={{ 
+                        position: 'relative', 
+                        width: '100%', 
+                        height: '100%',
+                        minHeight: 0,
+                        gridColumn: remainingImages.length === 3 && i === 2 ? 'span 2' : 'auto'
+                      }}>
+                      <img 
+                        src={cloudinaryLoader({ src: img.url, width: 600, quality: 75 })} 
+                        alt={`${tour.title} ${i+2}`} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} 
+                      />
+                    </div>
+                  ))}
               </div>
             );
           })()}
