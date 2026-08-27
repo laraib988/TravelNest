@@ -51,6 +51,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: blog.meta_title || blog.title,
     description: blog.meta_description || blog.summary,
     keywords: blog.focus_keywords || [],
+    publisher: 'Vaitour',
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-video-preview': -1,
+        'max-snippet': -1,
+      },
+    },
     alternates: { 
       canonical: `${APP_URL}/${locale}/blog/${blog.slug}`,
       languages: {
@@ -176,6 +188,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     headline: blog.title,
     image: blog.hero_image ? [blog.hero_image] : [],
     datePublished: blog.published_at,
+    dateModified: blog.updated_at || blog.published_at,
+    url: `${APP_URL}/blog/${blog.slug}`,
     author: [{
       '@type': 'Person',
       name: blog.author_name,

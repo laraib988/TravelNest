@@ -23,6 +23,7 @@ export default function AdminBlogNewPage() {
     meta_title: '',
     meta_description: '',
     focus_keywords: [] as string[],
+    focus_keywords_raw: '',
     summary: '',
     content_markdown: '',
     hero_image: '',
@@ -52,7 +53,7 @@ export default function AdminBlogNewPage() {
       const res = await fetch('/api/admin/blogs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, status }),
+        body: JSON.stringify({ ...form, status, focus_keywords: (form.focus_keywords_raw || '').split(',').map((s: string) => s.trim()).filter(Boolean) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -134,8 +135,8 @@ export default function AdminBlogNewPage() {
                 <label style={labelStyle}>Focus Keywords (comma separated)</label>
                 <input
                   style={inputStyle}
-                  value={(form.focus_keywords || []).join(', ')}
-                  onChange={(e) => setForm({ ...form, focus_keywords: e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean) })}
+                  value={form.focus_keywords_raw || ''}
+                  onChange={(e) => setForm({ ...form, focus_keywords_raw: e.target.value })}
                 />
               </div>
               <div>
