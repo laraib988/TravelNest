@@ -130,6 +130,8 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     },
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // If the parent value changes externally (e.g. form reset), sync the editor.
   useEffect(() => {
     if (!editor) return;
@@ -151,8 +153,6 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     }
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   };
-
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addImage = () => {
     fileInputRef.current?.click();
