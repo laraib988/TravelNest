@@ -102,10 +102,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('popstate', handleUrlChange);
   }, []);
 
-  // Fetch live exchange rates from Frankfurter (ECB)
+  // Fetch live exchange rates via local proxy to avoid CORS issues
   useEffect(() => {
     const codes = Object.keys(SUPPORTED_CURRENCIES).join(',');
-    fetch(`https://api.frankfurter.app/latest?from=USD&to=${codes}`, { cache: 'no-store' })
+    fetch(`/api/currency/rates?from=USD&to=${codes}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         if (data && data.rates) {

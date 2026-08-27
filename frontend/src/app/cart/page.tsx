@@ -82,8 +82,47 @@ export default function CartPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px 80px', fontFamily: 'var(--font-body)' }}>
-      <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 32px;
+          }
+          .cart-page-container {
+            padding: 40px 24px 80px;
+          }
+          .cart-item-thumb {
+            width: 180px;
+            height: 120px;
+          }
+          @media (max-width: 992px) {
+            .cart-layout {
+              grid-template-columns: 1fr;
+            }
+            .cart-page-header {
+              flex-direction: column;
+              align-items: flex-start !important;
+              gap: 16px;
+            }
+            .cart-page-header h1 {
+              font-size: 2rem !important;
+            }
+          }
+          @media (max-width: 576px) {
+            .cart-page-container {
+              padding: 24px 16px 60px !important;
+            }
+            .cart-item-thumb {
+              width: 100% !important;
+              height: 200px !important;
+            }
+          }
+        `
+      }} />
+      <div className="cart-page-container" style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', fontFamily: 'var(--font-body)' }}>
+        <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
         
         {/* BREADCRUMB NAV */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '0.88rem', color: '#64748b' }}>
@@ -93,7 +132,7 @@ export default function CartPage() {
         </div>
 
         {/* PAGE HEADING */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+        <div className="cart-page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
             <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', margin: 0, lineHeight: 1.2 }}>Multi-Experience Cart</h1>
             <p style={{ color: '#475569', marginTop: '6px', fontSize: '1rem' }}>Review your selected tours, choose variants, and apply promo discounts.</p>
@@ -103,14 +142,14 @@ export default function CartPage() {
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px' }}>
+        <div className="cart-layout">
           
           {/* CART ITEMS FEED */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {cartItems.map((item) => (
               <div 
                 key={item.id} 
-                className="card-panel" 
+                className="card-panel cart-item-container" 
                 style={{ 
                   padding: '24px', 
                   borderRadius: '24px',
@@ -145,7 +184,7 @@ export default function CartPage() {
                 </button>
 
                 {/* THUMBNAIL */}
-                <div style={{ width: '180px', height: '120px', borderRadius: '16px', overflow: 'hidden', flexShrink: 0 }}>
+                <div className="cart-item-thumb" style={{ borderRadius: '16px', overflow: 'hidden', flexShrink: 0 }}>
                   <Image src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                 </div>
 
@@ -282,5 +321,6 @@ export default function CartPage() {
 
       </div>
     </div>
+    </>
   );
 }

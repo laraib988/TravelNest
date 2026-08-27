@@ -75,6 +75,70 @@ export default function MyBookingsPage() {
           ))}
         </div>
 
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .booking-card-main {
+              padding: 24px;
+              display: flex;
+              gap: 24px;
+              flex: 1 1 300px;
+              min-width: 0;
+            }
+            .booking-card-img {
+              width: 120px;
+              height: 120px;
+              border-radius: 16px;
+              background: #f1f5f9;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #94a3b8;
+              overflow: hidden;
+              flex-shrink: 0;
+            }
+            .booking-card-sidebar {
+              padding: 24px;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: flex-end;
+              border-left: 1px solid #e2e8f0;
+              min-width: 200px;
+            }
+            .booking-expanded-grid {
+              padding: 24px;
+              background: #f8fafc;
+              border-top: 1px solid #e2e8f0;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 24px;
+            }
+            @media (max-width: 640px) {
+              .booking-card-main {
+                padding: 16px;
+                gap: 16px;
+                flex-basis: 100%;
+                flex-direction: column; /* Stack image and details on mobile */
+              }
+              .booking-card-img {
+                width: 100%;
+                height: 160px; /* Full width banner image on mobile */
+              }
+              .booking-card-sidebar {
+                padding: 16px;
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                align-items: flex-start;
+                min-width: 100%;
+              }
+              .booking-expanded-grid {
+                padding: 16px;
+                grid-template-columns: 1fr; /* Force 1 column on mobile to prevent overflow */
+              }
+            }
+          `
+        }} />
+
         {/* CONTENT */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}>
@@ -94,16 +158,16 @@ export default function MyBookingsPage() {
             {filteredBookings.map((booking) => (
               <div key={booking.id} className="card-panel" style={{ borderRadius: '24px', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                  <div style={{ padding: '24px', display: 'flex', gap: '24px', flex: 1, minWidth: '300px' }}>
-                    <div style={{ width: '120px', height: '120px', borderRadius: '16px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', overflow: 'hidden' }}>
+                  <div className="booking-card-main">
+                    <div className="booking-card-img">
                       {booking.listing_image ? (
                         <Image src={booking.listing_image} alt="Tour" style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
                       ) : (
                         <Compass size={40} />
                       )}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span className={getStatusBadgeClass(booking.status)} style={{ display: 'inline-block', width: 'fit-content', marginBottom: '8px' }}>
                           ⚡ {booking.status === 'PENDING_SUPPLIER_APPROVAL' ? 'PENDING APPROVAL' : booking.status}
                         </span>
@@ -111,16 +175,16 @@ export default function MyBookingsPage() {
                           💳 {booking.payment_status || 'PAID'}
                         </span>
                       </div>
-                      <h3 style={{ fontSize: '1.25rem', marginBottom: '10px', fontWeight: 700, color: '#0f172a' }}>{booking.traveler_details?.tour_name || booking.listing_title || 'Activity Booking'}</h3>
+                      <h3 style={{ fontSize: '1.25rem', marginBottom: '10px', fontWeight: 700, color: '#0f172a', whiteSpace: 'normal', wordBreak: 'break-word' }}>{booking.traveler_details?.tour_name || booking.listing_title || 'Activity Booking'}</h3>
                       <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '12px', fontWeight: 600 }}>Vehicle / Option: {booking.option_name}</div>
-                      <div style={{ display: 'flex', gap: '16px', color: '#64748b', fontSize: '0.85rem' }}>
+                      <div style={{ display: 'flex', gap: '16px', color: '#64748b', fontSize: '0.85rem', flexWrap: 'wrap' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} /> {new Date(booking.slot_start_time || booking.created_at).toLocaleDateString()}</span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Users size={14} /> {booking.total_travelers} Guests</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', borderLeft: '1px solid #e2e8f0', minWidth: '200px' }}>
+                  <div className="booking-card-sidebar">
                     <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Total Paid</span>
                     <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--brand-primary)', marginBottom: '16px' }}>${booking.gross_amount} {booking.currency}</span>
                     <button
@@ -133,7 +197,7 @@ export default function MyBookingsPage() {
                 </div>
 
                 {expandedId === booking.id && (
-                  <div style={{ padding: '24px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
+                  <div className="booking-expanded-grid">
                     <div>
                       <h4 style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '6px' }}>Traveler Details</h4>
                       <p style={{ fontWeight: 700, color: '#0f172a' }}>Lead Guest: {booking.traveler_details?.lead_name || booking.lead_name}</p>

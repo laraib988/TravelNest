@@ -56,12 +56,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string, email: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      
+      let data = null;
+      let error = null;
+      
+      if (token) {
+        const res = await fetch('/api/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          data = json.profile;
+        } else {
+          error = true;
+        }
+      } else {
+        error = true;
+      }
       if (error || !data) {
         // Fallback: use auth metadata directly
         const { data: authData } = await supabase.auth.getUser();
@@ -130,8 +143,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkUserExists = async (email: string) => {
     try {
-      const { data } = await supabase.from('profiles').select('*').eq('email', email).maybeSingle();
-      return !!data;
+      const res = await fetch(`/api/auth/check-user?email=${encodeURIComponent(email)}`);
+      if (res.ok) {
+        const json = await res.json();
+        return json.exists;
+      }
+      return false;
     } catch {
       return false;
     }

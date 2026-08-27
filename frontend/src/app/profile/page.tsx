@@ -160,8 +160,35 @@ export default function ProfilePage() {
   const totalSavings = (profile.loyalty_points / POINTS_PER_TOUR) * POINT_VALUE_USD;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px', fontFamily: 'var(--font-body)' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+          }
+          .companion-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+          }
+          @media (max-width: 576px) {
+            .profile-grid {
+              grid-template-columns: 1fr;
+            }
+            .companion-input-group {
+              flex-direction: column;
+            }
+            .companion-input-group button {
+              width: 100%;
+            }
+          }
+        `
+      }} />
+      <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a', padding: '40px 24px', fontFamily: 'var(--font-body)' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         
         <h1 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: 800, color: '#0f172a' }}>Account Settings</h1>
         <p style={{ color: '#475569', marginBottom: '32px' }}>Manage your personal details, loyalty points, saved travelers list, and notification preferences.</p>
@@ -243,7 +270,7 @@ export default function ProfilePage() {
         <form onSubmit={handleSave} className="card-panel" style={{ padding: '30px', borderRadius: '24px', marginBottom: '32px' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>Personal Information</h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+          <div className="profile-grid">
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>Full Name</label>
               <input
@@ -295,7 +322,7 @@ export default function ProfilePage() {
           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>Saved Companions & Family</h3>
           <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '20px' }}>Book tickets faster for family members without re-entering passport & name details.</p>
 
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          <div className="companion-input-group">
             <input
               type="text"
               placeholder="Add companion name..."
@@ -361,5 +388,6 @@ export default function ProfilePage() {
 
       </div>
     </div>
+    </>
   );
 }

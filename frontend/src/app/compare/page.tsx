@@ -134,118 +134,168 @@ export default function ComparePage() {
             <p style={{ color: '#64748b' }}>Search above to select and compare tours.</p>
           </div>
         ) : (
-          <div className="card-panel" style={{ borderRadius: '24px', overflow: 'hidden', border: '1px solid #cbd5e1', background: '#ffffff', boxShadow: 'var(--shadow-md)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
+          <div className="compare-table-wrapper card-panel">
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                .compare-table-wrapper {
+                  overflow-x: auto;
+                  -webkit-overflow-scrolling: touch;
+                  border-radius: 24px;
+                  border: 1px solid #cbd5e1;
+                  box-shadow: var(--shadow-md);
+                }
+                table {
+                  border-collapse: collapse;
+                }
+                @media (max-width: 768px) {
+                  .compare-table-wrapper th,
+                  .compare-table-wrapper td {
+                    padding: 16px 14px !important;
+                  }
+                  .compare-table-wrapper th:first-child,
+                  .compare-table-wrapper td:first-child {
+                    font-size: 0.85rem !important;
+                    padding: 16px 10px !important;
+                    width: 140px !important;
+                  }
+                }
+              `
+            }} />
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px', tableLayout: 'fixed' }}>
               
               {/* Top Row / Product Header */}
-              <div style={{ padding: '24px', background: '#f8fafc', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center' }}>
-                <span style={{ fontWeight: 800, fontSize: '1rem', color: '#475569' }}>Comparison Matrix</span>
-              </div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '24px', position: 'relative', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: '220px' }}>
-                  <button
-                    onClick={() => handleRemove(item.id)}
-                    aria-label="Remove tour"
-                    style={{ position: 'absolute', top: '12px', right: '12px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
-                  >
-                    <X size={15} />
-                  </button>
-                  <Image src={item.images?.[0]?.url} alt={item.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '12px', marginBottom: '14px' }}  width={100} height={140} />
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.35, marginBottom: '12px', flex: 1 }}>{item.title}</h3>
-                  <Link href={`/tours/${item.slug}`} className="btn-primary" style={{ padding: '10px 16px', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center' }}>
-                    View Experience
-                  </Link>
-                </div>
-              ))}
-            </div>
-
-            {/* Matrix Rows */}
-            {/* Price */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Price</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', fontWeight: 800, fontSize: '1.15rem', color: 'var(--brand-primary)' }}>
-                  {formatPrice(item.base_price)}
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginLeft: '4px' }}>/ {item.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Rating */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Rating & Reviews</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Star size={16} color="#d97706" fill="#d97706" />
-                  <strong style={{ color: '#0f172a' }}>{item.cached_rating_avg}</strong>
-                  <span style={{ fontSize: '0.82rem', color: '#64748b' }}>({item.cached_review_count || 120} reviews)</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Duration */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Duration</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
-                  <Clock size={16} color="#64748b" /> {item.duration}
-                </div>
-              ))}
-            </div>
-
-            {/* Category */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Category</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center' }}>
-                  <span className="badge-emerald" style={{ fontSize: '0.78rem' }}>{item.category_name}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Pickup Location */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Pickup Location</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#334155' }}>
-                  <MapPin size={16} color="#0284c7" /> {item.pickup_location}
-                </div>
-              ))}
-            </div>
-
-            {/* Booking Option / Payment Option */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Booking Type</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center' }}>
-                  <span className="badge-amber" style={{ fontSize: '0.78rem' }}>{item.confirmation_type}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Payment Mode */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)`, borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Payment Option</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#334155' }}>
-                  <CreditCard size={16} color="#64748b" /> {item.payment_option}
-                </div>
-              ))}
-            </div>
-
-            {/* Selling Point / Badges */}
-            <div style={{ display: 'grid', gridTemplateColumns: `260px repeat(${selectedListings.length}, 1fr)` }}>
-              <div style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Highlights</div>
-              {selectedListings.map((item) => (
-                <div key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-                  <span className="badge-rose" style={{ fontSize: '0.75rem', fontWeight: 700 }}>{item.selling_point}</span>
-                  {item.merchandising_badges?.map((badge: string, idx: number) => (
-                    <span key={idx} className="badge-rose" style={{ fontSize: '0.75rem' }}>{badge}</span>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <th style={{ padding: '24px', background: '#f8fafc', borderRight: '1px solid #e2e8f0', width: '200px', verticalAlign: 'middle' }}>
+                    <span style={{ fontWeight: 800, fontSize: '1rem', color: '#475569' }}>Comparison Matrix</span>
+                  </th>
+                  {selectedListings.map((item) => (
+                    <th key={item.id} style={{ padding: '24px', position: 'relative', borderRight: '1px solid #e2e8f0', verticalAlign: 'top' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
+                        <button
+                          onClick={() => handleRemove(item.id)}
+                          aria-label="Remove tour"
+                          style={{ position: 'absolute', top: '12px', right: '12px', background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b', zIndex: 10 }}
+                        >
+                          <X size={15} />
+                        </button>
+                        <div style={{ width: '100%', height: '140px', background: '#f1f5f9', borderRadius: '12px', overflow: 'hidden', flexShrink: 0 }}>
+                          {item.images?.[0]?.url ? (
+                            <Image src={item.images[0].url} alt={item.title || 'Tour'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} width={300} height={200} />
+                          ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.8rem' }}>No Image</div>
+                          )}
+                        </div>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.35, flex: 1, margin: 0 }}>{item.title}</h3>
+                        <Link href={`/tours/${item.slug}`} className="btn-primary" style={{ padding: '10px 16px', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center', marginTop: 'auto' }}>
+                          View Experience
+                        </Link>
+                      </div>
+                    </th>
                   ))}
-                </div>
-              ))}
-            </div>
+                </tr>
+              </thead>
 
+              <tbody>
+                {/* Price */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Price</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', fontWeight: 800, fontSize: '1.15rem', color: 'var(--brand-primary)' }}>
+                        {formatPrice(item.base_price)}
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginLeft: '4px' }}>/ {item.pricing_type?.replace(/^per\s+/i, '') || 'Person'}</span>
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Rating */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Rating & Reviews</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Star size={16} color="#d97706" fill="#d97706" />
+                        <strong style={{ color: '#0f172a' }}>{item.cached_rating_avg}</strong>
+                        <span style={{ fontSize: '0.82rem', color: '#64748b' }}>({item.cached_review_count || 120} reviews)</span>
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Duration */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Duration</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
+                        <Clock size={16} color="#64748b" /> {item.duration}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Category */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Category</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <span className="badge-emerald" style={{ fontSize: '0.78rem' }}>{item.category_name}</span>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Pickup Location */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Pickup Location</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#334155' }}>
+                        <MapPin size={16} color="#0284c7" /> {item.pickup_location}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Booking Option */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Booking Type</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <span className="badge-amber" style={{ fontSize: '0.78rem' }}>{item.confirmation_type}</span>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Payment Mode */}
+                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Payment Option</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#334155' }}>
+                        <CreditCard size={16} color="#64748b" /> {item.payment_option}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Highlights */}
+                <tr>
+                  <td style={{ padding: '20px 24px', fontWeight: 700, color: '#475569', background: '#f8fafc', borderRight: '1px solid #e2e8f0' }}>Highlights</td>
+                  {selectedListings.map((item) => (
+                    <td key={item.id} style={{ padding: '20px 24px', borderRight: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                        <span className="badge-rose" style={{ fontSize: '0.75rem', fontWeight: 700 }}>{item.selling_point}</span>
+                        {item.merchandising_badges?.map((badge: string, idx: number) => (
+                          <span key={idx} className="badge-rose" style={{ fontSize: '0.75rem' }}>{badge}</span>
+                        ))}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
           </div>
         )}
 

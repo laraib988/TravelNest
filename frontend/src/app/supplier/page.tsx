@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import {
   Globe,
@@ -13,6 +13,7 @@ import {
   CreditCard,
   Headphones,
   ChevronRight,
+  ChevronLeft,
   CheckCircle2,
   ArrowRight,
   Star,
@@ -29,7 +30,21 @@ import { useAuth } from '@/context/AuthContext';
 export default function SupplierPage() {
   const { user } = useAuth();
   const isSupplier = user && user.role === 'SUPPLIER';
-  // removed openAuthModal
+
+  const benefitsRef = useRef<HTMLDivElement>(null);
+  const howItWorksRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+
+  const scrollSlider = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = ref.current.clientWidth * 0.8;
+      ref.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const platformStats = [
     { value: '2M+', label: 'Monthly Visitors', icon: Globe },
@@ -169,8 +184,36 @@ export default function SupplierPage() {
           .stats-grid { margin-top: -10px; grid-template-columns: 1fr 1fr; }
           .section-title { font-size: 1.8rem; }
           .benefits-grid { grid-template-columns: 1fr; }
-          .how-it-works-grid { grid-template-columns: 1fr; }
-          .testimonials-grid { grid-template-columns: 1fr; }
+        }
+
+        .custom-slider {
+          display: flex;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          gap: 20px;
+          padding: 10px 4px 30px;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
+        .custom-slider::-webkit-scrollbar {
+          display: none;
+        }
+        .custom-slider > div {
+          flex: 0 0 85%;
+          max-width: 320px;
+          scroll-snap-align: center;
+        }
+        @media (min-width: 768px) {
+          .custom-slider > div {
+            flex: 0 0 calc(50% - 20px);
+            max-width: none;
+          }
+        }
+        @media (min-width: 1024px) {
+          .custom-slider > div {
+            flex: 0 0 calc(33.333% - 20px); 
+            max-width: none;
+          }
         }
       `}} />
 
@@ -315,28 +358,45 @@ export default function SupplierPage() {
       {/* SECTION 2: WHY PARTNER WITH US — BENEFITS GRID */}
       {/* ═══════════════════════════════════════════════════════════════ */}
       <section style={{ padding: '72px 24px', maxWidth: '1280px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <span style={{
-            display: 'inline-block',
-            padding: '4px 14px',
-            borderRadius: '100px',
-            background: '#e0f2fe',
-            color: '#0284c7',
-            fontSize: '0.8rem',
-            fontWeight: 700,
-            marginBottom: '12px'
-          }}>
-            PARTNER BENEFITS
-          </span>
-          <h2 className="section-title">
-            Why Operators Choose Vaitour
-          </h2>
-          <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '560px', margin: '0 auto', lineHeight: 1.6 }}>
-            Everything you need to list, manage, and scale your travel experiences — all in one platform.
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '48px', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <span style={{
+              display: 'inline-block',
+              padding: '4px 14px',
+              borderRadius: '100px',
+              background: '#e0f2fe',
+              color: '#0284c7',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              marginBottom: '12px'
+            }}>
+              PARTNER BENEFITS
+            </span>
+            <h2 className="section-title" style={{ textAlign: 'left' }}>
+              Why Operators Choose Vaitour
+            </h2>
+            <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '560px', lineHeight: 1.6 }}>
+              Everything you need to list, manage, and scale your travel experiences — all in one platform.
+            </p>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => scrollSlider(benefitsRef, 'left')}
+              style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={() => scrollSlider(benefitsRef, 'right')}
+              style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
 
-        <div className="benefits-grid">
+        <div className="custom-slider" ref={benefitsRef}>
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
@@ -376,28 +436,44 @@ export default function SupplierPage() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       <section id="how-it-works" style={{ padding: '72px 24px', background: '#ffffff' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <span style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              borderRadius: '100px',
-              background: '#f0fdf4',
-              color: '#059669',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              marginBottom: '12px'
-            }}>
-              GET STARTED
-            </span>
-            <h2 className="section-title">
-              How It Works
-            </h2>
-            <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
-              From registration to your first booking — we make onboarding effortless.
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '48px', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 14px',
+                borderRadius: '100px',
+                background: '#f0fdf4',
+                color: '#059669',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                marginBottom: '12px'
+              }}>
+                GET STARTED
+              </span>
+              <h2 className="section-title" style={{ textAlign: 'left' }}>
+                How It Works
+              </h2>
+              <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '500px', lineHeight: 1.6 }}>
+                From registration to your first booking — we make onboarding effortless.
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => scrollSlider(howItWorksRef, 'left')}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scrollSlider(howItWorksRef, 'right')}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
 
-          <div className="how-it-works-grid">
+          <div className="custom-slider" ref={howItWorksRef}>
             {howItWorks.map((item, index) => (
               <div
                 key={item.step}
@@ -453,28 +529,44 @@ export default function SupplierPage() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       <section style={{ padding: '72px 24px', background: '#f8fafc' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <span style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              borderRadius: '100px',
-              background: '#ede9fe',
-              color: '#7c3aed',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              marginBottom: '12px'
-            }}>
-              POWERFUL TOOLS
-            </span>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px' }}>
-              Your All-In-One Supplier Dashboard
-            </h2>
-            <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '560px', margin: '0 auto', lineHeight: 1.6 }}>
-              Manage bookings, track earnings, scan QR vouchers, and optimize pricing — all from one place.
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '48px', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 14px',
+                borderRadius: '100px',
+                background: '#ede9fe',
+                color: '#7c3aed',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                marginBottom: '12px'
+              }}>
+                POWERFUL TOOLS
+              </span>
+              <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px', textAlign: 'left' }}>
+                Your All-In-One Supplier Dashboard
+              </h2>
+              <p style={{ fontSize: '1.05rem', color: '#64748b', maxWidth: '560px', lineHeight: 1.6 }}>
+                Manage bookings, track earnings, scan QR vouchers, and optimize pricing — all from one place.
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => scrollSlider(toolsRef, 'left')}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scrollSlider(toolsRef, 'right')}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
 
-          <div className="benefits-grid">
+          <div className="custom-slider" ref={toolsRef}>
             {[
               { icon: PlusCircle, title: 'Listing Builder', desc: 'Create tours with photos, pricing tiers, time slots, and rich descriptions in minutes.', color: '#0284c7' },
               { icon: Calendar, title: 'Availability Calendar', desc: 'Manage daily slots, block dates, set seasonal pricing, and control inventory in real-time.', color: '#7c3aed' },
@@ -524,25 +616,41 @@ export default function SupplierPage() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       <section style={{ padding: '72px 24px', background: '#ffffff' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <span style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              borderRadius: '100px',
-              background: '#fef3c7',
-              color: '#d97706',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              marginBottom: '12px'
-            }}>
-              PARTNER STORIES
-            </span>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px' }}>
-              Trusted by Operators Worldwide
-            </h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '48px', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 14px',
+                borderRadius: '100px',
+                background: '#fef3c7',
+                color: '#d97706',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                marginBottom: '12px'
+              }}>
+                PARTNER STORIES
+              </span>
+              <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 10px', textAlign: 'left' }}>
+                Trusted by Operators Worldwide
+              </h2>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => scrollSlider(testimonialsRef, 'left')}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scrollSlider(testimonialsRef, 'right')}
+                style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
 
-          <div className="testimonials-grid">
+          <div className="custom-slider" ref={testimonialsRef}>
             {testimonials.map((t) => (
               <div
                 key={t.name}

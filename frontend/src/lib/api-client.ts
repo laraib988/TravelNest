@@ -2,8 +2,8 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://vaitour-5ttl.onrender.com/api/v1'
-    : 'http://localhost:4000/api/v1');
+    ? '/api'
+    : '/api');
 
 export async function fetchFromAPI(endpoint: string, options?: RequestInit) {
   const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;

@@ -386,10 +386,76 @@ export default function CreateListingPage() {
   const inputStyle = { width: '100%', padding: '14px 18px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '1rem', background: '#f8fafc', outline: 'none', transition: 'border 0.2s' };
 
   return (
-    <div style={{ maxWidth: '1200px', width: '100%', margin: '40px auto', padding: '0 24px' }}>
+    <div className="supplier-create-page" style={{ maxWidth: '1200px', width: '100%', margin: '40px auto', padding: '0 24px' }}>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .supplier-create-layout {
+            display: flex;
+            gap: 40px;
+            width: 100%;
+          }
+          .supplier-create-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+          }
+          .supplier-create-sidebar-inner {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 30px 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 120px;
+          }
+          .supplier-create-content {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          }
+          
+          /* RESPONSIVE OVERRIDES */
+          @media (max-width: 900px) {
+            .supplier-create-layout {
+              flex-direction: column;
+            }
+            .supplier-create-sidebar {
+              width: 100%;
+            }
+            .supplier-create-sidebar-inner {
+              position: static;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 12px;
+              padding: 20px;
+            }
+            .supplier-create-sidebar-inner > div {
+              margin-bottom: 0 !important;
+              padding: 8px 16px;
+              background: #f8fafc;
+              border-radius: 100px;
+            }
+          }
+          
+          @media (max-width: 768px) {
+            /* Force all multi-column inline grids to 1 column on mobile */
+            .supplier-create-content div[style*="display: grid"],
+            .supplier-create-content div[style*="grid-template-columns"] {
+              grid-template-columns: 1fr !important;
+            }
+            .supplier-create-content {
+              padding: 20px;
+            }
+          }
+        `
+      }} />
       
       {/* HEADER & SAVING STATUS */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0f172a', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>Create Listing</h1>
           <p style={{ color: '#64748b', margin: 0, fontSize: '1.05rem' }}>Auto-saving your progress as you type.</p>
@@ -399,11 +465,11 @@ export default function CreateListingPage() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '40px', width: '100%' }}>
+      <div className="supplier-create-layout">
         
         {/* LEFT SIDEBAR STEPPER */}
-        <div style={{ width: '280px', flexShrink: 0 }}>
-          <div style={{ background: '#ffffff', borderRadius: '24px', padding: '30px 24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', position: 'sticky', top: '120px' }}>
+        <div className="supplier-create-sidebar">
+          <div className="supplier-create-sidebar-inner">
             {STEPS.map((step, idx) => {
               const stepNum = idx + 1;
               const isActive = currentStep === stepNum;
@@ -424,11 +490,12 @@ export default function CreateListingPage() {
                     width: '32px', height: '32px', borderRadius: '50%', 
                     background: isActive ? '#0f172a' : isPast ? '#10b981' : '#f1f5f9',
                     color: isActive || isPast ? '#ffffff' : '#64748b',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.9rem'
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.9rem',
+                    flexShrink: 0
                   }}>
                     {isPast ? <Check size={16} /> : stepNum}
                   </div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: isActive ? 800 : 600, color: isActive ? '#0f172a' : '#64748b' }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: isActive ? 800 : 600, color: isActive ? '#0f172a' : '#64748b', whiteSpace: 'nowrap' }}>
                     {step}
                   </div>
                 </div>
@@ -438,7 +505,7 @@ export default function CreateListingPage() {
         </div>
 
         {/* RIGHT MAIN CONTENT AREA */}
-        <div style={{ flex: 1, minWidth: 0, width: '100%', background: '#ffffff', borderRadius: '24px', padding: '40px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <div className="supplier-create-content">
           
           {currentStep === 1 && (
             <div>
