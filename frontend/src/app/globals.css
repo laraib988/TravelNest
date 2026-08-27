@@ -669,7 +669,6 @@ input:focus, select:focus, textarea:focus {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
     gap: 12px;
-    height: 480px;
     border-radius: 16px;
     overflow: hidden;
     margin-bottom: 40px;

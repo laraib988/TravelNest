@@ -156,7 +156,7 @@ export default function TourGallery({ tour }: { tour: any }) {
             <img 
               src={cloudinaryLoader({ src: tour.images[0].url, width: 1200, quality: 75 })} 
               alt={tour.title} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} 
+              style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '8px', objectFit: 'contain', maxHeight: '600px' }} 
             />
           </div>
           {tour.images.length > 1 && (() => {
