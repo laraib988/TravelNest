@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata = { alternates: { canonical: '/sitemap' } };
+
 import { 
   ArrowRight, Map, User, FileText, Headphones, Building, 
   Gift, ChevronRight, Compass, Shield, Heart, Zap

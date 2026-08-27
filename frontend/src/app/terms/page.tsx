@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata = { alternates: { canonical: '/terms' } };
+
 import { 
   ArrowRight, Info, CheckSquare, UserCheck, Key, Globe, 
   CheckCircle, Tag, CreditCard, AlertTriangle, ShoppingBag, 

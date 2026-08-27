@@ -5,6 +5,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { MessageSquare, MapPin, Search } from 'lucide-react';
 import CommunityListClient from './CommunityListClient';
 
+export const metadata = { alternates: { canonical: '/community' } };
+
+
 export const revalidate = 1800; // ISR cache revalidation (30 minutes) for SEO
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';

@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata = { alternates: { canonical: '/support' } };
+
 import { 
   ArrowRight, Info, Headphones, Calendar, CreditCard, RefreshCcw, 
   User, Wrench, MessageSquare, Umbrella, AlertTriangle, Heart, 

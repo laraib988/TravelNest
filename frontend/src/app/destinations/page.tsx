@@ -11,6 +11,9 @@ export const revalidate = 3600;
 import { createClient } from '@supabase/supabase-js';
 import DestinationsClientPage from '@/components/DestinationsClientPage';
 
+export const metadata = { alternates: { canonical: '/destinations' } };
+
+
 export default async function DestinationsIndexPage() {
   console.log("🔥 CHECKING SSR: Running on Server (Index Page)!");
 

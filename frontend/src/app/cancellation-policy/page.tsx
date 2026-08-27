@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata = { alternates: { canonical: '/cancellation-policy' } };
+
 import { 
   ArrowRight, Info, List, Clock, Calendar, XCircle, 
   ShoppingBag, MousePointer, Activity, RefreshCcw, Heart, 

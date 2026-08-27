@@ -12,6 +12,9 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 import { getDynamicAlternates } from '@/lib/seo';
 
+export const metadata = { alternates: { canonical: '/blog' } };
+
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Vaitour Blog - Destination Guides & Travel Tips',

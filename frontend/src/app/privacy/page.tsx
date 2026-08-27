@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata = { alternates: { canonical: '/privacy' } };
+
 import { 
   ArrowRight, Info, Database, User, CreditCard, Smartphone, 
   Activity, Eye, Share2, Link as LinkIcon, Clock, Globe, 

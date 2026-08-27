@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata = { alternates: { canonical: '/refund-policy' } };
+
 import { 
   ArrowRight, Info, Clock, Shield, AlertCircle, 
   Cloud, ShoppingBag, MousePointer, PieChart, 

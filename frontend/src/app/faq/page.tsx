@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
 import FaqAccordion from './FaqAccordion';
 
+export const metadata = { alternates: { canonical: '/faq' } };
+
+
 // Using Next.js automatic Static Site Generation (SSG)
 // Since this page does not use cookies, headers, or searchParams dynamically,
 // Next.js will naturally pre-render it as a highly optimized static HTML page at build time.
