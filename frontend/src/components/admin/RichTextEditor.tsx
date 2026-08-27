@@ -33,7 +33,8 @@ import {
 } from 'lucide-react';
 
 // HTML ⇄ Markdown converters (blog content is stored as markdown).
-const turndown = new TurndownService({
+const Turndown = (TurndownService as any).default || TurndownService;
+const turndown = new Turndown({
   headingStyle: 'atx',
   bulletListMarker: '-',
   codeBlockStyle: 'fenced',
@@ -43,7 +44,8 @@ const turndown = new TurndownService({
 
 function markdownToHtml(md: string): string {
   if (!md) return '';
-  const html = marked.parse(md, { async: false, gfm: true, breaks: true });
+  const parse = (marked as any).parse || marked;
+  const html = parse(md, { async: false, gfm: true, breaks: true });
   return typeof html === 'string' ? html : '';
 }
 

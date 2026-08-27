@@ -29,7 +29,7 @@ export async function GET() {
   try {
     const { data, error } = await getSupabase()
       .from('blogs')
-      .select('id, title, slug, cover_image, category, author_name, published_at, status')
+      .select('id, title, slug, hero_image, summary, focus_keywords, author_name, published_at, status')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

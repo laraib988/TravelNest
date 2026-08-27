@@ -16,7 +16,7 @@ import { getDynamicAlternates } from '@/lib/seo';
 
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { alternates: { canonical: '/blog' },
+  return {
     title: 'Vaitour Blog - Destination Guides & Travel Tips',
     description: 'Expert travel guides, 3-day itineraries, cost breakdowns and local etiquette tips for Japan and beyond. Plan smarter with Vaitour.',
     keywords: ['best museums in tokyo', 'sapporo', 'harajuku', 'kamakura', 'asakusa', 'dotonbori', 'kobe japan', 'nara japan', 'nikko', 'things to do in tokyo', 'japan food', 'kabukicho', 'kyoto station', 'ueno park', 'ghibli museum tickets', 'hakone japan', 'kansai region', 'kanto', 'japan blog', 'travel tips'],
