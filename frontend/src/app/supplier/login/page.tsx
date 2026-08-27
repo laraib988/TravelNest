@@ -102,6 +102,16 @@ export default function SupplierLoginPage() {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+              <button 
+                type="button"
+                onClick={() => router.push('/supplier/forgot-password')}
+                style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+              >
+                Forgot password?
+              </button>
+            </div>
           </div>
 
           {authError && (
