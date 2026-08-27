@@ -37,6 +37,7 @@ export const metadata = {
     template: '%s | Vaitour'
   },
   description: 'Book authentic, top-rated local tours, sunset cruises, food walks, and travel experiences worldwide. Connect with verified local guides and plan your perfect trip.',
+  keywords: ['best museums in tokyo', 'sapporo', 'harajuku', 'kamakura', 'asakusa', 'dotonbori', 'kobe japan', 'nara japan', 'nikko', 'things to do in tokyo', 'japan food', 'kabukicho', 'kyoto station', 'ueno park', 'ghibli museum tickets', 'hakone japan', 'kansai region', 'kanto', 'vaitour'],
   verification: {
     google: 'E5I3y-OC4eYmBFKcLBcSTLLke3DNZEKzD05x3wOfyzE',
   },

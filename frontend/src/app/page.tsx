@@ -12,7 +12,7 @@ export async function generateMetadata() {
   return {
     title: seoTitle,
     description: seoDesc,
-    keywords: ['book local tours', 'Japan local guides', 'travel experiences', 'day trips', 'verified tour operators', 'holiday activities'],
+    keywords: ['book local tours', 'Japan local guides', 'travel experiences', 'day trips', 'verified tour operators', 'holiday activities', 'best museums in tokyo', 'sapporo', 'harajuku', 'kamakura', 'asakusa', 'dotonbori', 'kobe japan', 'nara japan', 'nikko', 'things to do in tokyo', 'japan food', 'kabukicho', 'kyoto station', 'ueno park', 'ghibli museum tickets', 'hakone japan', 'kansai region', 'kanto'],
     alternates: {
       canonical: url,
       languages: {
