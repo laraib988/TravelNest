@@ -224,8 +224,10 @@ export default async function Page({ params }: Props) {
     reviews: reviewsData,
     itinerary: p.itinerary || [],
     faqs: p.experience_details?.faqs || [],
-    supplier_profile: supplierProfile,
-    supplier_total_reviews: supplierTotalReviews,
+    supplier: supplierProfile ? {
+      ...supplierProfile,
+      total_reviews: supplierTotalReviews
+    } : null,
   };
   const productSchema = {
     '@context': 'https://schema.org/',
