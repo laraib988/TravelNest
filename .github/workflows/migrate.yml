@@ -1,0 +1,22 @@
+name: Migrate Supabase Database
+
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Dump Old Database
+        run: supabase db dump --db-url "postgresql://postgres.vozgnbqjqiaabkrpniqb:Buttar197042%23@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres" -f full_backup.sql
+
+      - name: Push to New Database
+        run: psql "postgresql://postgres.urtuukuccwuulqwuablt:Buttar197042%23@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres" -f full_backup.sql
