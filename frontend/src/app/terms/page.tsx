@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata = { alternates: { canonical: '/terms' } };
+
 
 import { 
   ArrowRight, Info, CheckSquare, UserCheck, Key, Globe, 
@@ -10,7 +10,7 @@ import {
   Briefcase, XCircle, Map, RefreshCcw
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/terms' },
   title: 'Terms of Service | Vaitour',
   description: 'Legally binding terms, conditions, and user responsibilities for utilizing the Vaitour platform.',
 };

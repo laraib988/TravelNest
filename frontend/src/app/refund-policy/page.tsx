@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata = { alternates: { canonical: '/refund-policy' } };
+
 
 import { 
   ArrowRight, Info, Clock, Shield, AlertCircle, 
@@ -10,7 +10,7 @@ import {
   Ticket, AlertTriangle, FileText, Users, Lock, Umbrella
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/refund-policy' },
   title: 'Refund Policy | Vaitour',
   description: 'Comprehensive information regarding our refund rules, cancellation windows, and processing timelines.',
 };

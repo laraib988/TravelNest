@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 import FaqAccordion from './FaqAccordion';
 
-export const metadata = { alternates: { canonical: '/faq' } };
+
 
 
 // Using Next.js automatic Static Site Generation (SSG)
 // Since this page does not use cookies, headers, or searchParams dynamically,
 // Next.js will naturally pre-render it as a highly optimized static HTML page at build time.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/faq' },
   title: 'Frequently Asked Questions | Vaitour',
   description: 'Find answers to common questions about booking tours, managing payments, and becoming a supplier on Vaitour.',
 };

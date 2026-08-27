@@ -1,6 +1,6 @@
 import { getDynamicAlternates } from '@/lib/seo';
 export async function generateMetadata() {
-  return {
+  return { alternates: { canonical: '/destinations' },
     title: 'Destinations | Vaitour',
     description: 'Explore the world.',
     alternates: await getDynamicAlternates('/destinations')
@@ -11,7 +11,7 @@ export const revalidate = 3600;
 import { createClient } from '@supabase/supabase-js';
 import DestinationsClientPage from '@/components/DestinationsClientPage';
 
-export const metadata = { alternates: { canonical: '/destinations' } };
+
 
 
 export default async function DestinationsIndexPage() {

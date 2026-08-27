@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata = { alternates: { canonical: '/sitemap' } };
+
 
 import { 
   ArrowRight, Map, User, FileText, Headphones, Building, 
   Gift, ChevronRight, Compass, Shield, Heart, Zap
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/sitemap' },
   title: 'Sitemap | Vaitour',
   description: 'Navigate the entire Vaitour ecosystem with our comprehensive sitemap.',
 };

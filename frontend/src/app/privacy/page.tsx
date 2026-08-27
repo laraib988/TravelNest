@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata = { alternates: { canonical: '/privacy' } };
+
 
 import { 
   ArrowRight, Info, Database, User, CreditCard, Smartphone, 
@@ -9,7 +9,7 @@ import {
   Shield, Mail, Lock, Heart, AlertTriangle, Briefcase, FileText
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/privacy' },
   title: 'Privacy Policy | Vaitour',
   description: 'Detailed information regarding how Vaitour collects, uses, and protects your personal data.',
 };

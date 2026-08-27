@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata = { alternates: { canonical: '/support' } };
+
 
 import { 
   ArrowRight, Info, Headphones, Calendar, CreditCard, RefreshCcw, 
@@ -9,7 +9,7 @@ import {
   Users, Gift, Edit, Map, Briefcase, Clock, ArrowUpCircle
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/support' },
   title: 'Help & Support | Vaitour',
   description: 'Comprehensive help center and customer support resources for Vaitour users.',
 };

@@ -12,11 +12,11 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 import { getDynamicAlternates } from '@/lib/seo';
 
-export const metadata = { alternates: { canonical: '/blog' } };
+
 
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return { alternates: { canonical: '/blog' },
     title: 'Vaitour Blog - Destination Guides & Travel Tips',
     description: 'Expert travel guides, 3-day itineraries, cost breakdowns and local etiquette tips for Japan and beyond. Plan smarter with Vaitour.',
     alternates: await getDynamicAlternates('/blog')

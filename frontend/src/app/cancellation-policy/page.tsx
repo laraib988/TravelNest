@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata = { alternates: { canonical: '/cancellation-policy' } };
+
 
 import { 
   ArrowRight, Info, List, Clock, Calendar, XCircle, 
@@ -10,7 +10,7 @@ import {
   Shield, Globe, UserCheck, FileText
 } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { alternates: { canonical: '/cancellation-policy' },
   title: 'Cancellation Policy | Vaitour',
   description: 'Detailed, real-world cancellation guidelines, grace periods, and tier-based rules for all Vaitour bookings.',
 };
