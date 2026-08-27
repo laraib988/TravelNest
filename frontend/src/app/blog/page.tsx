@@ -78,42 +78,44 @@ export default async function BlogIndexPage() {
       ) : (
         <div className="blog-grid">
           {posts.map((post) => (
-            <article key={post.slug} className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: '220px', position: 'relative' }}>
-                <Image src={post.hero_image} alt={post.hero_image_alt || post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
-                <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-primary)', color: '#fff', padding: '4px 10px', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', fontWeight: 700 }}>
-                  Travel Guide
+            <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: 'none', display: 'flex' }}>
+              <article className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', width: '100%', cursor: 'pointer' }}>
+                <div style={{ height: '220px', position: 'relative' }}>
+                  <Image src={post.hero_image} alt={post.hero_image_alt || post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
+                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--brand-primary)', color: '#fff', padding: '4px 10px', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', fontWeight: 700 }}>
+                    Travel Guide
+                  </div>
                 </div>
-              </div>
 
-              <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                  <div className="blog-meta-row">
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {post.author_avatar && (
-                        <Image src={post.author_avatar} alt={post.author_name} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }}  width={22} height={22} />
-                      )}
-                      <User size={13} /> {post.author_name}
-                    </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Calendar size={13} /> {post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
-                    </span>
+                <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div className="blog-meta-row">
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        {post.author_avatar && (
+                          <Image src={post.author_avatar} alt={post.author_name} style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover' }}  width={22} height={22} />
+                        )}
+                        <User size={13} /> {post.author_name}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Calendar size={13} /> {post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                      </span>
+                    </div>
+
+                    <h2 style={{ fontSize: '1.35rem', color: '#0f172a', lineHeight: 1.3, marginBottom: '10px', fontWeight: 700 }}>
+                      {post.title}
+                    </h2>
+
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '16px' }}>
+                      {post.summary || post.meta_description}
+                    </p>
                   </div>
 
-                  <h2 style={{ fontSize: '1.35rem', color: '#0f172a', lineHeight: 1.3, marginBottom: '10px', fontWeight: 700 }}>
-                    {post.title}
-                  </h2>
-
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '16px' }}>
-                    {post.summary || post.meta_description}
-                  </p>
+                  <div className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '10px 0', textDecoration: 'none' }}>
+                    Read Full Guide <ArrowRight size={16} />
+                  </div>
                 </div>
-
-                <Link href={`/blog/${post.slug}`} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '10px 0' }}>
-                  Read Full Guide <ArrowRight size={16} />
-                </Link>
-              </div>
-            </article>
+              </article>
+            </Link>
           ))}
         </div>
       )}

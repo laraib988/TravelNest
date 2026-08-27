@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { Calendar, User, ArrowLeft, CheckCircle2, MapPin } from 'lucide-react';
 
 export const revalidate = 86400; // 24h ISR
@@ -266,6 +267,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className="blog-content" style={{ fontSize: '1.02rem', lineHeight: 1.85, color: '#334155' }}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
                 components={{
                   h2: (props) => {
                     const idx = toc.findIndex((t) => t.level === 2 && t.text === String(props.children || '').trim());

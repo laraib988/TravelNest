@@ -8,8 +8,14 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
 import Highlight from '@tiptap/extension-highlight';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
 import { marked } from 'marked';
 import TurndownService from 'turndown';
+// @ts-ignore
+import { gfm } from 'turndown-plugin-gfm';
 
 import {
   Bold,
@@ -30,6 +36,7 @@ import {
   Redo2,
   Minus,
   Highlighter,
+  Table as TableIcon,
 } from 'lucide-react';
 
 // HTML ⇄ Markdown converters (blog content is stored as markdown).
@@ -41,6 +48,7 @@ const turndown = new Turndown({
   emDelimiter: '*',
   strongDelimiter: '**',
 });
+turndown.use(gfm);
 
 function markdownToHtml(md: string): string {
   if (!md) return '';
@@ -73,6 +81,15 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Placeholder.configure({ placeholder: placeholder || 'Start writing…' }),
       Highlight,
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'rte-table',
+        },
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: initialHtml,
     immediatelyRender: false,
@@ -229,6 +246,9 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
         </button>
         <button type="button" onClick={() => editor.chain().focus().setHorizontalRule().run()} style={{ ...toolBtn, background: '#fff', color: '#475569' }}>
           <Minus size={16} />
+        </button>
+        <button type="button" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} style={{ ...toolBtn, background: '#fff', color: '#475569' }} title="Insert Table">
+          <TableIcon size={16} />
         </button>
 
         <span style={{ width: 1, height: 22, background: '#e2e8f0', margin: '0 4px' }} />
