@@ -156,8 +156,9 @@ export default function ProfilePage() {
     }
   };
 
-  const pointValue = (profile.loyalty_points / POINTS_PER_TOUR) * POINT_VALUE_USD;
-  const totalSavings = (profile.loyalty_points / POINTS_PER_TOUR) * POINT_VALUE_USD;
+  const calculatedPoints = loyaltyHistory.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const pointValue = (calculatedPoints / POINTS_PER_TOUR) * POINT_VALUE_USD;
+  const totalSavings = (calculatedPoints / POINTS_PER_TOUR) * POINT_VALUE_USD;
 
   return (
     <>
@@ -223,7 +224,7 @@ export default function ProfilePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div style={{ background: '#ffffff', borderRadius: '16px', padding: '20px', border: '1px solid #fde68a' }}>
               <div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#b45309', fontVariantNumeric: 'tabular-nums' }}>
-                {profile.loyalty_points || 0}
+                {calculatedPoints}
               </div>
               <div style={{ color: '#92400e', fontWeight: 600, fontSize: '0.9rem' }}>Total Points</div>
             </div>
