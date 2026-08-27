@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
               '/admin-portal/', '/supplier/', '/checkout/', '/cart',
               '/wishlist', '/api/', '/login', '/signup', '/*/login', '/*/signup',
               '/notifications', '/profile', '/my-bookings', '/*/notifications', '/*/profile', '/*/my-bookings',
+              '/cdn-cgi/',
               '/*?*sort=', '/*?*session=', '/*?*duration=', '/*?*category=', '/*?*price=', '/*?*date=', '/*?*redirect='
             ] 
           },
