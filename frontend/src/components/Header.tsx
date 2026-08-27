@@ -61,15 +61,20 @@ export default function Header() {
   useEffect(() => {
     async function loadNotifications() {
       try {
-        const data = await fetchFromAPI('/users/me/notifications');
-        const list = Array.isArray(data) ? data : (data?.data || []);
-        setUnreadNotifications(list.filter((n: any) => !n.is_read && !n.read).length);
+        const data = await fetchFromAPI('/customer/bookings');
+        if (Array.isArray(data)) {
+          setUnreadNotifications(data.length);
+        } else {
+          setUnreadNotifications(0);
+        }
       } catch (e) {
         setUnreadNotifications(0);
       }
     }
-    loadNotifications();
-  }, [pathname]);
+    if (user) {
+      loadNotifications();
+    }
+  }, [pathname, user]);
 
 
   // Close dropdowns when clicking outside

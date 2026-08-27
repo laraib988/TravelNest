@@ -10,8 +10,9 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/', 
             disallow: [
               '/admin-portal/', '/supplier/', '/checkout/', '/cart',
-              '/wishlist', '/api/', 
-              '/*?*sort=', '/*?*session=', '/*?*duration=', '/*?*category=', '/*?*price=', '/*?*date='
+              '/wishlist', '/api/', '/login', '/signup', '/*/login', '/*/signup',
+              '/notifications', '/profile', '/my-bookings', '/*/notifications', '/*/profile', '/*/my-bookings',
+              '/*?*sort=', '/*?*session=', '/*?*duration=', '/*?*category=', '/*?*price=', '/*?*date=', '/*?*redirect='
             ] 
           },
         ]

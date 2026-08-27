@@ -115,6 +115,16 @@ async function getRelatedDestinations() {
   return data || [];
 }
 
+async function getRelatedBlogs(currentSlug: string) {
+  const { data } = await supabase
+    .from('blogs')
+    .select('title, slug, hero_image, summary, published_at')
+    .eq('status', 'published')
+    .neq('slug', currentSlug)
+    .limit(3);
+  return data || [];
+}
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const blog = await getBlog(slug);
@@ -139,6 +149,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const toc = buildToC(cleanMarkdown);
   const related = await getRelatedDestinations();
+  const relatedBlogs = await getRelatedBlogs(slug);
 
   let articleSchema: any = null;
   let faqSchema: any = null;
@@ -349,6 +360,30 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <div style={{ padding: '18px' }}>
                     <p style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px', marginTop: 0 }}>{d.name}</p>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{d.country}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Related blogs */}
+        {relatedBlogs.length > 0 && (
+          <div style={{ marginTop: '56px' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px' }}>
+              Read More
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+              {relatedBlogs.map((b: any) => (
+                <Link key={b.slug} href={`/blog/${b.slug}`} className="card-panel card-interactive" style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
+                  {b.hero_image && (
+                    <div style={{ height: '160px', position: 'relative' }}>
+                      <Image src={b.hero_image} alt={b.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  width={100} height={100} />
+                    </div>
+                  )}
+                  <div style={{ padding: '18px' }}>
+                    <p style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px', marginTop: 0, lineHeight: 1.4 }}>{b.title}</p>
+                    {b.summary && <span style={{ fontSize: '0.85rem', color: '#475569', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{b.summary}</span>}
                   </div>
                 </Link>
               ))}
