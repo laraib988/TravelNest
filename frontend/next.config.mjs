@@ -22,6 +22,7 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.cloudinary.com' },
       { protocol: 'https', hostname: 'ui-avatars.com' },
       { protocol: 'https', hostname: 'placehold.co' },
+      { protocol: 'https', hostname: 'static.toiimg.com' },
     ],
   },
   async redirects() {

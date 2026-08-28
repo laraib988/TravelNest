@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import useSWR from 'swr';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { LayoutDashboard, Users, Calendar, Settings, LogOut, CheckCircle2, MoreVertical, Edit, EyeOff, Trash2, Plus, ArrowUpRight, DollarSign, Search, Clock, Wallet, Banknote, SlidersHorizontal, CheckCircle, Eye, Download, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import AccountSettingsClient from './AccountSettingsClient';
 import { createClient } from '@supabase/supabase-js';
 
@@ -92,6 +92,7 @@ const section = (params?.section as string) || 'dashboard';
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [financeTab, setFinanceTab] = useState<'PAYOUTS' | 'INVOICES' | 'CONFIRMATION' | 'SETTINGS'>(section === 'account-settings' ? 'SETTINGS' : 'PAYOUTS');
   const [availabilityTab, setAvailabilityTab] = useState<'PRODUCTS' | 'SETTINGS'>('PRODUCTS');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [dateRanges, setDateRanges] = useState<Record<string, { from: string; to: string }>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -289,34 +290,302 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
+    <div className="supplier-dashboard-layout" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 768px) {
+          .supplier-dashboard-layout {
+            flex-direction: column !important;
+          }
+          .supplier-mobile-header {
+            display: flex !important;
+          }
+          .supplier-mobile-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+          }
+          .supplier-mobile-overlay.open {
+            opacity: 1; visibility: visible;
+          }
+          
+          /* Hamburger Drawer CSS */
+          .supplier-sidebar-container {
+            position: fixed !important;
+            top: 0 !important;
+            left: -320px !important;
+            width: 280px !important;
+            height: 100vh !important;
+            z-index: 1000 !important;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.1) !important;
+            border-right: none !important;
+            border-bottom: none !important;
+          }
+          .supplier-sidebar-container.open {
+            left: 0 !important;
+          }
+          .supplier-sidebar-container.open .supplier-mobile-close {
+            display: block !important;
+          }
+          
+          /* Reset inner padding/flex for drawer */
+          .supplier-sidebar-container > div:nth-of-type(2) {
+            padding: 20px !important;
+          }
+          .supplier-sidebar-container > div:nth-of-type(2) > div {
+            flex-direction: column !important;
+            overflow-x: visible !important;
+            white-space: normal !important;
+            padding-bottom: 0 !important;
+          }
+          
+          /* Show logout button again in drawer */
+          .supplier-sidebar-container > div:nth-of-type(3) {
+            display: block !important;
+          }
+
+          /* Main Content */
+          .supplier-main-content {
+            padding: 20px 16px !important;
+          }
+          /* Stats Grid */
+          div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+            grid-template-columns: 1fr !important;
+          }
+          /* Search Bar */
+          div[style*="width: 320px"] {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          /* Make all tables swipeable */
+          div[style*="overflow: hidden"] {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+          }
+          table {
+            min-width: 800px;
+          }
+          /* Tabs */
+          div[style*="border-radius: 100px"][style*="background: #f1f5f9"] {
+            flex-wrap: wrap !important;
+            border-radius: 16px !important;
+            padding: 12px !important;
+          }
+          /* Listings Header */
+          .supplier-listings-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .supplier-listings-header > button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          /* Listings Tab - Professional Card Layout */
+          .supplier-listing-row {
+            display: grid !important;
+            grid-template-columns: 80px 1fr !important;
+            grid-template-areas: 
+              "image details"
+              "status status"
+              "actions actions" !important;
+            gap: 12px !important;
+            padding: 16px !important;
+            align-items: start !important;
+          }
+          .supplier-listing-row > img {
+            grid-area: image;
+            width: 80px !important;
+            height: 80px !important;
+            object-fit: cover !important;
+          }
+          .supplier-listing-details {
+            grid-area: details;
+            margin-left: 0 !important;
+            width: 100%;
+          }
+          .supplier-listing-details-meta {
+            flex-wrap: wrap !important;
+            gap: 4px 8px !important;
+          }
+          .supplier-listing-details-meta > span:nth-child(even) {
+            display: none !important; /* hide the dots on mobile */
+          }
+          .supplier-listing-status {
+            grid-area: status;
+            width: 100% !important;
+            margin-top: 4px;
+          }
+          .supplier-listing-actions {
+            grid-area: actions;
+            margin-left: 0 !important;
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            padding-top: 12px !important;
+            border-top: 1px dashed #e2e8f0 !important;
+            justify-content: flex-start !important;
+          }
+          /* Bookings Tab - Professional Card Layout */
+          table.supplier-bookings-table {
+            min-width: 0 !important;
+          }
+          .supplier-bookings-table thead {
+            display: none !important;
+          }
+          .supplier-bookings-table, .supplier-bookings-table tbody {
+            display: block !important;
+            width: 100% !important;
+          }
+          .supplier-bookings-table tr {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+              "customer customer"
+              "datetime payment"
+              "status status"
+              "actions actions";
+            gap: 12px;
+            padding: 20px 16px !important;
+            border-bottom: 8px solid #f1f5f9 !important;
+          }
+          .supplier-bookings-table td {
+            display: block !important;
+            padding: 0 !important;
+            border: none !important;
+            text-align: left !important;
+          }
+          .supplier-bookings-table td:nth-child(1) { grid-area: customer; }
+          .supplier-bookings-table td:nth-child(2) { grid-area: datetime; }
+          .supplier-bookings-table td:nth-child(3) { grid-area: payment; }
+          .supplier-bookings-table td:nth-child(4) { grid-area: status; margin-top: 8px; }
+          .supplier-bookings-table td:nth-child(5) { 
+            grid-area: actions; 
+            border-top: 1px dashed #e2e8f0 !important;
+            margin-top: 8px;
+            padding-top: 16px !important;
+            display: flex !important;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-start !important;
+          }
+          .supplier-bookings-table td:nth-child(2)::before,
+          .supplier-bookings-table td:nth-child(3)::before,
+          .supplier-bookings-table td:nth-child(4)::before {
+            display: block;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+          }
+          .supplier-bookings-table td:nth-child(2)::before { content: 'Date & Time'; }
+          .supplier-bookings-table td:nth-child(3)::before { content: 'Amount & Guests'; }
+          .supplier-bookings-table td:nth-child(4)::before { content: 'Status'; }
+          
+          /* Finance Summary Cards */
+          div[style*="minmax(240px, 1fr)"] { grid-template-columns: 1fr !important; }
+          /* Finance Chart */
+          .finance-chart-container { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
+          .finance-chart-inner { min-width: 500px; }
+          
+          .finance-tabs-wrapper { 
+            flex-wrap: nowrap !important; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            border-radius: 12px !important; 
+            width: 100% !important; 
+            max-width: 100% !important; 
+            -webkit-overflow-scrolling: touch;
+          }
+          .finance-tabs-wrapper::-webkit-scrollbar { display: none; }
+          
+          .finance-search-wrapper { flex-direction: column !important; align-items: flex-start !important; gap: 12px; }
+          .finance-search-wrapper > div { width: 100% !important; max-width: 100% !important; }
+          
+          /* Finance Tables Base */
+          table.finance-payouts-table, table.finance-confirmations-table, table.finance-invoices-table { min-width: 0 !important; }
+          .finance-payouts-table thead, .finance-confirmations-table thead, .finance-invoices-table thead { display: none !important; }
+          .finance-payouts-table, .finance-payouts-table tbody, .finance-payouts-table tr, .finance-payouts-table td,
+          .finance-confirmations-table, .finance-confirmations-table tbody, .finance-confirmations-table tr, .finance-confirmations-table td,
+          .finance-invoices-table, .finance-invoices-table tbody, .finance-invoices-table tr, .finance-invoices-table td { display: block !important; width: 100% !important; }
+          .finance-payouts-table tr, .finance-confirmations-table tr, .finance-invoices-table tr { padding: 16px !important; border-bottom: 8px solid #f1f5f9 !important; position: relative; }
+          .finance-payouts-table td, .finance-confirmations-table td, .finance-invoices-table td { padding: 6px 0 !important; border: none !important; text-align: left !important; display: flex !important; justify-content: space-between !important; align-items: center !important; }
+          .finance-payouts-table td::before, .finance-confirmations-table td::before, .finance-invoices-table td::before { font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+          
+          /* Payouts Specific */
+          .finance-payouts-table td:nth-child(1) { display: none !important; }
+          .finance-payouts-table td:nth-child(2)::before { content: 'Ref'; }
+          .finance-payouts-table td:nth-child(3)::before { content: 'Traveler'; }
+          .finance-payouts-table td:nth-child(4)::before { content: 'Product Code'; }
+          .finance-payouts-table td:nth-child(5)::before { content: 'Date'; }
+          .finance-payouts-table td:nth-child(6)::before { content: 'Retail Price'; }
+          .finance-payouts-table td:nth-child(7)::before { content: 'Net Price'; }
+          .finance-payouts-table td:nth-child(8) { margin-top: 12px; padding-top: 12px !important; border-top: 1px dashed #e2e8f0 !important; justify-content: flex-end !important; }
+          
+          /* Confirmations Specific */
+          .finance-confirmations-table td:nth-child(1)::before { content: 'Date'; }
+          .finance-confirmations-table td:nth-child(2)::before { content: 'Payment ID'; }
+          .finance-confirmations-table td:nth-child(3)::before { content: 'Amount'; }
+          .finance-confirmations-table td:nth-child(4)::before { content: 'Method'; }
+          .finance-confirmations-table td:nth-child(5) { margin-top: 12px; padding-top: 12px !important; border-top: 1px dashed #e2e8f0 !important; justify-content: flex-start !important; }
+          .finance-confirmations-table td:nth-child(5)::before { content: 'Status'; margin-right: auto; }
+          .finance-confirmations-table td:nth-child(6) { justify-content: flex-end !important; margin-top: 8px; }
+          
+          /* Invoices Specific */
+          .finance-invoices-table td:nth-child(1)::before { content: 'Date'; }
+          .finance-invoices-table td:nth-child(2)::before { content: 'Invoice #'; }
+          .finance-invoices-table td:nth-child(3)::before { content: 'Amount'; }
+          .finance-invoices-table td:nth-child(4)::before { content: 'Due Date'; }
+          .finance-invoices-table td:nth-child(5) { margin-top: 12px; padding-top: 12px !important; border-top: 1px dashed #e2e8f0 !important; justify-content: flex-start !important; }
+          .finance-invoices-table td:nth-child(5)::before { content: 'Status'; margin-right: auto; }
+          .finance-invoices-table td:nth-child(6) { justify-content: flex-end !important; margin-top: 8px; }
+          
+          /* Availability Tab */
+          .availability-container { padding: 20px 16px !important; }
+          .availability-header-actions { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
+          .availability-header-actions > div { width: 100% !important; min-width: 0 !important; }
+          .availability-header-actions > button { width: 100% !important; justify-content: center !important; }
+          .availability-grid { grid-template-columns: 1fr !important; }
+          .availability-card { padding: 16px !important; }
+          .availability-dates-row { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; }
+          .availability-dates-row > span { display: none !important; }
+        }
+      `}} />
+      {/* Mobile Overlay */}
+      <div className={`supplier-mobile-overlay ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
+
       {/* Sidebar */}
-      <div style={{ width: '280px', background: '#ffffff', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>Vaitour Supplier</h2>
-          <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <CheckCircle2 size={14} color="#059669" /> Verified Partner
+      <div className={`supplier-sidebar-container ${mobileMenuOpen ? 'open' : ''}`} style={{ width: '280px', background: '#ffffff', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>Vaitour Supplier</h2>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CheckCircle2 size={14} color="#059669" /> Verified Partner
+            </div>
           </div>
+          <button className="supplier-mobile-close" onClick={() => setMobileMenuOpen(false)} style={{ display: 'none', background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}>
+            <X size={24} color="#64748b" />
+          </button>
         </div>
         
         <div style={{ flex: 1, padding: '20px' }}>
 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <Link href="/supplier/dashboard" style={{ padding: '12px 16px', background: activeTab === 'DASHBOARD' ? '#f0f9ff' : 'transparent', color: activeTab === 'DASHBOARD' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'DASHBOARD' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link href="/supplier/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px 16px', background: activeTab === 'DASHBOARD' ? '#f0f9ff' : 'transparent', color: activeTab === 'DASHBOARD' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'DASHBOARD' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <LayoutDashboard size={18} /> Dashboard
             </Link>
-            <Link href="/supplier/listings" style={{ padding: '12px 16px', background: activeTab === 'LISTINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'LISTINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'LISTINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link href="/supplier/listings" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px 16px', background: activeTab === 'LISTINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'LISTINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'LISTINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Calendar size={18} /> My Listings
             </Link>
-            <Link href="/supplier/bookings" style={{ padding: '12px 16px', background: activeTab === 'BOOKINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'BOOKINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'BOOKINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link href="/supplier/bookings" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px 16px', background: activeTab === 'BOOKINGS' ? '#f0f9ff' : 'transparent', color: activeTab === 'BOOKINGS' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'BOOKINGS' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Users size={18} /> Bookings
             </Link>
-            <Link href="/supplier/finance" style={{ padding: '12px 16px', background: activeTab === 'FINANCE' ? '#f0f9ff' : 'transparent', color: activeTab === 'FINANCE' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'FINANCE' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link href="/supplier/finance" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px 16px', background: activeTab === 'FINANCE' ? '#f0f9ff' : 'transparent', color: activeTab === 'FINANCE' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'FINANCE' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <DollarSign size={18} /> Finance & Payouts
             </Link>
-            <Link href="/supplier/availability" style={{ padding: '12px 16px', background: activeTab === 'AVAILABILITY' ? '#f0f9ff' : 'transparent', color: activeTab === 'AVAILABILITY' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'AVAILABILITY' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link href="/supplier/availability" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px 16px', background: activeTab === 'AVAILABILITY' ? '#f0f9ff' : 'transparent', color: activeTab === 'AVAILABILITY' ? '#0284c7' : '#64748b', borderRadius: '10px', fontWeight: activeTab === 'AVAILABILITY' ? 700 : 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Calendar size={18} /> Availability
             </Link>
-            <Link href="/supplier/account-settings" style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link href="/supplier/account-settings" onClick={() => setMobileMenuOpen(false)} style={{ padding: '12px 16px', color: '#64748b', borderRadius: '10px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <Settings size={18} /> Account Settings
             </Link>
           </div>
@@ -330,7 +599,18 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+      <div className="supplier-main-content" style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+        
+        {/* Mobile Header */}
+        <div className="supplier-mobile-header" style={{ display: 'none', padding: '0 0 24px 0', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button onClick={() => setMobileMenuOpen(true)} style={{ background: '#f1f5f9', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+              <Menu size={20} color="#0f172a" />
+            </button>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Supplier Dashboard</h2>
+          </div>
+          <Image src={user?.avatar || "https://ui-avatars.com/api/?name=Partner"} alt="avatar" width={36} height={36} style={{ borderRadius: '50%', border: '2px solid #e2e8f0' }} />
+        </div>
         
         {activeTab === 'DASHBOARD' && (
           <>
@@ -414,8 +694,8 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
             </div>
 
             {/* CHART (CSS Based) */}
-            <div style={{ padding: '40px 0', borderTop: '1px dashed #cbd5e1', borderBottom: '1px dashed #cbd5e1', marginBottom: '40px', position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '240px', paddingLeft: '40px' }}>
+            <div className="finance-chart-container" style={{ padding: '40px 0', borderTop: '1px dashed #cbd5e1', borderBottom: '1px dashed #cbd5e1', marginBottom: '40px', position: 'relative' }}>
+              <div className="finance-chart-inner" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '240px', paddingLeft: '40px' }}>
                 {(() => {
                   const chartData = [...Array(4)].map((_, i) => {
                     const d = new Date();
@@ -468,7 +748,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
             </div>
 
             {/* TABS */}
-            <div style={{ display: 'flex', gap: '12px', background: '#f1f5f9', padding: '6px', borderRadius: '100px', width: 'fit-content', marginBottom: '24px' }}>
+            <div className="finance-tabs-wrapper" style={{ display: 'flex', gap: '12px', background: '#f1f5f9', padding: '6px', borderRadius: '100px', width: 'fit-content', marginBottom: '24px' }}>
               {['PAYOUTS', 'INVOICES', 'CONFIRMATION', 'SETTINGS'].map(tab => (
                 <button
                   key={tab}
@@ -496,7 +776,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
             {financeTab === 'PAYOUTS' && (
               <>
                 {/* SEARCH BAR */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <div className="finance-search-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '10px 16px', width: '320px' }}>
                     <Search size={18} color="#94a3b8" />
                     <input 
@@ -514,7 +794,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
 
                 {/* TABLE */}
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                  <table className="finance-payouts-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
                     <thead>
                       <tr style={{ background: '#f8fafc', color: '#475569', fontSize: '0.8rem', fontWeight: 800 }}>
                         <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0', width: '40px' }}><input type="checkbox" /></th>
@@ -576,7 +856,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                 </div>
                 
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                  <table className="finance-confirmations-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
                     <thead>
                       <tr style={{ background: '#f8fafc', color: '#0f172a', fontSize: '0.85rem', fontWeight: 800 }}>
                         <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Date</th>
@@ -690,7 +970,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                 </div>
                 
                 <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                  <table className="finance-invoices-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
                     <thead>
                       <tr style={{ background: '#f8fafc', color: '#0f172a', fontSize: '0.85rem', fontWeight: 800 }}>
                         <th style={{ padding: '16px', borderBottom: '1px solid #e2e8f0' }}>Date</th>
@@ -802,7 +1082,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
 )}
         
         {activeTab === 'AVAILABILITY' && (
-          <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+          <div className="availability-container" style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Product Availability</h1>
             <p style={{ color: '#64748b', marginBottom: '24px' }}>Activate or deactivate your products and set temporary blocked dates. No admin approval needed.</p>
 
@@ -817,7 +1097,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                 </div>
               ) : (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                  <div className="availability-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: '280px' }}>
                       <input
                         type="text"
@@ -835,7 +1115,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                     </button>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+                  <div className="availability-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
                     {listings
                       .filter(item => !search || (item.title && item.title.toLowerCase().includes(search.toLowerCase())) || (item.id && item.id.toLowerCase().includes(search.toLowerCase())))
                       .map((item) => {
@@ -853,6 +1133,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
 
                         return (
                           <div
+                            className="availability-card"
                             key={item.id}
                             style={{
                               background: '#fff',
@@ -920,7 +1201,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                             {/* Date Range picker */}
                             <div style={{ marginBottom: '16px', flex: 1 }}>
                               <label style={{ color: '#334155', fontSize: '0.85rem', fontWeight: 700, display: 'block', marginBottom: '8px' }}>Temporary Block Dates</label>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+                              <div className="availability-dates-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
                                 <input
                                   type="date"
                                   style={{ flex: 1, minWidth: 0, padding: '10px 4px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%' }}
@@ -975,7 +1256,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
         
         {activeTab === 'LISTINGS' && (
           <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <div className="supplier-listings-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
               <div>
                 <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>My Listings</h1>
                 <p style={{ color: '#64748b', margin: 0 }}>Manage your tours, experiences, and packages.</p>
@@ -987,14 +1268,14 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
 
             <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
               {listings.map((item, index) => (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '20px 24px', borderBottom: index < listings.length - 1 ? '1px solid #e2e8f0' : 'none', transition: 'background 0.2s', cursor: 'default' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                <div className="supplier-listing-row" key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '20px 24px', borderBottom: index < listings.length - 1 ? '1px solid #e2e8f0' : 'none', transition: 'background 0.2s', cursor: 'default' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                   {/* Image */}
                   <Image src={item.image} alt={item.title} style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }}  width={80} height={60} />
                   
                   {/* Details */}
-                  <div style={{ flex: 1, marginLeft: '20px' }}>
+                  <div className="supplier-listing-details" style={{ flex: 1, marginLeft: '20px' }}>
                     <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{item.title}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.85rem', color: '#64748b' }}>
+                    <div className="supplier-listing-details-meta" style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.85rem', color: '#64748b' }}>
                       <span style={{ fontWeight: 600, color: '#334155' }}>{item.price}</span>
                       <span>•</span>
                       <span>ID: {item.id.startsWith('TN') ? item.id : 'TN' + item.id.replace(/-/g, '').substring(0, 8).toUpperCase()}</span>
@@ -1013,12 +1294,12 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                   </div>
 
                   {/* Status */}
-                  <div style={{ width: '150px', display: 'flex', alignItems: 'center' }}>
+                  <div className="supplier-listing-status" style={{ width: '150px', display: 'flex', alignItems: 'center' }}>
                     {getStatusBadge(item.status)}
                   </div>
 
                   {/* Actions Dropdown Simulation */}
-                  <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
+                  <div className="supplier-listing-actions" style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
                     <button onClick={() => router.push(`/supplier/listings/create?id=${item.editUrlId || item.id}`)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#334155', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit Listing">
                       <Edit size={16} />
                     </button>
@@ -1075,7 +1356,7 @@ const triggerToast = (title: string, message: string, type: 'success' | 'error' 
                   No bookings found yet. Keep sharing your tours!
                 </div>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table className="supplier-bookings-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
                       <th style={{ padding: '16px 24px', fontSize: '0.85rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>Customer & Option</th>

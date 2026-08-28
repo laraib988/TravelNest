@@ -173,11 +173,26 @@ export default function AccountSettingsClient() {
   if (loading) return <div>Loading account details...</div>;
 
   return (
-    <div style={{ padding: '24px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div className="account-settings-container" style={{ padding: '24px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .account-settings-container { padding: 16px !important; }
+          .account-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .account-header button { width: 100% !important; justify-content: center !important; }
+          .account-header > div { width: 100% !important; flex-direction: column !important; gap: 8px !important; }
+          .account-avatar-section { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .account-avatar-section > div { flex-direction: column !important; width: 100% !important; }
+          .account-avatar-section button { width: 100% !important; justify-content: center !important; padding: 12px !important; }
+          .account-grid { grid-template-columns: 1fr !important; }
+          .account-form-buttons { flex-direction: column !important; width: 100% !important; }
+          .account-form-buttons > button { width: 100% !important; }
+          .bank-card { flex-direction: column !important; align-items: stretch !important; gap: 16px !important; padding: 16px !important; }
+        }
+      `}</style>
       
       {/* 1. Profile Information */}
       <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="account-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Account Profile</h2>
           {!isEditing ? (
             <button 
@@ -222,7 +237,7 @@ export default function AccountSettingsClient() {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '32px', marginBottom: '24px', alignItems: 'center' }}>
+        <div className="account-avatar-section" style={{ display: 'flex', gap: '32px', marginBottom: '24px', alignItems: 'center' }}>
           <Image src={isEditing ? formData.avatar : (profileData?.avatar || 'https://ui-avatars.com/api/?name=Supplier')} alt="Profile Icon" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e2e8f0' }}  width={100} height={100} />
           {isEditing && (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -243,7 +258,7 @@ export default function AccountSettingsClient() {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div className="account-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}><User size={14} /> Full Name</label>
             {isEditing ? (
@@ -314,7 +329,7 @@ export default function AccountSettingsClient() {
 
       {/* 2. Security (Password Change) */}
       <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="account-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Lock size={24} color="#0284c7" /> Security Settings
           </h2>
@@ -349,7 +364,7 @@ export default function AccountSettingsClient() {
               <input type="password" required minLength={8} value={passwordForm.confirmPassword} onChange={e => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }} />
             </div>
             
-            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+            <div className="account-form-buttons" style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
               <button 
                 type="button"
                 onClick={() => { setIsChangingPassword(false); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); setPasswordMessage({text:'', type:''}); }}
@@ -377,14 +392,14 @@ export default function AccountSettingsClient() {
 
       {/* 3. KYC Documents */}
       <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="account-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FileText size={24} color="#0284c7" /> KYC Documents
           </h2>
         </div>
         
         {kycData?.documents && kycData.documents.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="account-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             {kycData.documents.map((doc: any, i: number) => (
               <div key={i} style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
@@ -422,7 +437,7 @@ export default function AccountSettingsClient() {
         )}
         
               <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div className="account-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                   <div>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Payment Settings</h2>
                     <p style={{ color: '#64748b', margin: '4px 0 0 0', fontSize: '0.9rem' }}>Manage your bank accounts for international payouts.</p>
@@ -440,7 +455,7 @@ export default function AccountSettingsClient() {
                 {!showBankForm && bankAccounts.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {bankAccounts.map((account) => (
-                      <div key={account.id} style={{ background: '#fff', borderRadius: '16px', border: account.is_primary ? '2px solid #10b981' : '1px solid #e2e8f0', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: account.is_primary ? '0 4px 12px rgba(16, 185, 129, 0.1)' : 'none' }}>
+                      <div className="bank-card" key={account.id} style={{ background: '#fff', borderRadius: '16px', border: account.is_primary ? '2px solid #10b981' : '1px solid #e2e8f0', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: account.is_primary ? '0 4px 12px rgba(16, 185, 129, 0.1)' : 'none' }}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{account.bank_name}</h3>
@@ -516,7 +531,7 @@ export default function AccountSettingsClient() {
                       }
                       if (btn) btn.innerText = 'Save Payment Settings';
                     }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+                      <div className="account-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
                         <div>
                           <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Account Holder Name</label>
                           <input name="bank_account_name" id="bank_account_name" type="text" style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }} placeholder="John Doe" required />
@@ -561,7 +576,7 @@ export default function AccountSettingsClient() {
                         <label htmlFor="is_primary" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>Make this my primary payout method</label>
                       </div>
                       
-                      <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
+                      <div className="account-form-buttons" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
                         {bankAccounts.length > 0 && (
                           <button type="button" onClick={() => setShowBankForm(false)} style={{ padding: '12px 24px', borderRadius: '8px', background: '#fff', color: '#64748b', fontWeight: 700, border: '1px solid #cbd5e1', cursor: 'pointer' }}>
                             Cancel
