@@ -80,6 +80,15 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: 'CONTENT PAGES',
+    items: [
+      { href: '/admin-portal/content/tours-experiences', icon: MapPin, label: 'Tours & Experiences' },
+      { href: '/admin-portal/content/attraction-tickets', icon: Tag, label: 'Attraction Tickets' },
+      { href: '/admin-portal/content/transport', icon: CalendarCheck, label: 'Transport' },
+      { href: '/admin-portal/content/car-rentals', icon: Package, label: 'Car Rentals' },
+    ],
+  },
+  {
     label: 'SYSTEM & SECURITY',
     items: [
       { href: '/admin-portal/security', icon: ShieldAlert, label: 'Security & Audit' },
