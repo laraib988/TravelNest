@@ -337,28 +337,28 @@ export default function HomePage() {
         <div className="categories-container">
           
           {/* Card 1 - Tours & experiences */}
-            <div className="category-card">
+          <Link href="/category/tours-experiences" className="category-card" style={{ textDecoration: 'none' }}>
             <Compass size={32} color="#f97316" />
             <span className="category-card-text">Tours & experiences</span>
-          </div>
+          </Link>
 
           {/* Card 2 - Attraction tickets */}
-            <div className="category-card">
+          <Link href="/category/attraction-tickets" className="category-card" style={{ textDecoration: 'none' }}>
             <Ticket size={32} color="#8b5cf6" />
             <span className="category-card-text">Attraction tickets</span>
-          </div>
+          </Link>
 
           {/* Card 3 - Transport */}
-            <div className="category-card">
+          <Link href="/category/transport" className="category-card" style={{ textDecoration: 'none' }}>
             <Train size={32} color="#3b82f6" />
             <span className="category-card-text">Transport</span>
-          </div>
+          </Link>
 
           {/* Card 4 - Car rentals */}
-            <div className="category-card">
+          <Link href="/category/car-rentals" className="category-card" style={{ textDecoration: 'none' }}>
             <Car size={32} color="#10b981" />
             <span className="category-card-text">Car rentals</span>
-          </div>
+          </Link>
 
         </div>
       </section>
