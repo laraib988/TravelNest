@@ -439,8 +439,7 @@ useEffect(() => {
     !!verifiedUserId &&
     formData.lead_phone.trim() !== '' &&
     formData.pickup_location.trim() !== '' &&
-    (formData.same_as_pickup || formData.dropoff_location.trim() !== '') &&
-    formData.pickup_time !== '';
+    (formData.same_as_pickup || formData.dropoff_location.trim() !== '');
 
   // ─── PAYONEER PAYMENT MODAL ───
   if (payoneerModal) {
@@ -804,9 +803,8 @@ useEffect(() => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Pickup Time <span style={{ color: '#dc2626' }}>*</span></label>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-secondary)', fontWeight: 600 }}>Pickup Time</label>
               <select 
-                required
                 value={formData.pickup_time}
                 onChange={(e) => setFormData({...formData, pickup_time: e.target.value})}
                 style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a', outline: 'none' }}
