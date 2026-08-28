@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/api-client';
 import MapboxAutocomplete from '@/components/MapboxAutocomplete';
-import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, Download, Smartphone, Tag, Coins, Mail, KeyRound } from 'lucide-react';
+import { Clock, ShieldCheck, CreditCard, CheckCircle2, Lock, ArrowLeft, Download, Smartphone, Tag, Coins, Mail, KeyRound, Copy, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -32,6 +32,16 @@ function CheckoutContent() {
   const [timeLeft, setTimeLeft] = useState<number>(900);
   const [submitting, setSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
+
+  // Payoneer Payment Integration
+  const PAYONEER_BASE_URL = 'https://link.payoneer.com/Token?t=055DDF9650B94D5DACF298D4442A0190&src=pl';
+  const [payoneerModal, setPayoneerModal] = useState<{
+    bookingReference: string;
+    totalAmount: number;
+    bookingId: string;
+    booking: any;
+  } | null>(null);
+  const [amountCopied, setAmountCopied] = useState(false);
 
 useEffect(() => {
     if (confirmedBooking) {
@@ -321,17 +331,14 @@ useEffect(() => {
     setSubmitting(true);
     
     try {
-      if (customerPaymentChoice === 'pay_now') {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
       const supplierId = searchParams.get('supplier_id') || 'mock-supplier';
       const optionId = searchParams.get('option_id') || 'mock-opt';
 
       const { data: session } = await supabase.auth.getSession();
       const token = session?.session?.access_token || '';
+
+      const isPayNow = customerPaymentChoice === 'pay_now';
+      const totalPayable = Math.max(0, subtotal - discountAmount - loyaltyDiscount);
 
       const res = await fetch('/api/public/bookings', {
         method: 'POST',
@@ -344,7 +351,7 @@ useEffect(() => {
           option_name: tourOptionName,
           slot_start_time: tourDate,
           total_travelers: quantity,
-          gross_amount: subtotal,
+          gross_amount: totalPayable,
           currency: currency.code,
           lead_name: formData.lead_name,
           lead_email: formData.lead_email,
@@ -353,8 +360,8 @@ useEffect(() => {
           pickup_time: formData.pickup_time,
           pickup_location: formData.pickup_location,
           dropoff_location: formData.same_as_pickup ? formData.pickup_location : formData.dropoff_location,
-          payment_token: `tok_stripe_sim_${Date.now()}`,
-          payment_status: customerPaymentChoice === 'pay_later' ? 'RESERVED' : 'PAID',
+          payment_token: isPayNow ? `payoneer_pending_${Date.now()}` : `tok_reserved_${Date.now()}`,
+          payment_status: isPayNow ? 'PENDING_PAYMENT' : 'RESERVED',
           confirmation_type: confirmationType.toUpperCase().includes('MANUAL') ? 'MANUAL' : 'INSTANT',
           loyalty_discount: loyaltyDiscount,
           loyalty_points_used: loyaltyApplied ? Math.floor(loyaltyPoints / 100) * 100 : 0,
@@ -385,12 +392,42 @@ useEffect(() => {
         }
       }
 
-      setConfirmedBooking(result.booking);
+      if (isPayNow) {
+        // Show Payoneer payment modal instead of confirming immediately
+        setPayoneerModal({
+          bookingReference: result.booking?.booking_reference || result.booking?.id || 'N/A',
+          totalAmount: totalPayable,
+          bookingId: result.booking?.id || result.booking?.booking_reference || 'N/A',
+          booking: result.booking,
+        });
+        setAmountCopied(false);
+        window.scrollTo(0, 0);
+      } else {
+        // Pay Later — show confirmation directly
+        setConfirmedBooking(result.booking);
+      }
     } catch (err: any) {
       alert(err.message || 'Checkout failed');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Handle Payoneer redirect
+  const handlePayoneerRedirect = () => {
+    if (!payoneerModal) return;
+    const payUrl = `${PAYONEER_BASE_URL}&amount=${payoneerModal.totalAmount.toFixed(2)}&currency=USD&reference=${encodeURIComponent(payoneerModal.bookingReference)}`;
+    window.open(payUrl, '_blank', 'noopener,noreferrer');
+    // After redirect, show the confirmed booking screen
+    setConfirmedBooking(payoneerModal.booking);
+    setPayoneerModal(null);
+  };
+
+  const handleCopyAmount = () => {
+    if (!payoneerModal) return;
+    navigator.clipboard.writeText(payoneerModal.totalAmount.toFixed(2));
+    setAmountCopied(true);
+    setTimeout(() => setAmountCopied(false), 2000);
   };
 
   // All required fields must be filled AND the email verified before the
@@ -404,6 +441,74 @@ useEffect(() => {
     formData.pickup_location.trim() !== '' &&
     (formData.same_as_pickup || formData.dropoff_location.trim() !== '') &&
     formData.pickup_time !== '';
+
+  // ─── PAYONEER PAYMENT MODAL ───
+  if (payoneerModal) {
+    return (
+      <div style={{ maxWidth: '600px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
+        <div style={{ borderRadius: '20px', padding: '40px', border: '1px solid #cbd5e1', background: '#ffffff', boxShadow: '0 8px 32px rgba(0,0,0,0.08)' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <CreditCard size={36} />
+            </div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Complete Your Payment</h1>
+            <p style={{ fontSize: '0.95rem', color: '#64748b', lineHeight: 1.6 }}>
+              Your booking has been created. Please complete payment on the Payoneer secure page to confirm your reservation.
+            </p>
+          </div>
+
+          {/* Amount Card */}
+          <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: '16px', padding: '24px', marginBottom: '24px', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.85rem', color: '#059669', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Payable Amount</div>
+            <div style={{ fontSize: '2.8rem', fontWeight: 800, color: '#059669', lineHeight: 1 }}>${payoneerModal.totalAmount.toFixed(2)} <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>USD</span></div>
+            <button
+              type="button"
+              onClick={handleCopyAmount}
+              style={{ marginTop: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 20px', borderRadius: '8px', background: amountCopied ? '#d1fae5' : '#ffffff', border: `1px solid ${amountCopied ? '#86efac' : '#cbd5e1'}`, color: amountCopied ? '#059669' : '#475569', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
+            >
+              <Copy size={14} /> {amountCopied ? 'Amount Copied!' : 'Copy Amount'}
+            </button>
+          </div>
+
+          {/* Booking Reference */}
+          <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #e2e8f0' }}>
+            <div>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, marginBottom: '4px' }}>Booking Reference</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', letterSpacing: '0.02em' }}>{payoneerModal.bookingReference}</div>
+            </div>
+            <div style={{ padding: '6px 12px', borderRadius: '8px', background: '#fef3c7', color: '#92400e', fontSize: '0.75rem', fontWeight: 700 }}>PENDING PAYMENT</div>
+          </div>
+
+          {/* Instruction Note */}
+          <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '16px 20px', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+              <ShieldCheck size={20} color="#d97706" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div style={{ fontSize: '0.88rem', color: '#92400e', lineHeight: 1.7 }}>
+                <strong>Important:</strong> Please ensure you enter the exact booking amount (<strong>${payoneerModal.totalAmount.toFixed(2)} USD</strong>) on the Payoneer secure payment page to confirm your booking. Your booking reference <strong>{payoneerModal.bookingReference}</strong> will be automatically linked.
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <button
+            type="button"
+            onClick={handlePayoneerRedirect}
+            style={{ width: '100%', padding: '16px', borderRadius: '12px', background: '#2563eb', color: '#ffffff', fontWeight: 700, fontSize: '1.15rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: 'background 0.2s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#1d4ed8')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = '#2563eb')}
+          >
+            <ExternalLink size={20} /> Proceed to Payoneer Payment
+          </button>
+
+          <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '0.82rem', color: '#94a3b8' }}>
+            <Lock size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+            Secure payment processed by Payoneer. You will be redirected to a new tab.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (confirmedBooking) {
     return (
