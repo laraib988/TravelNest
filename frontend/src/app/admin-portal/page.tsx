@@ -50,7 +50,7 @@ export default function AdminDashboard() {
         setStats(statsData);
         
         const bData = await getAdminBookings();
-        setRecentBookings(bData.slice(0, 6));
+        setRecentBookings(Array.isArray(bData) ? bData.slice(0, 6) : []);
       } catch (err) {
         console.error('Error loading dashboard:', err);
       } finally {
