@@ -928,17 +928,17 @@ useEffect(() => {
 
           {/* Payment input or info based on choice */}
           {customerPaymentChoice === 'pay_now' ? (
-            <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: '#f0f9ff', border: '1px solid #bae6fd', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0369a1' }}>Stripe / Adyen PCI-DSS Element</span>
-                <Lock size={14} color="#059669" />
+            <div style={{ padding: '20px', borderRadius: 'var(--radius-md)', background: '#f8fafc', border: '1px solid #cbd5e1', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Payoneer_logo.svg/1200px-Payoneer_logo.svg.png" alt="Payoneer" style={{ height: '24px', objectFit: 'contain' }} />
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#334155' }}>Secure Payment via Payoneer</span>
+                </div>
+                <Lock size={16} color="#059669" />
               </div>
-              <input
-                type="text"
-                readOnly
-                value={formData.card_number}
-                style={{ width: '100%', padding: '10px', background: 'transparent', border: 'none', color: '#0284c7', fontWeight: 700, outline: 'none' }}
-              />
+              <div style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>
+                By clicking the button below, your booking will be reserved and you will be redirected to the secure Payoneer payment gateway to complete your transaction.
+              </div>
             </div>
           ) : (
             <div style={{ padding: '16px', borderRadius: 'var(--radius-md)', background: isPayAfterTour ? '#fffbeb' : '#f8fafc', border: `1px solid ${isPayAfterTour ? '#fde68a' : '#e2e8f0'}`, marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>

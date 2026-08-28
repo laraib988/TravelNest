@@ -286,34 +286,34 @@ return (
             </div>
           )}
 
-          <TourReviews tour={tour} />
-
-          {/* ABOUT SUPPLIER - MOBILE ONLY */}
-          <div className="mobile-only" style={{ marginTop: '40px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-            <h2 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <ShieldCheck size={22} color="#059669" /> About the Supplier
-            </h2>
+          {/* SUPPLIER CARD (DESKTOP & MOBILE) */}
+          <div style={{ marginTop: '40px', marginBottom: '40px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               {tour.supplier?.avatar_url || tour.supplier?.profile_image ? (
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', overflow: 'hidden', position: 'relative', flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                   <img src={tour.supplier?.avatar_url || tour.supplier?.profile_image} alt={tour.supplier?.name || tour.supplier?.username || 'Supplier'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ) : (
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.2rem', fontWeight: 700, flexShrink: 0 }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--brand-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.6rem', fontWeight: 700, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                   {(tour.supplier?.name || tour.supplier?.username) ? (tour.supplier?.name || tour.supplier?.username).charAt(0).toUpperCase() : 'S'}
                 </div>
               )}
               <div>
-                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {tour.supplier?.name || tour.supplier?.username || 'Verified Supplier'} <ShieldCheck size={18} color="#059669" />
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {tour.supplier?.name || tour.supplier?.username || 'Verified Supplier'}
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', color: '#059669', padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #a7f3d0' }}>
+                    <ShieldCheck size={14} /> Verified Supplier
+                  </div>
                 </div>
-                {tour.supplier?.username && tour.supplier?.name && <div style={{ fontSize: '0.85rem', color: '#64748b' }}>@{tour.supplier.username}</div>}
-                <div style={{ fontSize: '0.9rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-                  <Star size={14} color="#d97706" fill="#d97706" /> {tour.supplier?.total_reviews || tour.cached_review_count || 0} reviews
+                <div style={{ fontSize: '0.95rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                  <Star size={16} color='#d97706' fill='#d97706' /> 
+                  <span style={{ fontWeight: 700, color: '#334155' }}>{tour.supplier?.total_reviews || 0}</span> reviews from all tours
                 </div>
               </div>
             </div>
           </div>
+
+          <TourReviews tour={tour} />
         </div>
         
         <div className="tour-booking-right desktop-only">
