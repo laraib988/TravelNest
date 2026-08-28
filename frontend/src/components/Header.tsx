@@ -143,11 +143,7 @@ export default function Header() {
         }}
       >
         <div className="desktop-only" style={{ flexDirection: "column", width: "100%" }}>
-        {/* TOP ANNOUNCEMENT BAR */}
-        <div style={{ background: 'var(--brand-gradient)', color: '#ffffff', padding: '6px 24px', fontSize: '0.82rem', fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          <Sparkles size={14} /> ⚡ Flash Sale: Get 15% off Bali & Tokyo Experiences with code <strong>VAITOUR2026</strong>
-        </div>
-
+        {/* TOP ANNOUNCEMENT BAR (Removed) */}
         {/* HEADER 1: PRIMARY TOP HEADER BAR */}
         <div 
           style={{ 

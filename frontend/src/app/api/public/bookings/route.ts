@@ -165,36 +165,39 @@ export async function POST(request: Request) {
           console.error('Failed to resolve supplier email:', e);
         }
 
-        // Send confirmation + new order emails (customer + supplier).
-        const emailResult = await sendBookingEmails({
-          booking_reference,
-          qr_voucher_code,
-          listing_title,
-          option_name,
-          slot_start_time,
-          total_travelers: Number(total_travelers) || 1,
-          gross_amount: Number(gross_amount) || 0,
-          currency: currency || 'USD',
-          payment_status: payment_status || 'PAID',
-          status: data.status,
-          confirmation_type: confirmation_type === 'MANUAL' ? 'MANUAL' : 'INSTANT',
-          pickup_time: pickup_time || '',
-          pickup_location: pickup_location || '',
-          dropoff_location: dropoff_location || '',
-          lead_name: lead_name || '',
-          lead_email: lead_email || '',
-          lead_phone: lead_phone || '',
-          special_requirements: special_requirements || '',
-          supplier_email: supplierEmail || '',
-          appUrl: process.env.APP_URL || 'https://www.vaitour.com',
-          newAccountCredentials: new_account_credentials ? {
-            email: new_account_credentials.email,
-            temporaryPassword: new_account_credentials.temporary_password,
-            loginUrl: new_account_credentials.login_url || (process.env.APP_URL || 'https://www.vaitour.com') + '/login'
-          } : undefined,
-        });
-        if (emailResult.errors.length > 0) {
-          console.warn('Booking email issues:', emailResult.errors.join('; '));
+        // Send confirmation + new order emails (customer + supplier) ONLY IF NOT PENDING PAYMENT.
+        // For 'PENDING_PAYMENT' (Payoneer checkout), emails will be sent via webhook/success page after payment.
+        if (payment_status !== 'PENDING_PAYMENT') {
+          const emailResult = await sendBookingEmails({
+            booking_reference,
+            qr_voucher_code,
+            listing_title,
+            option_name,
+            slot_start_time,
+            total_travelers: Number(total_travelers) || 1,
+            gross_amount: Number(gross_amount) || 0,
+            currency: currency || 'USD',
+            payment_status: payment_status || 'PAID',
+            status: data.status,
+            confirmation_type: confirmation_type === 'MANUAL' ? 'MANUAL' : 'INSTANT',
+            pickup_time: pickup_time || '',
+            pickup_location: pickup_location || '',
+            dropoff_location: dropoff_location || '',
+            lead_name: lead_name || '',
+            lead_email: lead_email || '',
+            lead_phone: lead_phone || '',
+            special_requirements: special_requirements || '',
+            supplier_email: supplierEmail || '',
+            appUrl: process.env.APP_URL || 'https://www.vaitour.com',
+            newAccountCredentials: new_account_credentials ? {
+              email: new_account_credentials.email,
+              temporaryPassword: new_account_credentials.temporary_password,
+              loginUrl: new_account_credentials.login_url || (process.env.APP_URL || 'https://www.vaitour.com') + '/login'
+            } : undefined,
+          });
+          if (emailResult.errors.length > 0) {
+            console.warn('Booking email issues:', emailResult.errors.join('; '));
+          }
         }
 
         // Successfully saved to Supabase

@@ -887,7 +887,7 @@ useEffect(() => {
                     <input type="radio" name="payment_choice" checked={customerPaymentChoice === 'pay_later'} onChange={() => setCustomerPaymentChoice('pay_later')} style={{ width: '18px', height: '18px', accentColor: '#f59e0b' }} />
                     <span style={{ fontWeight: 700, color: '#92400e', fontSize: '1rem' }}>🕐 Pay After Tour</span>
                   </div>
-                  <div style={{ fontSize: '0.82rem', color: '#b45309', marginLeft: '28px' }}>Reserve your spot now — no payment required today. You will receive a secure payment link after your tour completes.</div>
+                  <div style={{ fontSize: '0.82rem', color: '#b45309', marginLeft: '28px' }}>Reserve your spot now — no payment required today. You can pay via cash or card after your tour completes.</div>
                   <div style={{ marginLeft: '28px', marginTop: '8px', padding: '6px 10px', background: '#fef3c7', borderRadius: '6px', fontSize: '0.78rem', color: '#92400e', fontWeight: 600 }}>⚠️ Booking is PENDING until payment received</div>
                 </label>
 
@@ -947,7 +947,7 @@ useEffect(() => {
                 </strong>
                 <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
                   {isPayAfterTour
-                    ? 'Your spot is reserved. After your tour is complete, you will receive a secure payment link via email to settle the balance.'
+                    ? 'Your spot is reserved. After your tour is complete, you can pay the full amount via cash or card directly to the guide/driver.'
                     : 'Your card details are not needed yet. We will send you a secure payment link 3 days before the experience.'}
                 </span>
               </div>
