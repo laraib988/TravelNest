@@ -349,12 +349,17 @@ export async function sendOtpEmail(email: string, otp_code: string): Promise<{ s
     return { success: false, error: 'Email is required' };
   }
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from,
       to: email,
       subject: 'Your Vaitour Verification Code',
       html: checkoutOtpHtml({ email, otp_code, appUrl }),
     });
+    
+    if (error) {
+      return { success: false, error: error.message || 'Resend API rejected the email' };
+    }
+    
     return { success: true };
   } catch (e: any) {
     return { success: false, error: e?.message || 'Failed to send OTP email' };
@@ -371,12 +376,13 @@ export async function sendBookingEmails(data: BookingEmailData): Promise<{ custo
   const customerEmail = data.lead_email;
   if (customerEmail) {
     try {
-      await resend.emails.send({
+      const { error } = await resend.emails.send({
         from,
         to: customerEmail,
         subject: `Booking Confirmed · ${data.booking_reference} · Vaitour`,
         html: customerBookingConfirmationHtml(data),
       });
+      if (error) errors.push(`Customer email failed: ${error.message}`);
     } catch (e: any) {
       errors.push(`Customer email failed: ${e?.message || 'unknown'}`);
     }
@@ -387,12 +393,13 @@ export async function sendBookingEmails(data: BookingEmailData): Promise<{ custo
   const supplierEmail = data.supplier_email;
   if (supplierEmail) {
     try {
-      await resend.emails.send({
+      const { error } = await resend.emails.send({
         from,
         to: supplierEmail,
         subject: `New Order Received · ${data.booking_reference} · Vaitour`,
         html: supplierNewOrderHtml(data),
       });
+      if (error) errors.push(`Supplier email failed: ${error.message}`);
     } catch (e: any) {
       errors.push(`Supplier email failed: ${e?.message || 'unknown'}`);
     }
