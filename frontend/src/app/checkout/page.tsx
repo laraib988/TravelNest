@@ -510,27 +510,47 @@ useEffect(() => {
   }
 
   if (confirmedBooking) {
+    const isPendingPayment = confirmedBooking.payment_status === 'PENDING_PAYMENT';
+    const isPendingApproval = confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL';
+    
+    // Determine title and colors based on state
+    let iconBg = '#d1fae5';
+    let iconColor = '#059669';
+    let title = 'Booking Confirmed!';
+    
+    if (isPendingPayment) {
+      iconBg = '#e0f2fe'; // blue-100
+      iconColor = '#0284c7'; // blue-600
+      title = 'Booking Reserved - Awaiting Payment';
+    } else if (isPendingApproval) {
+      iconBg = '#fef3c7'; // yellow-100
+      iconColor = '#d97706'; // yellow-600
+      title = 'Booking Submitted!';
+    }
+
     return (
       <div style={{ maxWidth: '800px', margin: '40px auto', padding: '0 24px', background: '#ffffff' }}>
         <div className="card-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '40px', border: '1px solid #cbd5e1', background: '#ffffff' }}>
-          <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '#fef3c7' : '#d1fae5', color: confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '#d97706' : '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-            <CheckCircle2 size={44} />
+          <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: iconBg, color: iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+             {isPendingPayment ? <Clock size={44} /> : <CheckCircle2 size={44} />}
           </div>
           <h1 style={{ fontSize: '2.2rem', marginBottom: '8px', color: '#0f172a', textAlign: 'center' }}>
-            {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? 'Booking Submitted!' : 'Booking Confirmed!'}
+            {title}
           </h1>
           <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '32px', textAlign: 'center' }}>
-            {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' 
-              ? 'Your booking request has been sent to the supplier. You will receive an email once it is approved.'
-              : <>Your electronic ticket has been dispatched to <strong>{confirmedBooking.traveler_details.lead_email}</strong>.</>}
+            {isPendingPayment 
+              ? <>Your spot is reserved. Please ensure you complete the payment on Payoneer to receive your electronic ticket.</>
+              : isPendingApproval 
+                ? 'Your booking request has been sent to the supplier. You will receive an email once it is approved.'
+                : <>Your electronic ticket has been dispatched to <strong>{confirmedBooking.traveler_details.lead_email}</strong>.</>}
           </p>
 
           {/* QR VOUCHER CARD */}
           <div style={{ background: '#f8fafc', padding: '30px', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', marginBottom: '32px' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '20px', marginBottom: '20px', gap: '16px' }}>
               <div>
-                <span className={confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"} style={{ marginBottom: '8px', display: 'inline-block' }}>
-                  {confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT BOOKING CONFIRMED'}
+                <span className={isPendingPayment ? "badge-info" : confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? "badge-warning" : "badge-emerald"} style={{ marginBottom: '8px', display: 'inline-block' }}>
+                  {isPendingPayment ? '⏳ AWAITING PAYMENT' : confirmedBooking.status === 'PENDING_SUPPLIER_APPROVAL' ? '⏳ PENDING SUPPLIER APPROVAL' : '⚡ INSTANT BOOKING CONFIRMED'}
                 </span>
                 <h2 style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: 800, marginBottom: '4px' }}>{tourTitle}</h2>
                 <h3 style={{ fontSize: '1.1rem', color: '#334155', fontWeight: 600, marginBottom: '8px' }}>Option: {confirmedBooking.option_name || 'Standard'}</h3>
@@ -544,7 +564,7 @@ useEffect(() => {
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--brand-primary)' }}>{confirmedBooking.booking_reference}</div>
               </div>
               <div>
-                <span style={{ color: 'var(--text-muted)' }}>Total Amount Paid:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{isPendingPayment ? 'Total Amount Due:' : 'Total Amount Paid:'}</span>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>{formatPrice(Number(confirmedBooking.gross_amount) || 0)}</div>
               </div>
               <div>

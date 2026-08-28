@@ -150,7 +150,7 @@ export default function Footer() {
               fontWeight: 600,
             }}
           >
-            © 2026 Vaitour Tours Powered by <strong style={{ color: '#ffffff' }}>Ebadah Group Co. Ltd</strong> Japan
+            © 2026 Vaitour Tours Japan. All rights reserved.
           </div>
 
         </div>
