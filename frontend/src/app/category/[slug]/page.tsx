@@ -101,20 +101,26 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
               gap: '24px' 
             }}>
-              {tours?.map((tour) => (
-                <Link href={`/en/tours/${tour.slug}`} key={tour.id} style={{ textDecoration: 'none' }}>
-                  <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+              {(tourSec.items && tourSec.items.length > 0 ? tourSec.items : tours)?.map((tour: any) => (
+                <Link href={tour.slug ? `/en/tours/${tour.slug}` : '#'} key={tour.id} style={{ textDecoration: 'none', cursor: tour.slug ? 'pointer' : 'default' }}>
+                  <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div style={{ height: '200px', position: 'relative' }}>
-                      <Image src={tour.hero_image || '/images/placeholder.jpg'} alt={tour.title} fill style={{ objectFit: 'cover' }} />
+                      <Image src={tour.image || tour.hero_image || '/images/placeholder.jpg'} alt={tour.title} fill style={{ objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', top: '12px', left: '12px', background: '#0284c7', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
-                        {tour.category || 'Tour'}
+                        {tour.category || 'Attraction'}
                       </div>
                     </div>
-                    <div style={{ padding: '16px' }}>
-                      <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tour.title}</h3>
-                      <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px' }}>📍 {tour.pickup_location || 'Various Locations'}</p>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
-                        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>From <strong style={{ fontSize: '1.1rem', color: '#0f172a' }}>{tour.currency || 'USD'} {tour.base_price}</strong></span>
+                    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                      <h3 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>{tour.title}</h3>
+                      {tour.pickup_location && <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px' }}>📍 {tour.pickup_location}</p>}
+                      {tour.description && <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px', flexGrow: 1 }}>{tour.description}</p>}
+                      
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '12px', marginTop: 'auto' }}>
+                        {tour.base_price ? (
+                          <span style={{ fontSize: '0.8rem', color: '#64748b' }}>From <strong style={{ fontSize: '1.1rem', color: '#0f172a' }}>{tour.currency || 'USD'} {tour.base_price}</strong></span>
+                        ) : (
+                          <span style={{ fontSize: '0.8rem', color: '#64748b' }}><strong style={{ fontSize: '1.1rem', color: '#0f172a' }}>View Only</strong></span>
+                        )}
                         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0284c7' }}>View Details &rarr;</span>
                       </div>
                     </div>

@@ -163,6 +163,23 @@ export default function ContentEditorPage() {
         <input style={inputStyle} value={form.tours_section.title} onChange={e => setForm({...form, tours_section: {...form.tours_section, title: e.target.value}})} />
         <label style={labelStyle}>Subtitle</label>
         <input style={inputStyle} value={form.tours_section.subtitle} onChange={e => setForm({...form, tours_section: {...form.tours_section, subtitle: e.target.value}})} />
+        
+        {/* Custom Items Preview */}
+        {form.tours_section.items && form.tours_section.items.length > 0 && (
+          <div style={{ marginTop: '24px' }}>
+            <label style={labelStyle}>Custom Items ({form.tours_section.items.length} Attractions Loaded)</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px', marginTop: '12px' }}>
+              {form.tours_section.items.map((item: any, i: number) => (
+                <div key={i} style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                  <img src={item.image} alt={item.title} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
+                  <div style={{ padding: '8px' }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={sectionStyle}>
