@@ -1,4 +1,4 @@
-"use client";
+ï»¿"use client";
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
@@ -145,9 +145,9 @@ export default function AttractionsFilterGrid({ items }: { items: ExtraSection[]
             <select value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', background: '#fff' }}>
               <option value="">Any Price</option>
               <option value="free">Free Entry</option>
-              <option value="under_3000">Under ¥3,000</option>
-              <option value="3000_6000">¥3,000 - ¥6,000</option>
-              <option value="over_6000">Over ¥6,000</option>
+              <option value="under_3000">Under Â¥3,000</option>
+              <option value="3000_6000">Â¥3,000 - Â¥6,000</option>
+              <option value="over_6000">Over Â¥6,000</option>
             </select>
           </div>
           
