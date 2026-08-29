@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import AttractionsFilterGrid from '@/components/AttractionsFilterGrid';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -51,8 +52,8 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         show_search_bar: true,
         background_image: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?q=80&w=2000'
       },
-      destinations_section: { show: true, title: 'Top Cities for Attractions' },
-      tours_section: { show: true, title: '', subtitle: '' },
+      destinations_section: { show: false, title: 'Top Cities for Attractions' },
+      tours_section: { show: false, title: '', subtitle: '' },
       extra_sections: [{ title: "Japan Travel Attractions & Places Guide", image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800', content: "<p>Welcome to our comprehensive guide to Japan's most spectacular theme parks, digital art museums, historic temples, and iconic observatories. Whether you are looking to skip the lines at world-renowned theme parks or explore cutting-edge immersive art, we have you covered.</p>" },
 { title: "1. Universal Studios Japan (USJ)", image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800', content: "<p><strong>Location:</strong> Osaka, Japan</p><p><strong>Overview & Highlights:</strong> Japan ke sab se mashhoor aur bade theme parks mein se ek, jahan realistic gaming aur animation worlds ko live experience kiya ja sakta hai.</p><ul><li><strong>Major Zones & Rides:</strong> Super Nintendo World, The Wizarding World of Harry Potter, Despicable Me Minion Mayhem, The Flying Dinosaur.</li><li><strong>Special Events:</strong> Seasonal Halloween Horror Nights, immersive horror mazes, aur special shows.</li></ul><p><strong>Entrance Fee:</strong> Approx. ¥8,600 - ¥10,400 (Varies by day)<br/><strong>Best Time to Visit:</strong> Spring (March-May) or Autumn (September-November)</p>" },
 { title: "2. Tokyo Disney Resort (Disneyland & DisneySea)", image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800', content: "<p><strong>Location:</strong> Tokyo / Chiba, Japan</p><p><strong>Overview & Highlights:</strong> World-class theme park resort jisme do bade alag-alag parks shaamil hain.</p><ul><li><strong>Tokyo Disneyland:</strong> World Bazaar, Adventureland, Westernland, Tomorrowland. Key Rides: 'it\\'s a small world', Beauty and the Beast.</li><li><strong>Tokyo DisneySea:</strong> Mediterranean Harbor, Arabian Coast, Fantasy Springs. Key Rides: Journey to the Center of the Earth, Soaring.</li></ul><p><strong>Entrance Fee:</strong> Approx. ¥7,900 - ¥10,900 (Varies by day)<br/><strong>Best Time to Visit:</strong> Spring (April-May) or Autumn (October-November)</p>" },
@@ -275,7 +276,10 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         </section>
       )}
 
-      {/* 4. EXTRA SECTIONS (PROFESSIONAL DESIGN) */}
+      {/* 4. EXTRA SECTIONS */}
+      {slug === 'attraction-tickets' ? (
+        <AttractionsFilterGrid items={extras} />
+      ) : (
         <section style={{ padding: '80px 20px', background: '#f8fafc' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '40px' }}>
@@ -318,6 +322,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
             </div>
           </div>
         </section>
+      )}
 
     </div>
   );
