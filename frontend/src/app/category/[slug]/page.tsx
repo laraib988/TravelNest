@@ -21,7 +21,56 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
     .eq('slug', slug)
     .single();
 
-  if (!pageData) {
+  const FALLBACK_PAGES: Record<string, any> = {
+    'tours-experiences': {
+      title: 'Tours & Experiences',
+      hero_section: {
+        heading: 'Discover Unforgettable Tours & Experiences',
+        subheading: 'Book the best local guides, sightseeing tours, and unique activities.',
+        show_search_bar: true,
+        background_image: 'https://images.unsplash.com/photo-1522083165195-3444ecd5244e?q=80&w=2000'
+      },
+      destinations_section: { show: true, title: 'Top Destinations for Experiences' },
+      tours_section: { show: true, title: 'Popular Tours & Experiences', subtitle: 'Handpicked activities for you' }
+    },
+    'attraction-tickets': {
+      title: 'Attraction Tickets',
+      hero_section: {
+        heading: 'Skip the Line: Attraction Tickets',
+        subheading: 'Book tickets to museums, theme parks, and historic landmarks instantly.',
+        show_search_bar: true,
+        background_image: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?q=80&w=2000'
+      },
+      destinations_section: { show: true, title: 'Top Cities for Attractions' },
+      tours_section: { show: true, title: 'Best Selling Tickets', subtitle: 'Book your entry today' }
+    },
+    'transport': {
+      title: 'Transport',
+      hero_section: {
+        heading: 'Trains, Buses & Transfers',
+        subheading: 'Reliable transport options to get you where you need to go.',
+        show_search_bar: true,
+        background_image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2000'
+      },
+      destinations_section: { show: false },
+      tours_section: { show: true, title: 'Transport Options', subtitle: 'Private transfers and public transit passes' }
+    },
+    'car-rentals': {
+      title: 'Car Rentals',
+      hero_section: {
+        heading: 'Car Rentals & Private Drivers',
+        subheading: 'Explore at your own pace with a rental car or hired private driver.',
+        show_search_bar: true,
+        background_image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2000'
+      },
+      destinations_section: { show: false },
+      tours_section: { show: true, title: 'Featured Vehicles', subtitle: 'Rentals and Private Charters' }
+    }
+  };
+
+  const finalPageData = pageData || FALLBACK_PAGES[slug];
+
+  if (!finalPageData) {
     notFound();
   }
 
@@ -39,10 +88,10 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
     .eq('status', 'PUBLISHED')
     .limit(16); // 4 rows
 
-  const hero = pageData.hero_section || {};
-  const destSec = pageData.destinations_section || {};
-  const tourSec = pageData.tours_section || {};
-  const extras = pageData.extra_sections || [];
+  const hero = finalPageData.hero_section || {};
+  const destSec = finalPageData.destinations_section || {};
+  const tourSec = finalPageData.tours_section || {};
+  const extras = finalPageData.extra_sections || [];
 
   return (
     <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
@@ -62,7 +111,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
       }}>
         <div style={{ textAlign: 'center', color: '#fff', padding: '0 20px', maxWidth: '800px', width: '100%' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '16px', textShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-            {hero.heading || pageData.title}
+            {hero.heading || finalPageData.title}
           </h1>
           {hero.subheading && (
             <p style={{ fontSize: '1.2rem', marginBottom: '32px', opacity: 0.9 }}>{hero.subheading}</p>
