@@ -528,6 +528,7 @@ export default function CreateListingPage() {
                       <option value="Cultural">Cultural Tour</option>
                       <option value="Adventure">Adventure</option>
                       <option value="Relaxation">Relaxation</option>
+                      <option value="Attraction Tickets">Attraction Tickets</option>
                     </select>
                   </div>
                   <div>
