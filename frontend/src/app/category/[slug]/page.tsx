@@ -321,26 +321,48 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
       )}
 
       {/* 4. EXTRA SECTIONS (PROFESSIONAL DESIGN) */}
-      {extras.map((sec: any, idx: number) => (
-        <section key={idx} style={{ 
-          padding: '80px 20px', 
-          background: idx % 2 === 0 ? '#f8fafc' : '#ffffff' 
-        }}>
-          <div style={{ 
-            maxWidth: '1000px', 
-            margin: '0 auto',
-            textAlign: idx % 2 === 0 ? 'center' : 'left'
-          }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px', letterSpacing: '-0.02em' }}>
-              {sec.title}
-            </h2>
-            <div 
-              style={{ fontSize: '1.1rem', lineHeight: 1.8, color: '#475569' }} 
-              dangerouslySetInnerHTML={{ __html: sec.content }} 
-            />
+        <section style={{ padding: '80px 20px', background: '#f8fafc' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '40px' }}>
+              {extras.map((sec: any, idx: number) => {
+                const isCard = sec.title.match(/^\d+\./) || sec.title.includes('Passes');
+                return (
+                  <div key={idx} style={{
+                    background: '#ffffff',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gridColumn: isCard ? 'span 1' : '1 / -1',
+                    marginBottom: isCard ? '0' : '20px'
+                  }}>
+                    {isCard && (
+                      <div style={{ position: 'relative', width: '100%', height: '250px' }}>
+                        <Image 
+                          src={sec.image || 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800'} 
+                          alt={sec.title}
+                          fill
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </div>
+                    )}
+                    <div style={{ padding: isCard ? '30px' : '40px' }}>
+                      <h2 style={{ fontSize: isCard ? '1.8rem' : '2.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '20px', letterSpacing: '-0.02em', textAlign: isCard ? 'left' : 'center' }}>
+                        {sec.title}
+                      </h2>
+                      <div 
+                        className="prose max-w-none"
+                        style={{ fontSize: '1.1rem', lineHeight: 1.8, color: '#475569', textAlign: isCard ? 'left' : 'center' }} 
+                        dangerouslySetInnerHTML={{ __html: sec.content }} 
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
-      ))}
 
     </div>
   );
