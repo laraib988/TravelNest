@@ -7,8 +7,11 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-pool.query('SELECT slug FROM dynamic_pages').then(res => {
-  console.log(res.rows);
+pool.query("SELECT * FROM pg_policies WHERE tablename = 'dynamic_pages'").then(res => {
+  console.log("Policies:", res.rows);
+  return pool.query("SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public' AND tablename = 'dynamic_pages'");
+}).then(res => {
+  console.log("RLS Enabled:", res.rows);
   pool.end();
 }).catch(err => {
   console.error(err);

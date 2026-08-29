@@ -277,10 +277,26 @@ export default async function Page({ params }: Props) {
     ]
   };
 
+  const faqSchema = mappedListing.faqs && mappedListing.faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: mappedListing.faqs.map((faq: any) => ({
+      '@type': 'Question',
+      name: faq.q || faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a || faq.answer
+      }
+    }))
+  } : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
       <TourDetailView initialTour={mappedListing} relevantProducts={relevantProducts} />
     </>
   );

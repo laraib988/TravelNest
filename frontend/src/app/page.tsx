@@ -46,7 +46,7 @@ export const revalidate = 3600;
 export default function Page() {
   const orgSchema = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': 'TravelAgency',
     name: 'Vaitour',
     url: 'https://www.vaitour.com',
     logo: 'https://www.vaitour.com/icon.png',
@@ -55,7 +55,17 @@ export default function Page() {
       'https://twitter.com/vaitour',
       'https://www.facebook.com/vaitour',
       'https://www.instagram.com/vaitour'
-    ]
+    ],
+    knowsAbout: [
+      'Japan Travel', 'Guided Tours', 'Experiences', 'Day Trips', 'Ticket Booking'
+    ],
+    areaServed: 'Worldwide',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      email: 'support@vaitour.com',
+      availableLanguage: ['English', 'Japanese', 'French', 'Arabic', 'Urdu']
+    }
   };
 
   const websiteSchema = {

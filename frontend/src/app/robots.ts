@@ -16,6 +16,11 @@ export default function robots(): MetadataRoute.Robots {
               '/*?*sort=', '/*?*session=', '/*?*duration=', '/*?*category=', '/*?*price=', '/*?*date=', '/*?*redirect='
             ] 
           },
+          // Dedicated rules for AI / LLM Crawlers (AEO/GEO optimization)
+          {
+            userAgent: ['OAI-SearchBot', 'ChatGPT-User', 'GoogleOther', 'anthropic-ai', 'PerplexityBot'],
+            allow: ['/tours/', '/destinations/', '/blog/', '/'],
+          }
         ]
       : [{ userAgent: '*', disallow: '/' }], // staging = fully blocked
     sitemap: 'https://www.vaitour.com/sitemap.xml',
