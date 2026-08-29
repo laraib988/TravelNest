@@ -193,12 +193,19 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
     .eq('is_published', true)
     .limit(6);
 
-  // Fetch some top tours for the grid/slider
-  const { data: tours } = await supabase
-    .from('products')
-    .select('*')
-    .eq('status', 'PUBLISHED')
-    .limit(16); // 4 rows
+    let query = supabase
+      .from('products')
+      .select('*')
+      .eq('status', 'PUBLISHED');
+
+    if (slug === 'attraction-tickets') {
+      query = query.eq('basic_info->>category', 'Attraction Tickets');
+    } else if (slug === 'tours-experiences') {
+      // e.g. you could filter by other categories, or leave as is
+      query = query.neq('basic_info->>category', 'Attraction Tickets');
+    }
+
+    const { data: tours } = await query.limit(24);
 
   const hero = finalPageData.hero_section || {};
   const destSec = finalPageData.destinations_section || {};
