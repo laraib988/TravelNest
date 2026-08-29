@@ -52,7 +52,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         background_image: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?q=80&w=2000'
       },
       destinations_section: { show: true, title: 'Top Cities for Attractions' },
-      tours_section: { show: true, title: 'Best Selling Tickets', subtitle: 'Book your entry today' },
+      tours_section: { show: true, title: '', subtitle: '' },
       extra_sections: [
         {
           title: 'Japan Travel Attractions & Places Guide',
@@ -264,7 +264,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
       {tourSec.show && (
         <section style={{ padding: '60px 20px', background: '#fff' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>{tourSec.title}</h2>
+            {tourSec.title && <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>{tourSec.title}</h2>}
             {tourSec.subtitle && <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '32px' }}>{tourSec.subtitle}</p>}
             
             <div style={{ 
