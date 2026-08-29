@@ -153,11 +153,25 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
               gap: '24px' 
             }}>
-              {(tourSec.items && tourSec.items.length > 0 ? tourSec.items : tours)?.map((tour: any) => (
+              {(tourSec.items && tourSec.items.length > 0 ? tourSec.items : tours)?.map((rawTour: any) => {
+                // Map the dynamic products table structure
+                const tour = {
+                  id: rawTour.id,
+                  slug: rawTour.id, // Using ID as slug based on current architecture
+                  title: rawTour.basic_info?.title || rawTour.title || 'Tour & Experience',
+                  image: rawTour.basic_info?.photos?.heroImage || rawTour.hero_image || '/images/placeholder.jpg',
+                  category: rawTour.basic_info?.sellingPoints || rawTour.category || 'Experience',
+                  pickup_location: rawTour.logistics?.pickupLocation || rawTour.pickup_location,
+                  description: rawTour.basic_info?.summary || rawTour.description,
+                  base_price: rawTour.transport_pricing?.[0]?.amount || rawTour.base_price,
+                  currency: rawTour.currency || 'USD'
+                };
+                
+                return (
                 <Link href={tour.slug ? `/en/tours/${tour.slug}` : '#'} key={tour.id} style={{ textDecoration: 'none', cursor: tour.slug ? 'pointer' : 'default' }}>
                   <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div style={{ height: '200px', position: 'relative' }}>
-                      <Image src={tour.image || tour.hero_image || '/images/placeholder.jpg'} alt={tour.title} fill style={{ objectFit: 'cover' }} />
+                      <Image src={tour.image} alt={tour.title} fill style={{ objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', top: '12px', left: '12px', background: '#0284c7', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                         {tour.category || 'Attraction'}
                       </div>
@@ -178,7 +192,8 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
                     </div>
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
