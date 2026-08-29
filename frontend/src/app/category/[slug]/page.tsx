@@ -31,7 +31,17 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         background_image: 'https://images.unsplash.com/photo-1522083165195-3444ecd5244e?q=80&w=2000'
       },
       destinations_section: { show: true, title: 'Top Destinations for Experiences' },
-      tours_section: { show: true, title: 'Popular Tours & Experiences', subtitle: 'Handpicked activities for you' }
+      tours_section: { show: true, title: 'Popular Tours & Experiences', subtitle: 'Handpicked activities for you' },
+      extra_sections: [
+        {
+          title: 'Why Book Your Tours & Experiences with Vaitour?',
+          content: '<p>When you book with Vaitour, you are connecting directly with verified local guides and top-rated tour operators. Whether you are looking for an authentic food walking tour in Tokyo, a breathtaking sunset cruise in Bali, or a cultural heritage walk in Kyoto, our platform ensures <strong>instant confirmation, secure payments, and free cancellation</strong> on most activities. Skip the tourist traps and discover the world through the eyes of a local.</p>'
+        },
+        {
+          title: 'How to Choose the Perfect Experience',
+          content: '<p>Planning your itinerary? We recommend mixing iconic landmark visits with off-the-beaten-path local experiences. Look for tours with small group sizes for a more personalized touch. Check the <em>"Inclusions"</em> on our product pages to see if hotel pickup, meals, or entrance fees are covered. With Vaitour\'s curated categories, finding the perfect half-day trip, full-day excursion, or multi-day adventure has never been easier.</p>'
+        }
+      ]
     },
     'attraction-tickets': {
       title: 'Attraction Tickets',
@@ -42,7 +52,17 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         background_image: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?q=80&w=2000'
       },
       destinations_section: { show: true, title: 'Top Cities for Attractions' },
-      tours_section: { show: true, title: 'Best Selling Tickets', subtitle: 'Book your entry today' }
+      tours_section: { show: true, title: 'Best Selling Tickets', subtitle: 'Book your entry today' },
+      extra_sections: [
+        {
+          title: 'Skip the Line and Save Time',
+          content: '<p>Don\'t waste your precious vacation hours waiting in long queues. By pre-booking your <strong>attraction tickets</strong> through Vaitour, you secure guaranteed entry to the world\'s most popular museums, theme parks, observation decks, and historical landmarks. Enjoy mobile ticketing and VIP fast-track access where available.</p>'
+        },
+        {
+          title: 'Top-Rated Attractions Worldwide',
+          content: '<p>From the magical worlds of Universal Studios Japan and Disneyland to the historic depths of the Colosseum and Louvre Museum, we partner directly with official ticket providers to bring you the best prices and combo deals. Secure your digital pass today and start exploring!</p>'
+        }
+      ]
     },
     'transport': {
       title: 'Transport',
@@ -53,7 +73,13 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         background_image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2000'
       },
       destinations_section: { show: false },
-      tours_section: { show: true, title: 'Transport Options', subtitle: 'Private transfers and public transit passes' }
+      tours_section: { show: true, title: 'Transport Options', subtitle: 'Private transfers and public transit passes' },
+      extra_sections: [
+        {
+          title: 'Seamless Airport Transfers & Rail Passes',
+          content: '<p>Navigating a new city can be stressful. Vaitour simplifies your journey by offering pre-booked <strong>airport transfers, bullet train (Shinkansen) tickets, and comprehensive city transport passes</strong>. Whether you need a private van for your family or a budget-friendly bus ticket, we have you covered from arrival to departure.</p>'
+        }
+      ]
     },
     'car-rentals': {
       title: 'Car Rentals',
@@ -64,7 +90,17 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
         background_image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2000'
       },
       destinations_section: { show: false },
-      tours_section: { show: true, title: 'Featured Vehicles', subtitle: 'Rentals and Private Charters' }
+      tours_section: { show: true, title: 'Featured Vehicles', subtitle: 'Rentals and Private Charters' },
+      extra_sections: [
+        {
+          title: 'Freedom to Explore at Your Own Pace',
+          content: '<p>Rent a car through Vaitour and unlock the ultimate road trip experience. Drive through the scenic countryside of Hokkaido, explore the rugged coastlines of Europe, or simply enjoy the convenience of a private vehicle in bustling metropolises. We offer a wide range of vehicles from compact cars to luxury SUVs.</p>'
+        },
+        {
+          title: 'Private Driver Charters',
+          content: '<p>Prefer to sit back and relax? Hire a <strong>private driver and charter service</strong>. Our professional, vetted local drivers will take you exactly where you want to go, offering insider tips along the way. Perfect for family groups, corporate travel, or customized full-day sightseeing itineraries.</p>'
+        }
+      ]
     }
   };
 
