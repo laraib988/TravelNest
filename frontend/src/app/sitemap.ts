@@ -1,4 +1,4 @@
-export const revalidate = 0; // Ensure sitemap is dynamically generated to include new blogs automatically
+export const revalidate = 3600; // Ensure sitemap is dynamically generated to include new blogs automatically
 
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';

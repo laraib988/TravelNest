@@ -10,8 +10,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 3600;
+
 
 export default async function CategoryDynamicPage({ params }: { params: { slug: string } }) {
   const { slug } = params;

@@ -10,7 +10,7 @@ export async function generateMetadata() {
 import TourSearchClient from './TourSearchClient';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default function Page() {
   return (
