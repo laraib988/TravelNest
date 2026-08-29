@@ -131,7 +131,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
           <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', marginBottom: '32px' }}>{destSec.title}</h2>
           <div style={{ display: 'flex', gap: '20px', overflowX: 'auto', paddingBottom: '20px', scrollSnapType: 'x mandatory' }}>
             {dests?.map(d => (
-              <Link href={`/en/destinations/${d.slug}`} key={d.id} style={{ minWidth: '200px', flex: '0 0 200px', scrollSnapAlign: 'start', position: 'relative', borderRadius: '16px', overflow: 'hidden', height: '250px', textDecoration: 'none' }}>
+              <Link href={`/destinations/${d.slug}`} key={d.id} style={{ minWidth: '200px', flex: '0 0 200px', scrollSnapAlign: 'start', position: 'relative', borderRadius: '16px', overflow: 'hidden', height: '250px', textDecoration: 'none' }}>
                 <Image src={d.hero_image || ''} alt={d.name} fill style={{ objectFit: 'cover' }} />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
                 <h3 style={{ position: 'absolute', bottom: '20px', left: '20px', color: '#fff', fontSize: '1.2rem', margin: 0, fontWeight: 700 }}>{d.name}</h3>
@@ -168,7 +168,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
                 };
                 
                 return (
-                <Link href={tour.slug ? `/en/tours/${tour.slug}` : '#'} key={tour.id} style={{ textDecoration: 'none', cursor: tour.slug ? 'pointer' : 'default' }}>
+                <Link href={tour.slug ? `/tours/${tour.slug}` : '#'} key={tour.id} style={{ textDecoration: 'none', cursor: tour.slug ? 'pointer' : 'default' }}>
                   <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div style={{ height: '200px', position: 'relative' }}>
                       <Image src={tour.image} alt={tour.title} fill style={{ objectFit: 'cover' }} />
