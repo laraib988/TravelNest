@@ -185,7 +185,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const fallbackArticleSchema = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': ['BlogPosting', 'TechArticle'],
     headline: blog.title,
     image: blog.hero_image ? [blog.hero_image] : [],
     datePublished: blog.published_at,
@@ -193,11 +193,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     url: `${APP_URL}/blog/${blog.slug}`,
     author: [{
       '@type': 'Person',
-      name: blog.author_name,
+      name: blog.author_name || 'Vaitour Team',
+      sameAs: [
+        'https://www.linkedin.com/in/vaitour-founder',
+        'https://github.com/vaitour',
+        'https://twitter.com/vaitour'
+      ]
     }],
     publisher: {
       '@type': 'Organization',
       name: 'Vaitour',
+      sameAs: [
+        'https://www.linkedin.com/company/vaitour',
+        'https://twitter.com/vaitour'
+      ],
       logo: {
         '@type': 'ImageObject',
         url: 'https://www.vaitour.com/icon.png'

@@ -54,8 +54,18 @@ export default function Page() {
     sameAs: [
       'https://twitter.com/vaitour',
       'https://www.facebook.com/vaitour',
-      'https://www.instagram.com/vaitour'
+      'https://www.instagram.com/vaitour',
+      'https://www.linkedin.com/company/vaitour'
     ],
+    founder: {
+      '@type': 'Person',
+      name: 'Vaitour Team',
+      sameAs: [
+        'https://www.linkedin.com/in/vaitour-founder', // placeholder
+        'https://github.com/vaitour',
+        'https://www.upwork.com/agencies/vaitour'
+      ]
+    },
     knowsAbout: [
       'Japan Travel', 'Guided Tours', 'Experiences', 'Day Trips', 'Ticket Booking'
     ],
