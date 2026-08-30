@@ -60,7 +60,7 @@ export default function SmartSearchBar({
 
     debounceRef.current = setTimeout(async () => {
       try {
-        const q = %\%;
+        const q = `%${query}%`;
         
         const [destRes, toursRes] = await Promise.all([
           supabase
@@ -105,7 +105,7 @@ export default function SmartSearchBar({
     if (!query.trim()) return;
     saveRecentSearch(query);
     setIsFocused(false);
-    router.push(/tours?search=\);
+    router.push(`/tours?search=${encodeURIComponent(query)}`);
   };
 
   const navigateTo = (url: string, term: string) => {
@@ -222,7 +222,7 @@ export default function SmartSearchBar({
                       {results.destinations.map(d => (
                         <button 
                           key={d.id}
-                          onClick={() => navigateTo(/destinations/\, d.name)}
+                          onClick={() => navigateTo(`/destinations/${d.slug}`, d.name)}
                           style={{ width: '100%', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                           onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
                           onMouseOut={(e) => e.currentTarget.style.background = 'none'}
@@ -249,7 +249,7 @@ export default function SmartSearchBar({
                         return (
                           <button 
                             key={t.id}
-                            onClick={() => navigateTo(/tours/\, title)}
+                            onClick={() => navigateTo(`/tours/${t.slug}`, title)}
                             style={{ width: '100%', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                             onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
                             onMouseOut={(e) => e.currentTarget.style.background = 'none'}
