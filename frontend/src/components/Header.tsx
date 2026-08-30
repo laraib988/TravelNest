@@ -30,6 +30,7 @@ ArrowRightLeft,
   X,
   Search
 } from 'lucide-react';
+import SmartSearchBar from './SmartSearchBar';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -177,38 +178,7 @@ export default function Header() {
           {/* CENTER: SEARCH BAR (NOT ON HOMEPAGE) */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', paddingLeft: '32px' }}>
             {cleanPath !== '' && (
-              <form 
-                action="/tours" 
-                method="get" 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  background: '#f1f5f9', 
-                  borderRadius: '100px', 
-                  padding: '6px 16px', 
-                  width: '100%', 
-                  maxWidth: '380px',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)'
-                }}
-              >
-                <input 
-                  type="text" 
-                  name="search" 
-                  placeholder="Search destinations or activities" 
-                  style={{ 
-                    flex: 1, 
-                    background: 'transparent', 
-                    border: 'none', 
-                    outline: 'none', 
-                    fontSize: '0.95rem', 
-                    color: '#0f172a' 
-                  }} 
-                />
-                <button type="submit" style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </button>
-              </form>
+              <SmartSearchBar style={{ maxWidth: '380px' }} />
             )}
           </div>
 
@@ -360,10 +330,7 @@ export default function Header() {
           {isMobileSearchOpen ? (
             <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '10px' }}>
                <button onClick={() => setIsMobileSearchOpen(false)} style={{ background: 'none', border: 'none', padding: '4px' }}><X size={24} color="#0f172a" /></button>
-               <form onSubmit={(e) => { e.preventDefault(); window.location.href = `/tours?search=${encodeURIComponent(mobileSearchQuery)}`; }} style={{ flex: 1, display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '6px 12px' }}>
-                  <input autoFocus type="text" value={mobileSearchQuery} onChange={e => setMobileSearchQuery(e.target.value)} placeholder="Search destinations, tours..." style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '0.95rem', color: '#0f172a' }} />
-                  <button type="submit" style={{ background: 'none', border: 'none', padding: 0, display: 'flex', alignItems: 'center' }}><Search size={18} color="#64748b" /></button>
-               </form>
+               <SmartSearchBar autoFocus={true} style={{ flex: 1 }} />
             </div>
           ) : (
             <>

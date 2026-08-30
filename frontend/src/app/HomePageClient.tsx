@@ -32,6 +32,7 @@ import {
   Train,
   Car
 } from 'lucide-react';
+import SmartSearchBar from '@/components/SmartSearchBar';
 import { fetchFromAPI } from '@/lib/api-client';
 import { useCurrency } from '@/context/CurrencyContext';
 import SortFilterDropdown, { SortOption } from '@/components/SortFilterDropdown';
@@ -314,20 +315,7 @@ export default function HomePage() {
               <span>{t('free_cancellation')}</span>
             </div>
 
-            <form onSubmit={handleSearch} className="hero-search-form" style={{ marginTop: '20px', borderRadius: 'var(--radius-pill)', padding: '6px 6px 6px 20px', display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '600px', background: '#ffffff', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)' }}>
-              <Search size={20} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
-              <input
-                type="text"
-                placeholder="e.g. Best time to visit Japan, Tokyo..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="hero-search-input"
-                style={{ flex: 1, background: 'transparent', border: 'none', color: '#0f172a', fontSize: '1rem', outline: 'none' }}
-              />
-              <button type="submit" disabled={searching} className="btn-primary hero-search-button" style={{ padding: '12px 28px', borderRadius: 'var(--radius-pill)', flexShrink: 0 }}>
-                {searching ? 'Searching...' : t('explore_now')}
-              </button>
-            </form>
+            <SmartSearchBar className="hero-search-form" placeholder="e.g. Best time to visit Japan, Tokyo..." style={{ marginTop: '20px', maxWidth: '600px', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)', flex: 1 }} inputStyle={{ padding: '6px' }} />
           </div>
         </div>
       </section>
