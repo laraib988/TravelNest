@@ -273,7 +273,7 @@ export default async function CategoryDynamicPage({ params }: { params: { slug: 
                 // Map the dynamic products table structure
                 const tour = {
                   id: rawTour.id,
-                  slug: rawTour.id, // Using ID as slug based on current architecture
+                  slug: rawTour.slug || `${(rawTour.basic_info?.title || rawTour.title || "Tour").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${rawTour.id}`,
                   title: rawTour.basic_info?.title || rawTour.title || 'Tour & Experience',
                   image: rawTour.basic_info?.photos?.heroImage || rawTour.hero_image || '/images/placeholder.jpg',
                   category: rawTour.basic_info?.sellingPoints || rawTour.category || 'Experience',

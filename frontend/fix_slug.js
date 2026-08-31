@@ -1,1 +1,9 @@
-const fs = require('fs'); let c = fs.readFileSync('src/app/blog/[slug]/page.tsx', 'utf8'); c = c.replace(import { notFound } from 'next/navigation';, import { notFound } from 'next/navigation';\nimport { headers } from 'next/headers';); c = c.replace(/export async function generateMetadata.*\\n.*\\n.*\\n.*/, export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {\n  const headersList = await headers();\n  const locale = headersList.get('x-locale') || 'en';\n  const { slug } = await params;\n  const blog = await getBlog(slug);\n  if (!blog) return { title: 'Blog not found' };); c = c.replace(/canonical: \\\\\$\\{APP_URL\\}\\/en\\/blog\\/\\$\\{blog.slug\\}\\\/, canonical: \\\\/\/blog/\\\\`); fs.writeFileSync('src/app/blog/[slug]/page.tsx', c);
+
+const fs = require("fs");
+let code = fs.readFileSync("src/app/category/[slug]/page.tsx", "utf8");
+code = code.replace(
+  "slug: rawTour.id, // Using ID as slug based on current architecture",
+  "slug: rawTour.slug || `${(rawTour.basic_info?.title || rawTour.title || \"Tour\").toLowerCase().replace(/[^a-z0-9]+/g, \"-\").replace(/(^-|-$)/g, \"\")}-${rawTour.id}`,"
+);
+fs.writeFileSync("src/app/category/[slug]/page.tsx", code);
+

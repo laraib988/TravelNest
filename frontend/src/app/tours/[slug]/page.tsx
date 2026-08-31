@@ -128,15 +128,19 @@ export default async function Page({ params }: Props) {
     supplierTotalReviews = count || 0;
   }
 
-  const relevantProducts = rawRelevant.map((rp: any) => ({
-    id: rp.id,
-    slug: rp.id,
-    title: rp.basic_info?.title || 'Tour',
-    images: rp.basic_info?.photos?.heroImage ? [{ url: rp.basic_info.photos.heroImage, alt: 'Cover' }] : [],
-    price: rp.transport_pricing?.[0]?.amount || 150,
-    cached_rating_avg: 5.0,
-    cached_review_count: 0
-  }));
+  const relevantProducts = rawRelevant.map((rp: any) => {
+    const rTitle = rp.basic_info?.title || 'Tour';
+    const rSlug = rTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return {
+      id: rp.id,
+      slug: rp.slug || `${rSlug}-${rp.id}`,
+      title: rTitle,
+      images: rp.basic_info?.photos?.heroImage ? [{ url: rp.basic_info.photos.heroImage, alt: 'Cover' }] : [],
+      price: rp.transport_pricing?.[0]?.amount || 150,
+      cached_rating_avg: 5.0,
+      cached_review_count: 0
+    };
+  });
 
   if (p.status !== 'PUBLISHED' && p.status !== 'APPROVED') {
     if (p.destination_id) {
@@ -192,7 +196,7 @@ export default async function Page({ params }: Props) {
     duration_text: p.transport_pricing?.[0]?.duration || '2 Hours',
     duration_minutes: 120,
     merchandising_badges: ['NEW'],
-    slug: p.id,
+    slug: p.slug || `${(p.basic_info?.title || p.title || 'Tour Experience').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${p.id}`,
     category_name: p.basic_info?.sellingPoints || p.basic_info?.category || 'Experiences',
     confirmation_type: p.logistics?.bookingType || 'Instant Confirmation',
     payment_option: p.logistics?.paymentOption || 'Pay Now',
