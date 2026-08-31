@@ -684,3 +684,35 @@ input:focus, select:focus, textarea:focus {
 .rte-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
 .rte-table th, .rte-table td { border: 1px solid #cbd5e1; padding: 8px; }
 .rte-table th { background-color: #f1f5f9; }
+
+/* Tiptap Editor & Global Table Styles */
+.ProseMirror table,
+.blog-content table {
+  border-collapse: collapse;
+  margin: 0;
+  overflow: hidden;
+  table-layout: fixed;
+  width: 100%;
+  margin-bottom: 24px;
+}
+.ProseMirror td,
+.ProseMirror th,
+.blog-content td,
+.blog-content th {
+  border: 1px solid #cbd5e1;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 8px 12px;
+  position: relative;
+  vertical-align: top;
+}
+.ProseMirror th,
+.blog-content th {
+  background-color: #f1f5f9;
+  font-weight: bold;
+  text-align: left;
+}
+.ProseMirror p {
+  margin: 0;
+}
+

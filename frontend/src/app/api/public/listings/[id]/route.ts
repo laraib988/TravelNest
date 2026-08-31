@@ -67,7 +67,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       duration_text: p.transport_pricing?.[0]?.duration || '2 Hours',
       duration_minutes: 120,
       merchandising_badges: ['NEW'],
-      slug: p.id,
+      slug: p.slug || `${(p.basic_info?.title || "Tour").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${p.id}`,
       category_name: p.basic_info?.sellingPoints || p.basic_info?.category || 'Experiences',
       confirmation_type: p.logistics?.bookingType || 'Instant Confirmation',
       payment_option: p.logistics?.paymentOption || 'Pay Now',
