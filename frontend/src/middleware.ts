@@ -131,7 +131,7 @@ export function middleware(request: NextRequest) {
   const redirectUrl = new URL(redirectPath, request.url);
   redirectUrl.search = request.nextUrl.search;
 
-  return NextResponse.redirect(redirectUrl);
+  return NextResponse.redirect(redirectUrl, 308);
 }
 
 export const config = {
