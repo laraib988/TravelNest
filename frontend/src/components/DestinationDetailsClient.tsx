@@ -257,7 +257,7 @@ export default function DestinationDetailsClient({ destination, relatedProducts,
         )}
 
         {/* SECTION 3.5: BEST TIME TO VISIT */}
-        {destination.best_time_to_visit && destination.best_time_to_visit.months.length > 0 && (
+        {destination.best_time_to_visit?.months?.length > 0 && (
           <section style={{ padding: '64px 0', borderTop: '1px solid #f1f5f9' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
               <Calendar size={22} color="#0284c7" />

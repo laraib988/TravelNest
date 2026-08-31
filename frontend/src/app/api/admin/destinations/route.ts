@@ -51,7 +51,7 @@ export async function GET() {
   try {
     const { data, error } = await getSupabase()
       .from('destinations')
-      .select('id, name, slug, country, hero_image, popular_activities_count, is_published, created_at, description')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {

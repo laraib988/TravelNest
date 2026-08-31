@@ -19,6 +19,10 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'unsplash.com' },
+      { protocol: 'https', hostname: 'plus.unsplash.com' },
+      { protocol: 'https', hostname: 'media.istockphoto.com' },
+      { protocol: 'https', hostname: 'encrypted-tbn0.gstatic.com' },
       { protocol: 'https', hostname: '*.cloudinary.com' },
       { protocol: 'https', hostname: 'ui-avatars.com' },
       { protocol: 'https', hostname: 'placehold.co' },
@@ -65,7 +69,7 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'geolocation=(self), camera=()' },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https://images.unsplash.com https://*.cloudinary.com https://*.tile.openstreetmap.org https://unpkg.com https://*.mapbox.com https://ui-avatars.com https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.frankfurter.app https://travelnest-backend.onrender.com https://*.onrender.com http://localhost:4000 https://cdn.jsdelivr.net;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https://images.unsplash.com https://unsplash.com https://plus.unsplash.com https://media.istockphoto.com https://encrypted-tbn0.gstatic.com https://*.cloudinary.com https://*.tile.openstreetmap.org https://unpkg.com https://*.mapbox.com https://ui-avatars.com https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://api.frankfurter.app https://travelnest-backend.onrender.com https://*.onrender.com http://localhost:4000 https://cdn.jsdelivr.net;",
           },
         ],
       },
